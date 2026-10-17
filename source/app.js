@@ -621,11 +621,13 @@ $("btnBrush").onclick=()=>setBrushing(!S.brushing);
 for(const id of ["rgFrom","rgTo"]) $(id).onchange=()=>{ const a=fromInput($("rgFrom").value), b=fromInput($("rgTo").value); if(isFinite(a)&&isFinite(b)) setSel(Math.min(a,b),Math.max(a,b)); else if(isFinite(a)) setSel(a,a) };
 
 /* Étape 3 : correction */
-document.querySelectorAll('input[name="op"]').forEach(r=>r.onchange=()=>{ const op=document.querySelector('input[name="op"]:checked').value; $("opValWrap").hidden=op==="interp"; $("opValLab").textContent=op==="decal"?"Décalage (mm, + ou −)":"Niveau (mm)" });
+document.querySelectorAll('input[name="op"]').forEach(r=>r.onchange=()=>{ const op=document.querySelector('input[name="op"]:checked').value; $("opValWrap").hidden=op==="interp"; $("opDir").hidden=op!=="decal"; $("opValLab").textContent=op==="decal"?(isM()?"Décalage (mm)":"Décalage (mm, + ou −)"):"Niveau (mm)" });
 $("btnCorr").onclick=()=>{
   if(!S.sel){ toast("Sélectionnez d'abord la période à corriger (étape 2)."); return }
   const op=document.querySelector('input[name="op"]:checked').value; let val=null;
-  if(op!=="interp"){ val=toNum($("opVal").value); if(!isFinite(val)){ toast("Indiquez la valeur en mm."); $("opVal").focus(); return } if(op==="fixe"&&val<0){ toast("Le niveau ne peut pas être négatif."); return } }
+  if(op!=="interp"){ val=toNum($("opVal").value.replace(/[−–]/g,"-"));
+    if(op==="decal"&&isM()&&isFinite(val)) val=Math.abs(val)*opDirSign; /* téléphone : sens choisi avec les boutons Monter / Descendre */
+    if(!isFinite(val)){ toast("Indiquez la valeur en mm."); $("opVal").focus(); return } if(op==="fixe"&&val<0){ toast("Le niveau ne peut pas être négatif."); return } }
   const {i0,i1}=S.sel, d=S.ds, n=i1-i0+1;
   const per=i0===i1?`${fmtDT(d.t[i0])}`:`${fmtD(d.t[i0])} ${fmtHM(d.t[i0])} → ${fmtD(d.t[i1])!==fmtD(d.t[i0])?fmtD(d.t[i1])+" ":""}${fmtHM(d.t[i1])}`;
   const what=op==="interp"?"niveau relié en ligne droite":op==="fixe"?`niveau fixé à ${nf(val,1)} mm`:`niveau décalé de ${val>0?"+":""}${nf(val,1)} mm`;
@@ -1588,6 +1590,8 @@ document.querySelectorAll("#mnav [data-mtab]").forEach(x=>x.onclick=()=>{ if(doc
 }
 addEventListener("popstate",()=>{ if(mPushed){ mPushed=false; if(S.view!=="home") setView("home") } });
 $("mBack").onclick=()=>setView("home");
+let opDirSign=1;
+document.querySelectorAll("#opDir [data-dir]").forEach(x=>x.onclick=()=>{ opDirSign=+x.dataset.dir; document.querySelectorAll("#opDir [data-dir]").forEach(y=>y.setAttribute("aria-pressed",y===x)) });
 document.addEventListener("click",e=>{ if(e.target.closest("[data-closecard]")){ $("anomCard").hidden=true; if(S.anomHover!=null){ S.anomHover=null; renderChart() } } });
 $("mFicheMore").onclick=()=>{ const o=document.body.classList.toggle("mfiche-open"); $("mFicheMore").setAttribute("aria-expanded",o); $("mFicheMore").textContent=o?"Moins de détails":"Détails de l'enregistrement" };
 $("mExcel").onclick=()=>$("btnExport").click();

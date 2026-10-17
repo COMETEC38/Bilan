@@ -314,7 +314,7 @@ tr.diff td:nth-child(3){font-weight:700}
 .modal-actions .help{margin-right:auto}
 
 /* ================= Version téléphone (écrans étroits uniquement ; PC et tablette inchangés) ================= */
-.mnav,.mexport,.mback,.mtitle,.mfiche-more,.msub,.mshow,.ad-close{display:none}
+.mnav,.mexport,.mback,.mtitle,.mfiche-more,.msub,.mshow,.ad-close,.mdir{display:none}
 @media (max-width:700px), (pointer:coarse) and (max-height:500px){
   body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px));-webkit-tap-highlight-color:transparent}
   body.nodata{padding-bottom:24px}
@@ -439,6 +439,9 @@ tr.diff td:nth-child(3){font-weight:700}
   .modal-actions{position:sticky;bottom:calc(-20px - env(safe-area-inset-bottom,0px));background:var(--surface);padding:10px 0 4px}
   .modal-actions .btn{flex:1;justify-content:center;min-height:46px}
   .anomcard{position:fixed!important;left:8px!important;right:8px!important;top:auto!important;bottom:calc(80px + env(safe-area-inset-bottom,0px))!important;width:auto!important;max-height:48vh;overflow:auto;border-radius:14px;z-index:55}
+  .mdir:not([hidden]){display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .mdir button{min-height:46px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;font-weight:700;font-size:15px;cursor:pointer}
+  .mdir button[aria-pressed="true"]{border-color:var(--brand);background:var(--brand-soft);color:var(--brand)}
   .ad-close{display:flex;align-items:center;justify-content:center;position:sticky;top:0;float:right;width:36px;height:36px;margin:-6px -6px 0 6px;border:none;border-radius:18px;background:var(--surface-2);color:var(--ink);font-size:22px;line-height:1;cursor:pointer;z-index:1}
   .tour{bottom:calc(84px + env(safe-area-inset-bottom,0px))!important}
   .toast{bottom:calc(88px + env(safe-area-inset-bottom,0px))}
@@ -636,6 +639,7 @@ tr.diff td:nth-child(3){font-weight:700}
             <label><input type="radio" name="op" value="fixe"> <span>Remplacer par une valeur fixe</span></label>
             <label><input type="radio" name="op" value="decal"> <span>Décaler le niveau (+ ou −)</span></label>
           </div>
+          <div class="mdir" id="opDir" hidden role="group" aria-label="Sens du décalage"><button type="button" data-dir="1" aria-pressed="true">▲ Monter (+)</button><button type="button" data-dir="-1" aria-pressed="false">▼ Descendre (−)</button></div>
           <label class="field" id="opValWrap" hidden><span id="opValLab">Niveau (mm)</span><input id="opVal" inputmode="decimal"></label>
           <button class="btn primary" id="btnCorr" type="button">Appliquer la correction</button>
           <details id="gridDetails"><summary>Modifier mesure par mesure</summary>

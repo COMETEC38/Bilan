@@ -314,7 +314,7 @@ tr.diff td:nth-child(3){font-weight:700}
 .modal-actions .help{margin-right:auto}
 
 /* ================= Version téléphone (écrans étroits uniquement ; PC et tablette inchangés) ================= */
-.mnav,.mexport,.mback,.mtitle,.mfiche-more,.msub,.mshow,.ad-close{display:none}
+.mnav,.mexport,.mback,.mtitle,.mfiche-more,.msub,.mshow,.ad-close,.mdir{display:none}
 @media (max-width:700px), (pointer:coarse) and (max-height:500px){
   body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px));-webkit-tap-highlight-color:transparent}
   body.nodata{padding-bottom:24px}
@@ -439,6 +439,9 @@ tr.diff td:nth-child(3){font-weight:700}
   .modal-actions{position:sticky;bottom:calc(-20px - env(safe-area-inset-bottom,0px));background:var(--surface);padding:10px 0 4px}
   .modal-actions .btn{flex:1;justify-content:center;min-height:46px}
   .anomcard{position:fixed!important;left:8px!important;right:8px!important;top:auto!important;bottom:calc(80px + env(safe-area-inset-bottom,0px))!important;width:auto!important;max-height:48vh;overflow:auto;border-radius:14px;z-index:55}
+  .mdir:not([hidden]){display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .mdir button{min-height:46px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;font-weight:700;font-size:15px;cursor:pointer}
+  .mdir button[aria-pressed="true"]{border-color:var(--brand);background:var(--brand-soft);color:var(--brand)}
   .ad-close{display:flex;align-items:center;justify-content:center;position:sticky;top:0;float:right;width:36px;height:36px;margin:-6px -6px 0 6px;border:none;border-radius:18px;background:var(--surface-2);color:var(--ink);font-size:22px;line-height:1;cursor:pointer;z-index:1}
   .tour{bottom:calc(84px + env(safe-area-inset-bottom,0px))!important}
   .toast{bottom:calc(88px + env(safe-area-inset-bottom,0px))}
@@ -636,6 +639,7 @@ tr.diff td:nth-child(3){font-weight:700}
             <label><input type="radio" name="op" value="fixe"> <span>Remplacer par une valeur fixe</span></label>
             <label><input type="radio" name="op" value="decal"> <span>Décaler le niveau (+ ou −)</span></label>
           </div>
+          <div class="mdir" id="opDir" hidden role="group" aria-label="Sens du décalage"><button type="button" data-dir="1" aria-pressed="true">▲ Monter (+)</button><button type="button" data-dir="-1" aria-pressed="false">▼ Descendre (−)</button></div>
           <label class="field" id="opValWrap" hidden><span id="opValLab">Niveau (mm)</span><input id="opVal" inputmode="decimal"></label>
           <button class="btn primary" id="btnCorr" type="button">Appliquer la correction</button>
           <details id="gridDetails"><summary>Modifier mesure par mesure</summary>
@@ -705,7 +709,7 @@ tr.diff td:nth-child(3){font-weight:700}
     <button type="button" data-mtab="volumes"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 20V11M12 20V5M18 20v-7"/></svg></span>Volumes</button>
     <button type="button" data-mtab="export"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 20h16"/></svg></span>Exporter</button>
   </nav>
-  <footer>COMETEC · Instrumentation des eaux · ZA de Longifan, 38530 Chapareillan · COMETEC Bilan version 2.0.0</footer>
+  <footer>COMETEC · Instrumentation des eaux · ZA de Longifan, 38530 Chapareillan · COMETEC Bilan version 2.0.1</footer>
 </div>
 <div class="modal" id="reportModal" hidden role="dialog" aria-modal="true" aria-labelledby="t-report">
   <form class="modal-box" id="reportForm">
@@ -1869,11 +1873,13 @@ $("btnBrush").onclick=()=>setBrushing(!S.brushing);
 for(const id of ["rgFrom","rgTo"]) $(id).onchange=()=>{ const a=fromInput($("rgFrom").value), b=fromInput($("rgTo").value); if(isFinite(a)&&isFinite(b)) setSel(Math.min(a,b),Math.max(a,b)); else if(isFinite(a)) setSel(a,a) };
 
 /* Étape 3 : correction */
-document.querySelectorAll('input[name="op"]').forEach(r=>r.onchange=()=>{ const op=document.querySelector('input[name="op"]:checked').value; $("opValWrap").hidden=op==="interp"; $("opValLab").textContent=op==="decal"?"Décalage (mm, + ou −)":"Niveau (mm)" });
+document.querySelectorAll('input[name="op"]').forEach(r=>r.onchange=()=>{ const op=document.querySelector('input[name="op"]:checked').value; $("opValWrap").hidden=op==="interp"; $("opDir").hidden=op!=="decal"; $("opValLab").textContent=op==="decal"?(isM()?"Décalage (mm)":"Décalage (mm, + ou −)"):"Niveau (mm)" });
 $("btnCorr").onclick=()=>{
   if(!S.sel){ toast("Sélectionnez d'abord la période à corriger (étape 2)."); return }
   const op=document.querySelector('input[name="op"]:checked').value; let val=null;
-  if(op!=="interp"){ val=toNum($("opVal").value); if(!isFinite(val)){ toast("Indiquez la valeur en mm."); $("opVal").focus(); return } if(op==="fixe"&&val<0){ toast("Le niveau ne peut pas être négatif."); return } }
+  if(op!=="interp"){ val=toNum($("opVal").value.replace(/[−–]/g,"-"));
+    if(op==="decal"&&isM()&&isFinite(val)) val=Math.abs(val)*opDirSign; /* téléphone : sens choisi avec les boutons Monter / Descendre */
+    if(!isFinite(val)){ toast("Indiquez la valeur en mm."); $("opVal").focus(); return } if(op==="fixe"&&val<0){ toast("Le niveau ne peut pas être négatif."); return } }
   const {i0,i1}=S.sel, d=S.ds, n=i1-i0+1;
   const per=i0===i1?`${fmtDT(d.t[i0])}`:`${fmtD(d.t[i0])} ${fmtHM(d.t[i0])} → ${fmtD(d.t[i1])!==fmtD(d.t[i0])?fmtD(d.t[i1])+" ":""}${fmtHM(d.t[i1])}`;
   const what=op==="interp"?"niveau relié en ligne droite":op==="fixe"?`niveau fixé à ${nf(val,1)} mm`:`niveau décalé de ${val>0?"+":""}${nf(val,1)} mm`;
@@ -2836,6 +2842,8 @@ document.querySelectorAll("#mnav [data-mtab]").forEach(x=>x.onclick=()=>{ if(doc
 }
 addEventListener("popstate",()=>{ if(mPushed){ mPushed=false; if(S.view!=="home") setView("home") } });
 $("mBack").onclick=()=>setView("home");
+let opDirSign=1;
+document.querySelectorAll("#opDir [data-dir]").forEach(x=>x.onclick=()=>{ opDirSign=+x.dataset.dir; document.querySelectorAll("#opDir [data-dir]").forEach(y=>y.setAttribute("aria-pressed",y===x)) });
 document.addEventListener("click",e=>{ if(e.target.closest("[data-closecard]")){ $("anomCard").hidden=true; if(S.anomHover!=null){ S.anomHover=null; renderChart() } } });
 $("mFicheMore").onclick=()=>{ const o=document.body.classList.toggle("mfiche-open"); $("mFicheMore").setAttribute("aria-expanded",o); $("mFicheMore").textContent=o?"Moins de détails":"Détails de l'enregistrement" };
 $("mExcel").onclick=()=>$("btnExport").click();
