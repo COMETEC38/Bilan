@@ -553,7 +553,7 @@ tr.diff td:nth-child(3){font-weight:700}
     </section>
   </div>
   </div>
-  <footer>COMETEC · Instrumentation des eaux · ZA de Longifan, 38530 Chapareillan · COMETEC Bilan version 1.9.0</footer>
+  <footer>COMETEC · Instrumentation des eaux · ZA de Longifan, 38530 Chapareillan · COMETEC Bilan version 1.9.1</footer>
 </div>
 <div class="modal" id="reportModal" hidden role="dialog" aria-modal="true" aria-labelledby="t-report">
   <form class="modal-box" id="reportForm">
@@ -2600,23 +2600,24 @@ $("btnDemoLab").onclick=()=>{ const L=DEMO.lab; Object.assign(S.lab.c,{dco:L.dco
 
 /* Visite guidée : 4 bulles, au premier lancement de la démo, rejouable depuis le bandeau */
 const TOUR=[
-  {el:"actDiag",title:"Diagnostic du bilan",text:"Le diagnostic a repéré 4 anomalies : canne bouchée, canne hors de l'eau, une mesure à 0 et un niveau figé la nuit, invisible à l'œil. Ouvrez-le pour les voir sur la courbe et les réparer d'un clic."},
   {el:"actLevels",title:"Corriger des niveaux",text:"La table H/Q de SITE TEST est déjà chargée et validée. Repérez le pic parasite à 140 mm vers 06:00, sélectionnez-le sur la courbe et reliez-le en ligne droite."},
   {el:"actLaw",title:"Changer la loi hauteur/débit",text:"Cliquez sur « Utiliser la loi de démonstration » : tout le bilan est recalculé avec la nouvelle loi. Les charges polluantes ont aussi des analyses d'exemple prêtes à l'emploi."},
-  {el:"btnExport",title:"Exporter",text:"Exportez l'Excel complet (graphiques, anomalies, corrections, journal) ou le rapport PDF prêt à remettre. Les exports de démonstration sont marqués comme tels."}];
+  {el:"actDiag",title:"Diagnostic du bilan",text:"Le diagnostic a repéré 4 anomalies : canne bouchée, canne hors de l'eau, une mesure à 0 et un niveau figé la nuit, invisible à l'œil. Ouvrez-le pour les voir sur la courbe et les réparer d'un clic."},
+  {el:["btnExport","btnReport"],title:"Exporter en Excel et rapport PDF",text:"Exportez l'Excel complet (graphiques, anomalies, corrections, journal) ou le rapport PDF prêt à remettre. Les exports de démonstration sont marqués comme tels."}];
+const tourEls=st=>[].concat(st.el).map(id=>$(id)).filter(Boolean);
 let tourI=-1;
 function startTour(){ if(!S.ds) return; setView("home"); tourI=-1; nextTour() }
-function nextTour(){ $(TOUR[tourI]?.el)?.classList.remove("tour-target"); tourI++; if(tourI>=TOUR.length) return endTour(true); showTour() }
+function nextTour(){ document.querySelectorAll(".tour-target").forEach(x=>x.classList.remove("tour-target")); tourI++; if(tourI>=TOUR.length) return endTour(true); showTour() }
 function showTour(){
-  const st=TOUR[tourI], el=$(st.el), box=$("tour");
+  const st=TOUR[tourI], els=tourEls(st), el=els[0], box=$("tour");
   $("tourStep").textContent=`Visite guidée · ${tourI+1} / ${TOUR.length}`; $("tourTitle").textContent=st.title; $("tourText").textContent=st.text;
   $("tourNext").textContent=tourI===TOUR.length-1?"Terminer":"Suivant";
-  document.querySelectorAll(".tour-target").forEach(x=>x.classList.remove("tour-target")); el.classList.add("tour-target");
+  document.querySelectorAll(".tour-target").forEach(x=>x.classList.remove("tour-target")); els.forEach(x=>x.classList.add("tour-target"));
   el.scrollIntoView({block:"center",behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"});
   box.hidden=false; setTimeout(placeTour,380); placeTour(); $("tourNext").focus({preventScroll:true});
 }
 function placeTour(){
-  if(tourI<0||$("tour").hidden) return; const el=$(TOUR[tourI].el), box=$("tour"), r=el.getBoundingClientRect(), w=box.offsetWidth, h=box.offsetHeight, vw=innerWidth, vh=innerHeight;
+  if(tourI<0||$("tour").hidden) return; const rs=tourEls(TOUR[tourI]).map(x=>x.getBoundingClientRect()), box=$("tour"), r={left:Math.min(...rs.map(q=>q.left)),top:Math.min(...rs.map(q=>q.top)),bottom:Math.max(...rs.map(q=>q.bottom))}; r.height=r.bottom-r.top; const w=box.offsetWidth, h=box.offsetHeight, vw=innerWidth, vh=innerHeight;
   if(vw<=700) return; // sur mobile : bulle fixée en bas de l'écran (CSS)
   let left=r.left-w-16, top=r.top+r.height/2-h/2;                         // à gauche de l'élément
   if(left<12){ left=Math.min(Math.max(12,r.left),vw-w-12); top=r.bottom+12; if(top+h>vh-12) top=r.top-h-12 } // sinon dessous ou dessus
