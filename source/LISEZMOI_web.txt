@@ -1,0 +1,29 @@
+COMETEC Bilan – version web installable
+=======================================
+
+À l'attention de la personne qui gère le site cometec.fr.
+
+1. Où déposer les fichiers
+   Copier tout le contenu de ce dossier (index.html, manifest.webmanifest, sw.js et le dossier icons)
+   dans un sous-dossier du site, par exemple :  https://www.cometec.fr/bilan/
+   Les fichiers doivent rester ensemble, dans la même arborescence.
+
+2. Conditions
+   - Le site doit être en HTTPS (obligatoire pour l'installation et le mode hors ligne).
+   - Aucun serveur d'application, aucune base de données : ce sont des fichiers statiques.
+   - Si possible, servir manifest.webmanifest avec le type « application/manifest+json »
+     (la plupart des hébergeurs le font déjà).
+   - Ne pas mettre sw.js en cache longue durée côté serveur (en-tête Cache-Control: no-cache),
+     pour que les mises à jour arrivent rapidement chez les utilisateurs.
+
+3. Vérification
+   Ouvrir https://www.cometec.fr/bilan/ dans Edge ou Chrome sur un PC :
+   un bouton « Installer l'application » apparaît en haut de la page, et une icône d'installation
+   dans la barre d'adresse.
+
+4. Mises à jour
+   Remplacer simplement les fichiers par la nouvelle version. Les utilisateurs la reçoivent
+   automatiquement à la prochaine ouverture de l'application avec une connexion Internet.
+
+Confidentialité : les fichiers de bilan ouverts par les utilisateurs sont traités dans leur navigateur
+et ne sont jamais envoyés au site.

@@ -1,0 +1,19 @@
+{
+  "name": "bulr2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "echarts": "^5.5.1",
+    "exceljs": "^4.4.0",
+    "jspdf": "^2.5.1",
+    "jszip": "^3.10.1",
+    "playwright": "^1.47.2"
+  }
+}

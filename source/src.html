@@ -1,0 +1,571 @@
+<title>COMETEC Bilan</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Mise en page : en-tête logo + filet rouge (charte des fiches COMETEC), fiche du bilan, puis graphique large + panneau « Loi H/Q » à droite, volumes et journal en dessous. */
+:root{
+  --bg:#F2F5F5; --surface:#FFFFFF; --surface-2:#E9F0F0; --ink:#122B2B; --ink-2:#456161; --muted:#6F8787;
+  --line:#D2DDDD; --brand:#1A4D4D; --brand-soft:#CCDCDC; --rule:#E3000B; --on-brand:#FFFFFF;
+  --s-new:#00919B; --s-orig:#C85A10; --s-level:#1A4D4D; --grid:#E3EAEA;
+  --warn-bg:#FFF3E2; --warn-ink:#8A4700; --ok-ink:#1D6B47; --ok-bg:#E6F4EC; --ko-bg:#FDECEC; --ko-ink:#A3191F; --corr:#E39B1B; --focus:#00919B;
+  --an-red:#D23B42; --an-orange:#DB7A16; --an-grey:#7D8F8F; --beta-bg:#FFE38A; --beta-ink:#6B4A00;
+  --f-display:"Gill Sans MT","Gill Sans","Gill Sans Nova",Calibri,"Trebuchet MS",sans-serif;
+  --f-body:Arial,"Liberation Sans",Helvetica,sans-serif;
+  --r:6px; --logo-plate:transparent; --logo-pad:0;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E1818; --surface:#142222; --surface-2:#1B2D2D; --ink:#E4EEEE; --ink-2:#A6BDBD; --muted:#7D9494;
+  --line:#284040; --brand:#8CC3C3; --brand-soft:#21393A; --rule:#FF4A52; --on-brand:#0E1818;
+  --s-new:#0FA3AB; --s-orig:#DE6F22; --s-level:#9CC9C9; --grid:#203434;
+  --warn-bg:#3A2A12; --warn-ink:#FFC57E; --ok-ink:#7FD3A8; --ok-bg:#15352A; --ko-bg:#3F1C1E; --ko-ink:#FF9EA2; --corr:#F0A92E; --focus:#0FA3AB; --an-red:#FF6B72; --an-orange:#F5A04A; --an-grey:#9AB0B0; --beta-bg:#5A4510; --beta-ink:#FFD866; --logo-plate:#FFFFFF; --logo-pad:6px 12px; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1818; --surface:#142222; --surface-2:#1B2D2D; --ink:#E4EEEE; --ink-2:#A6BDBD; --muted:#7D9494;
+  --line:#284040; --brand:#8CC3C3; --brand-soft:#21393A; --rule:#FF4A52; --on-brand:#0E1818;
+  --s-new:#0FA3AB; --s-orig:#DE6F22; --s-level:#9CC9C9; --grid:#203434;
+  --warn-bg:#3A2A12; --warn-ink:#FFC57E; --ok-ink:#7FD3A8; --ok-bg:#15352A; --ko-bg:#3F1C1E; --ko-ink:#FF9EA2; --corr:#F0A92E; --focus:#0FA3AB; --an-red:#FF6B72; --an-orange:#F5A04A; --an-grey:#9AB0B0; --beta-bg:#5A4510; --beta-ink:#FFD866; --logo-plate:#FFFFFF; --logo-pad:6px 12px; color-scheme:dark}
+
+*{box-sizing:border-box}
+html,body{background:var(--bg)}
+body{color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 32px}
+.wrap{max-width:1360px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+
+/* En-tête */
+header.top{display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px;padding-block:18px 14px;border-bottom:1.5px solid var(--rule)}
+.logo{display:block;height:92px;width:auto;max-width:70vw;object-fit:contain;background:var(--logo-plate);border-radius:10px;padding:var(--logo-pad);box-sizing:content-box}
+@media (max-width:600px){.logo{height:64px}}
+.appname{display:flex;align-items:center;gap:14px;margin-right:auto;min-width:0}
+.appicon{width:58px;height:58px;flex:none;filter:drop-shadow(0 2px 6px rgba(18,43,43,.12))}
+@media (max-width:600px){.appicon{width:44px;height:44px}}
+.apptitle{display:flex;flex-direction:column;gap:2px;min-width:0}
+.apptitle h1{margin:0;font-family:var(--f-display);font-weight:600;font-size:28px;letter-spacing:.02em;line-height:1.1;color:var(--brand);text-wrap:balance}
+.apptitle>span{color:var(--ink-2);font-size:14px}
+.apptitle>span b{color:var(--ink);font-weight:700;letter-spacing:.02em}
+.apptitle h1 .prod{color:var(--rule);font-weight:600}
+.actions{display:flex;flex-wrap:wrap;gap:8px}
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);border-radius:var(--r);padding:7px 12px;cursor:pointer;font-weight:600;font-size:13px}
+.btn:hover{border-color:var(--brand)}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:var(--on-brand)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn svg{width:16px;height:16px;flex:none}
+.btn.small{padding:4px 9px;font-size:12px}
+.link{background:none;border:none;color:var(--brand);text-decoration:underline;cursor:pointer;padding:0;font-size:13px}
+
+/* Fiche du bilan */
+.fiche{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.fiche div{background:var(--surface);padding:8px 12px;min-width:0}
+.fiche dt{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0}
+.fiche dd{margin:2px 0 0;font-weight:600;overflow-wrap:anywhere}
+#content{width:100%}
+.empty{display:flex;flex-direction:column;align-items:center;gap:22px;padding-block:28px 8px}
+.dropzone{position:relative;width:100%;max-width:880px;min-height:340px;display:flex;align-items:center;justify-content:center;border:2px dashed color-mix(in srgb,var(--brand) 55%,transparent);border-radius:14px;background:var(--surface);overflow:hidden;cursor:pointer}
+.dropzone:hover,.dropzone.over{border-color:var(--brand);background:color-mix(in srgb,var(--brand-soft) 35%,var(--surface))}
+.dropzone.over .dz-icon{transform:translateY(-4px)}
+.trace{position:absolute;left:0;right:0;bottom:0;width:100%;height:24%;pointer-events:none}
+.trace-line{fill:none;stroke:var(--s-new);stroke-width:1.6;opacity:.35;vector-effect:non-scaling-stroke}
+.trace-fill{fill:var(--s-new);opacity:.06}
+.dz-inner{position:relative;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;padding:40px 20px 110px}
+.dz-icon{width:56px;height:56px;color:var(--brand)}
+@media (prefers-reduced-motion:no-preference){.dz-icon{transition:transform .2s}}
+.dz-inner h2{margin:6px 0 0;font-family:var(--f-display);font-size:clamp(24px,3.4vw,32px);font-weight:600;color:var(--ink);letter-spacing:.005em;text-wrap:balance}
+.dz-inner p{margin:0;color:var(--ink-2);font-size:15px}
+.btn.big{padding:11px 22px;font-size:15px;margin-top:8px}
+.dz-err ul{margin:6px 0 0;padding-left:18px;text-align:left}
+.filerr{max-width:none}
+.filerr .link{margin-left:10px}
+.dz-err{color:var(--warn-ink)!important;background:var(--warn-bg);border-radius:var(--r);padding:8px 12px;font-size:13px!important;max-width:52ch}
+.promise{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;width:100%;max-width:880px}
+@media (max-width:720px){.promise{grid-template-columns:minmax(0,1fr)}}
+.promise li{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--ink-2);padding:12px 14px;border-top:1px solid var(--rule)}
+.promise svg{width:20px;height:20px;flex:none;color:var(--brand);margin-top:1px}
+.promise b{color:var(--ink)}
+.private{display:flex;align-items:center;gap:8px;margin:0;font-size:12px;color:var(--muted)}
+.private svg{width:14px;height:14px}
+[hidden]{display:none!important}
+.intro{border:1.5px dashed var(--brand);border-radius:var(--r);padding:10px 14px;background:var(--surface);font-size:13px;color:var(--ink-2)}
+.intro b{color:var(--ink)}
+.badge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:2px 7px;border-radius:999px;background:var(--brand-soft);color:var(--brand);vertical-align:middle;margin-left:6px}
+
+/* Chiffres clés */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.kpi .lab{font-size:12px;color:var(--ink-2)}
+.kpi .val{font-family:var(--f-display);font-size:26px;font-weight:600;line-height:1.1}
+.kpi .val small{font-family:var(--f-body);font-size:13px;font-weight:400;color:var(--ink-2)}
+.kpi .sub{font-size:12px;color:var(--muted)}
+.delta{font-weight:700}
+.alert{display:flex;gap:10px;align-items:flex-start;background:var(--warn-bg);color:var(--warn-ink);border-radius:var(--r);padding:10px 12px;font-size:13px}
+.alert b{font-weight:700}
+
+/* Rubriques : titre entre deux filets rouges, comme sur les fiches COMETEC */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;min-width:0;display:flex;flex-direction:column;gap:12px}
+.rubrique{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:5px 2px}
+.rubrique h2{margin:0;font-size:14px;font-weight:700;letter-spacing:.02em}
+.rubrique .hint{font-size:12px;color:var(--muted)}
+
+.main{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:16px;align-items:start}
+@media (max-width:1000px){.main{grid-template-columns:minmax(0,1fr)}}
+@media (min-width:1001px){.main>section.card{position:sticky;top:12px}}
+#chart{width:100%;height:520px}
+@media (max-width:600px){#chart{height:440px}}
+.chart-tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:12px;color:var(--ink-2)}
+.legend{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-right:auto}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{display:inline-block;width:22px;height:0;border-top:2.5px solid}
+.sw.dash{border-top-style:dashed}
+
+/* Panneau loi H/Q */
+.seg{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.seg button{border:none;background:var(--surface);padding:8px;cursor:pointer;font-size:13px;font-weight:600;color:var(--ink-2)}
+.seg button[aria-pressed="true"]{background:var(--brand);color:var(--on-brand)}
+.field{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--ink-2)}
+.row2>*{min-width:0}
+.field select,.field input{width:100%;min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:6px 8px;font-size:14px;color:var(--ink)}
+.field select:disabled,.field input:disabled{opacity:.5;cursor:not-allowed}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#hqchart{width:100%;height:180px}
+.tablewrap{max-height:300px;overflow:auto;border:1px solid var(--line);border-radius:var(--r)}
+table{border-collapse:collapse;width:100%}
+th,td{padding:3px 8px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+th{position:sticky;top:0;background:var(--brand);color:var(--on-brand);font-size:12px;font-weight:700;z-index:1}
+th:first-child,td:first-child{text-align:left}
+td input{width:100%;min-width:60px;border:1px solid transparent;background:transparent;text-align:right;padding:2px 4px;border-radius:4px;font-variant-numeric:tabular-nums}
+td input:hover,td input:focus{border-color:var(--line);background:var(--surface-2)}
+td.del{width:28px;padding:0 4px}
+td.del button{border:none;background:none;color:var(--muted);cursor:pointer;font-size:16px;line-height:1}
+td.del button:hover{color:var(--rule)}
+tr.bad td{background:var(--warn-bg)}
+.lawmsg{font-size:12px;color:var(--warn-ink);min-height:1em}
+.lawmsg.ok{color:var(--ok-ink)}
+textarea{width:100%;min-height:110px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);padding:6px 8px;font-family:ui-monospace,Consolas,monospace;font-size:12px}
+details summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--brand)}
+details[open] summary{margin-bottom:8px}
+.stack{display:flex;flex-direction:column;gap:8px}
+.inline{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+
+/* Volumes */
+.bottom{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:1000px){.bottom{grid-template-columns:minmax(0,1fr)}}
+.vol .tablewrap{max-height:460px}
+td.bar{width:34%;min-width:120px}
+.bars{display:flex;flex-direction:column;gap:2px}
+.bars i{display:block;height:5px;border-radius:0 3px 3px 0;min-width:1px}
+.bars i.n{background:var(--s-new)}.bars i.o{background:var(--s-orig);opacity:.75}
+tr.partiel td{color:var(--muted);font-style:italic}
+tfoot td{font-weight:700;border-top:2px solid var(--brand);border-bottom:none;background:var(--surface-2);position:sticky;bottom:0}
+.journal ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;font-size:13px}
+.journal li span{display:block;color:var(--muted);font-size:12px}
+footer{font-size:12px;color:var(--muted);text-align:center;padding-top:8px}
+
+.drop{position:fixed;inset:0;background:color-mix(in srgb,var(--brand) 82%,transparent);color:var(--on-brand);display:flex;align-items:center;justify-content:center;font-family:var(--f-display);font-size:26px;z-index:50;padding:24px;text-align:center}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:var(--r);font-size:13px;z-index:60;max-width:calc(100vw - 32px)}
+@media (prefers-reduced-motion:no-preference){.toast{transition:opacity .2s}}
+
+/* Panneau Modifications */
+.lead{margin:0;font-family:var(--f-display);font-size:17px;font-weight:600;color:var(--ink)}
+.action{display:grid;grid-template-columns:28px minmax(0,1fr) 12px;gap:12px;align-items:center;text-align:left;width:100%;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:14px;cursor:pointer;color:var(--ink)}
+.action:hover:not(:disabled){border-color:var(--brand);background:color-mix(in srgb,var(--brand-soft) 30%,var(--surface))}
+.action:disabled{opacity:.5;cursor:default}
+.action svg{width:26px;height:26px;color:var(--brand)}
+.action b{display:block;font-size:15px}
+.action small{display:block;color:var(--ink-2);font-size:12.5px;margin-top:2px;line-height:1.35}
+.action i{font-style:normal;font-size:22px;color:var(--brand)}
+.back{align-self:flex-start;background:none;border:none;padding:0;color:var(--brand);font-weight:600;font-size:13px;cursor:pointer}
+.vtitle{margin:0;font-family:var(--f-display);font-size:19px;font-weight:600;color:var(--brand)}
+.step{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line);padding-top:12px}
+.step h4{margin:0;display:flex;align-items:center;gap:8px;font-size:14px}
+.step .n{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--brand);color:var(--on-brand);font-size:12px;font-weight:700}
+.step.off{opacity:.45}
+.step.off .n{background:var(--muted)}
+.help{margin:0;font-size:12.5px;color:var(--ink-2)}
+.minidrop{display:flex;flex-wrap:wrap;align-items:center;gap:10px;border:1.5px dashed color-mix(in srgb,var(--brand) 55%,transparent);border-radius:8px;padding:12px;font-size:12.5px;color:var(--muted)}
+.minidrop.big{flex-direction:column;align-items:flex-start;padding:16px;gap:8px}
+.impact{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.impact div{background:var(--surface-2);border-radius:6px;padding:8px 10px;font-size:12px;color:var(--ink-2)}
+.impact b{display:block;font-family:var(--f-display);font-size:19px;color:var(--ink);font-weight:600}
+.impact .full{grid-column:1/-1}
+.minidrop.over{border-color:var(--brand);background:color-mix(in srgb,var(--brand-soft) 40%,var(--surface))}
+.check{border-radius:8px;padding:10px 12px;font-size:13px;display:flex;flex-direction:column;gap:6px}
+.check p{margin:0}
+.check .ttl{font-weight:700;font-size:14px}
+.check.ok{background:var(--ok-bg);color:var(--ok-ink)}
+.check.ko{background:var(--ko-bg);color:var(--ko-ink)}
+.check.info{background:var(--surface-2);color:var(--ink-2)}
+.check .help{color:inherit;opacity:.85}
+.check .warn{color:var(--warn-ink)}
+table.mini{width:auto;background:var(--surface);border-radius:6px;overflow:hidden}
+table.mini th{position:static;background:var(--surface-2);color:var(--ink);font-weight:600}
+table.mini td,table.mini th{padding:3px 10px;color:var(--ink)}
+#checkChart{width:100%;height:190px}
+.opts{display:flex;flex-direction:column;gap:6px;font-size:13px}
+.opts label{display:flex;gap:8px;align-items:flex-start;cursor:pointer}
+.opts input{margin-top:3px}
+.opts small{display:block;color:var(--muted)}
+.modlist h4{margin:6px 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.modlist ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.modlist li{display:flex;gap:10px;align-items:center;justify-content:space-between;border-left:3px solid var(--corr);background:var(--surface-2);border-radius:0 6px 6px 0;padding:7px 10px;font-size:12.5px}
+.modlist li span{min-width:0}
+.modlist li b{display:block}
+.modlist li small{display:block;color:var(--ink-2)}
+#gridBody tr.m td{background:color-mix(in srgb,var(--corr) 14%,var(--surface))}
+#gridBody td input{min-width:70px}
+#vLevels .tablewrap{max-height:320px}
+tr.diff td:nth-child(3){font-weight:700}
+.swbox{display:inline-block;width:14px;height:10px;border-radius:2px;opacity:.5}
+
+.beta{display:inline-block;vertical-align:middle;margin-left:6px;padding:1px 6px;border-radius:4px;background:var(--beta-bg);color:var(--beta-ink);font:700 10px/1.5 var(--f-body);font-style:normal;letter-spacing:.06em;text-transform:uppercase;position:relative;top:-1px}
+.sep{margin:8px 0 0;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);border-top:1px solid var(--line);padding-top:10px}
+.ldin{max-height:none}
+.ldin td{padding:3px 6px}
+.ldin td input{border-color:var(--line);background:var(--surface);min-width:0}
+.ldin td input.bad{border-color:var(--rule);background:var(--ko-bg)}
+.ldin th:nth-child(n+2),.ldin td:nth-child(n+2){width:38%}
+.ratios{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin:8px 0}
+.ratios>*{min-width:0}
+.ldres{max-height:none}
+.ldres th,.ldres td{padding:3px 5px}
+.ldres th{white-space:normal;line-height:1.2;vertical-align:bottom}
+.ldres td.lt{color:var(--ink-2)}
+.ldnote{margin:0;font-size:11.5px;color:var(--muted)}
+.chart-empty{max-width:none;min-height:520px}
+@media (max-width:600px){.chart-empty{min-height:420px}}
+.chart-empty .trace{height:18%}
+.chart-empty .private{margin-top:6px}
+.nodata #fiche,.nodata #kpis,.nodata #alerts,.nodata #chart,.nodata .chart-tools,.nodata #chartHint{display:none}
+.nd{color:var(--muted);font-style:italic;text-align:left!important;padding:14px 8px!important;white-space:normal}
+.journal ol li.nd{list-style:none;margin-left:-20px;padding:0!important}
+#chartSec{position:relative}
+.action.hot{border-color:color-mix(in srgb,var(--an-red) 55%,var(--line))}
+.action.hot small{color:var(--an-red);font-weight:600}
+.alert.diag{background:color-mix(in srgb,var(--an-red) 10%,var(--surface));color:var(--ink);border:1px solid color-mix(in srgb,var(--an-red) 35%,transparent)}
+.alert.diag>b{color:var(--an-red)}
+.alert .link{font-weight:700}
+.anomcard{position:absolute;z-index:30;width:min(380px,calc(100% - 16px));background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:0 14px 40px rgba(10,30,30,.22);padding:14px}
+.adt{display:flex;flex-direction:column;gap:8px;font-size:13px}
+.ad-head{display:flex;align-items:center;gap:9px}
+.ad-head b{font-family:var(--f-display);font-size:16px;font-weight:600}
+.ad-head .chip{margin-left:auto}
+.ad-num{display:inline-grid;place-items:center;min-width:22px;height:22px;border-radius:50%;color:#fff;font-weight:700;font-size:12px;flex:none}
+.ad-when{margin:0;color:var(--muted);font-size:12px}
+.ad-text{margin:0;line-height:1.45;color:var(--ink)}
+.ad-lab{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-top:2px}
+.ad-one{margin:0}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chipb{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 10px;font-size:12px;cursor:pointer;color:var(--ink-2)}
+.chipb.on{background:var(--brand);border-color:var(--brand);color:var(--on-brand);font-weight:700}
+.chip{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.st-open{background:color-mix(in srgb,var(--an-red) 14%,var(--surface));color:var(--an-red)}
+.st-fixed{background:var(--ok-bg);color:var(--ok-ink)}
+.st-ign{background:var(--surface-2);color:var(--muted)}
+.ad-imp{display:grid;grid-template-columns:1fr;gap:4px;background:var(--surface-2);border-radius:8px;padding:8px 10px}
+.ad-imp div{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;font-size:12px;color:var(--ink-2)}
+.ad-imp span{min-width:110px}
+.ad-imp b{color:var(--ink);font-size:13px}
+.ad-imp em{font-style:normal;font-weight:700;font-size:12px;padding:1px 6px;border-radius:4px;background:var(--surface)}
+.ad-imp em.dn{color:var(--ok-ink)} .ad-imp em.up{color:var(--warn-ink)}
+.ad-src{margin:0;font-size:12px;color:var(--s-new)}
+.ad-src.warn{color:var(--warn-ink)}
+.ad-btns{margin-top:2px}
+.ad-done{background:var(--ok-bg);color:var(--ok-ink);border-radius:8px;padding:8px 10px;line-height:1.45}
+.ad-ign{background:var(--surface-2);color:var(--ink-2);border-radius:8px;padding:8px 10px}
+.dgsum{display:flex;flex-direction:column;gap:8px;border:1px solid var(--line);border-radius:8px;padding:12px}
+.dg-big{font-family:var(--f-display);font-size:19px;font-weight:600}
+.dg-counts{display:flex;flex-wrap:wrap;gap:6px}
+.dg-imp{margin:0;font-size:12.5px;color:var(--ink-2)}
+.dg-imp b{color:var(--ink)}
+.dgsum .btn{align-self:flex-start}
+.dglist{display:flex;flex-direction:column;gap:6px}
+.dgitem{border:1px solid var(--line);border-radius:8px;background:var(--surface);overflow:hidden}
+.dgitem.sel{border-color:var(--brand);box-shadow:0 0 0 1px var(--brand)}
+.dgitem.ignored .dgrow{opacity:.7}
+.dgitem>.adt{padding:2px 12px 12px;border-top:1px solid var(--line);padding-top:10px}
+.dgitem>.adt .ad-head,.dgitem>.adt .ad-when{display:none}
+.dgrow{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;width:100%;border:none;background:none;padding:9px 11px;cursor:pointer;text-align:left;color:var(--ink)}
+.dgrow:hover{background:var(--surface-2)}
+.dgtxt b{display:block;font-size:13.5px}
+.dgtxt small{display:block;color:var(--muted);font-size:11.5px}
+.modal{position:fixed;inset:0;background:rgba(10,25,25,.45);display:flex;align-items:flex-start;justify-content:center;z-index:70;overflow:auto;padding:max(24px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 24px max(16px,env(safe-area-inset-left,0px))}
+.modal-box{background:var(--surface);border-radius:10px;box-shadow:0 20px 50px rgba(0,0,0,.25);width:min(720px,100%);padding:20px;display:flex;flex-direction:column;gap:12px}
+.formgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
+.formgrid>*{min-width:0}
+.modal textarea{font-family:var(--f-body);font-size:14px;min-height:70px}
+.modal-actions{justify-content:flex-end}
+.modal-actions .help{margin-right:auto}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <img class="logo" src="%%LOGO%%" alt="COMETEC – instrumentation des eaux">
+    <div class="appname">
+    <svg class="appicon" viewBox="0 0 120 120" role="img" aria-label="Icône COMETEC Bilan"><rect x="2" y="2" width="116" height="116" rx="25" fill="#FFFFFF" stroke="#D2DDDD" stroke-width="3"/><path d="M 85.5 34.5 A 36 36 0 1 0 85.5 85.5" fill="none" stroke="#556364" stroke-width="15"/><path d="M 30 70 C 44 70, 50 46, 62 46 S 78 74, 104 52" fill="none" stroke="#E3000B" stroke-width="7" stroke-linecap="round"/></svg>
+    <div class="apptitle">
+      <h1>COMETEC <span class="prod">Bilan</span></h1>
+      <span>Traitement des bilans pour <span style="white-space:nowrap">débitmètres portables <b>BUL'R2</b></span></span>
+    </div>
+    </div>
+    <button class="btn" id="btnInstall" type="button" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 8v6m0 0-3-3m3 3 3-3"/></svg>Installer l'application</button>
+    <div class="actions">
+      <input type="file" id="fileInput" accept=".xlsx,.csv,.txt" hidden>
+      <button class="btn" id="btnOpen" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h6l2 2h10v10H3z"/></svg>Ouvrir un enregistrement</button>
+      <button class="btn" id="btnReport" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6M9 13h8M9 17h8"/></svg>Rapport PDF</button>
+      <button class="btn primary" id="btnExport" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 20h16"/></svg>Exporter en Excel</button>
+    </div>
+  </header>
+
+  <div class="dz-err filerr" id="fileErr" role="alert" hidden></div>
+  <div class="intro" id="intro"><span><b>Exemple chargé.</b> Glissez votre propre fichier du BUL'R2 sur la page pour le traiter. Pour essayer une correction, ouvrez <b>Modifications › Corriger des niveaux</b> et utilisez la table de démonstration.</span></div>
+  <div id="content" class="wrap">
+  <dl class="fiche" id="fiche"></dl>
+  <div class="kpis" id="kpis"></div>
+  <div id="alerts" class="stack"></div>
+
+  <div class="main">
+    <section class="card" id="chartSec" aria-labelledby="t-courbe">
+      <div class="rubrique"><h2 id="t-courbe">Courbes du bilan</h2><span class="hint" id="chartHint">Molette ou pincement pour zoomer, glisser pour se déplacer</span></div>
+      <div class="chart-tools">
+        <div class="legend" id="legend"></div>
+        <button class="btn small" id="btnZoom" type="button" aria-pressed="false">Zoom par sélection</button>
+        <button class="btn small" id="btnReset" type="button">Tout afficher</button>
+      </div>
+      <div id="chart" role="img" aria-label="Débit et niveau en fonction du temps"></div>
+      <div id="anomCard" class="anomcard" hidden role="dialog" aria-label="Analyse de l'anomalie"></div>
+      <div class="dropzone chart-empty" id="dropzone" hidden>
+        <svg class="trace" viewBox="0 0 1000 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0,97.7 L6,94.4 L11,98.6 L17,87.8 L22,32.5 L28,95.3 L33,104.3 L39,108.3 L44,107.4 L50,103.8 L56,26.7 L61,47.4 L67,98.2 L72,101.3 L78,103.8 L83,70.1 L89,32.8 L94,97.2 L100,91.2 L106,92.9 L111,93.9 L117,98.7 L122,102.6 L128,27.6 L133,49.7 L139,104.1 L144,107.3 L150,104.1 L156,110.3 L161,40.5 L167,91.0 L172,109.5 L178,106.6 L183,108.8 L189,111.1 L194,111.2 L200,31.1 L206,78.7 L211,98.6 L217,102.2 L222,102.4 L228,105.6 L233,96.7 L239,100.5 L244,43.2 L250,80.6 L256,101.6 L261,103.0 L267,105.8 L272,94.9 L278,33.8 L283,98.5 L289,105.5 L294,95.4 L300,95.9 L306,42.5 L311,34.6 L317,92.4 L322,101.2 L328,100.7 L333,103.4 L339,101.1 L344,40.0 L350,91.2 L356,95.9 L361,87.9 L367,91.5 L372,95.8 L378,31.7 L383,72.5 L389,76.8 L394,88.6 L400,98.5 L406,102.1 L411,37.8 L417,97.6 L422,95.2 L428,95.4 L433,95.9 L439,99.6 L444,95.8 L450,101.9 L456,109.4 L461,109.0 L467,28.3 L472,88.9 L478,108.0 L483,111.2 L489,107.0 L494,102.4 L500,102.3 L506,104.3 L511,43.3 L517,95.2 L522,102.1 L528,103.4 L533,110.0 L539,111.5 L544,113.5 L550,94.4 L556,76.6 L561,14.0 L567,61.8 L572,95.0 L578,39.6 L583,54.1 L589,103.7 L594,110.4 L600,111.4 L606,111.1 L611,111.4 L617,112.3 L622,112.6 L628,112.7 L633,113.0 L639,113.2 L644,113.1 L650,43.8 L656,68.9 L661,107.6 L667,111.6 L672,104.5 L678,107.7 L683,112.8 L689,111.0 L694,113.3 L700,110.6 L706,110.6 L711,113.8 L717,113.6 L722,114.0 L728,48.2 L733,96.2 L739,110.5 L744,112.1 L750,105.6 L756,101.8 L761,109.1 L767,113.9 L772,113.2 L778,42.5 L783,68.1 L789,102.1 L794,110.1 L800,110.9 L806,100.3 L811,103.7 L817,27.8 L822,67.2 L828,102.8 L833,40.9 L839,87.4 L844,85.0 L850,34.2 L856,92.3 L861,92.0 L867,101.7 L872,31.0 L878,79.3 L883,97.0 L889,87.3 L894,23.2 L900,90.2 L906,96.0 L911,93.1 L917,29.9 L922,86.1 L928,96.1 L933,103.4 L939,105.6 L944,104.7 L950,37.6 L956,74.0 L961,96.9 L967,100.1 L972,95.7 L978,26.2 L983,90.7 L989,91.5 L994,96.7 L1000,40.3 L1000,120 L0,120 Z" class="trace-fill"/><path d="M0,97.7 L6,94.4 L11,98.6 L17,87.8 L22,32.5 L28,95.3 L33,104.3 L39,108.3 L44,107.4 L50,103.8 L56,26.7 L61,47.4 L67,98.2 L72,101.3 L78,103.8 L83,70.1 L89,32.8 L94,97.2 L100,91.2 L106,92.9 L111,93.9 L117,98.7 L122,102.6 L128,27.6 L133,49.7 L139,104.1 L144,107.3 L150,104.1 L156,110.3 L161,40.5 L167,91.0 L172,109.5 L178,106.6 L183,108.8 L189,111.1 L194,111.2 L200,31.1 L206,78.7 L211,98.6 L217,102.2 L222,102.4 L228,105.6 L233,96.7 L239,100.5 L244,43.2 L250,80.6 L256,101.6 L261,103.0 L267,105.8 L272,94.9 L278,33.8 L283,98.5 L289,105.5 L294,95.4 L300,95.9 L306,42.5 L311,34.6 L317,92.4 L322,101.2 L328,100.7 L333,103.4 L339,101.1 L344,40.0 L350,91.2 L356,95.9 L361,87.9 L367,91.5 L372,95.8 L378,31.7 L383,72.5 L389,76.8 L394,88.6 L400,98.5 L406,102.1 L411,37.8 L417,97.6 L422,95.2 L428,95.4 L433,95.9 L439,99.6 L444,95.8 L450,101.9 L456,109.4 L461,109.0 L467,28.3 L472,88.9 L478,108.0 L483,111.2 L489,107.0 L494,102.4 L500,102.3 L506,104.3 L511,43.3 L517,95.2 L522,102.1 L528,103.4 L533,110.0 L539,111.5 L544,113.5 L550,94.4 L556,76.6 L561,14.0 L567,61.8 L572,95.0 L578,39.6 L583,54.1 L589,103.7 L594,110.4 L600,111.4 L606,111.1 L611,111.4 L617,112.3 L622,112.6 L628,112.7 L633,113.0 L639,113.2 L644,113.1 L650,43.8 L656,68.9 L661,107.6 L667,111.6 L672,104.5 L678,107.7 L683,112.8 L689,111.0 L694,113.3 L700,110.6 L706,110.6 L711,113.8 L717,113.6 L722,114.0 L728,48.2 L733,96.2 L739,110.5 L744,112.1 L750,105.6 L756,101.8 L761,109.1 L767,113.9 L772,113.2 L778,42.5 L783,68.1 L789,102.1 L794,110.1 L800,110.9 L806,100.3 L811,103.7 L817,27.8 L822,67.2 L828,102.8 L833,40.9 L839,87.4 L844,85.0 L850,34.2 L856,92.3 L861,92.0 L867,101.7 L872,31.0 L878,79.3 L883,97.0 L889,87.3 L894,23.2 L900,90.2 L906,96.0 L911,93.1 L917,29.9 L922,86.1 L928,96.1 L933,103.4 L939,105.6 L944,104.7 L950,37.6 L956,74.0 L961,96.9 L967,100.1 L972,95.7 L978,26.2 L983,90.7 L989,91.5 L994,96.7 L1000,40.3" class="trace-line"/></svg>
+        <div class="dz-inner">
+          <svg class="dz-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 28v10a2 2 0 0 0 2 2h28a2 2 0 0 0 2-2V28"/><path d="M24 8v22m0 0-8-8m8 8 8-8"/></svg>
+          <h2 id="t-empty">Ouvrez un enregistrement du BUL'R2</h2>
+          <p>Glissez ici le fichier Excel (.xlsx) ou CSV exporté par l'appareil.</p>
+          <button class="btn primary big" id="btnOpen2" type="button">Ouvrir un enregistrement</button>
+          <div class="dz-err" id="emptyErr" role="alert" hidden></div>
+          <p class="private"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Le fichier est traité sur cet ordinateur et n'est envoyé nulle part.</p>
+        </div>
+      </div>
+    </section>
+
+    <aside class="card mods" aria-labelledby="t-mods">
+      <div class="rubrique"><h2 id="t-mods">Modifications</h2><span class="badge" id="modBadge" hidden></span></div>
+
+      <div id="vHome" class="stack">
+        <p class="lead">Que souhaitez-vous faire&nbsp;?</p>
+        <button class="action" id="actLevels" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 16c3 0 3-8 6-8s3 5 5 5 3-3 7-3"/><path d="M3 21h18"/></svg>
+          <span><b>Corriger des niveaux</b><small>Bouchon, sonde hors de l'eau, valeur aberrante : remplacez le niveau sur une ou plusieurs périodes.</small></span><i aria-hidden="true">›</i>
+        </button>
+        <button class="action" id="actLaw" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 20V4m0 16h16"/><path d="M6 18c6 0 10-5 13-13"/></svg>
+          <span><b>Changer la loi hauteur/débit</b><small>La loi réglée sur le site était fausse : recalculez tout le bilan avec la bonne.</small></span><i aria-hidden="true">›</i>
+        </button>
+        <button class="action" id="actDiag" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="10.5" cy="10.5" r="7"/><path d="m21 21-5.5-5.5"/><path d="M6.5 11h2l1-2.5 2 5 1-2.5h1.5"/></svg>
+          <span><b>Diagnostic du bilan</b><small id="actDiagSub">Repère les niveaux à 0 et les niveaux figés, et les reconstitue d'après le reste de la courbe.</small></span><i aria-hidden="true">›</i>
+        </button>
+        <p class="sep">Exploitation du bilan</p>
+        <button class="action" id="actLoads" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.8 3h10.4a2 2 0 0 0 1.8-3l-5-9V3"/><path d="M7.5 15h9"/></svg>
+          <span><b>Charges polluantes et EH <em class="beta">Bêta</em></b><small id="actLoadsSub">Saisissez les analyses du laboratoire : flux en kg/j, équivalents-habitants, taux de charge, rendements.</small></span><i aria-hidden="true">›</i>
+        </button>
+        <div id="modList" class="modlist"></div>
+      </div>
+
+      <div id="vDiag" class="stack" hidden>
+        <button class="back" data-back type="button">‹ Toutes les modifications</button>
+        <h3 class="vtitle">Diagnostic du bilan</h3>
+        <p class="help">Repère toutes les mesures où le niveau tombe à 0, et les périodes où il reste figé sur exactement la même valeur. Survolez-les sur la courbe ou choisissez-les ci-dessous : la zone est reconstituée d'après le reste de la courbe, avec son effet sur le bilan.</p>
+        <label class="field" style="flex-direction:row;align-items:center;gap:8px;flex-wrap:wrap">Niveau figé signalé à partir de
+          <select id="dgX" style="width:auto"><option value="5">5 min</option><option value="10">10 min</option><option value="15">15 min</option><option value="30">30 min</option><option value="60">1 heure</option></select>
+          <span class="help" id="dgXHelp"></span></label>
+        <div id="dgSum"></div>
+        <div id="dgList" class="dglist"></div>
+        <p class="help">Rien n'est modifié sans votre accord. Chaque anomalie, réparée ou ignorée, est tracée dans l'export Excel (onglet « Anomalies »).</p>
+      </div>
+
+      <div id="vLoads" class="stack" hidden>
+        <button class="back" data-back type="button">‹ Retour</button>
+        <h3 class="vtitle">Charges polluantes et équivalents-habitants <em class="beta">Bêta</em></h3>
+        <p class="help">Saisissez les résultats d'analyse de l'échantillon moyen. Les flux sont calculés avec le volume du bilan, corrections comprises.</p>
+
+        <section class="step">
+          <h4><span class="n">1</span>Période du prélèvement</h4>
+          <div class="row2">
+            <label class="field">Début<input type="datetime-local" id="ldFrom" step="1"></label>
+            <label class="field">Fin<input type="datetime-local" id="ldTo" step="1"></label>
+          </div>
+          <p class="help num" id="ldVol"></p>
+          <button class="link" id="ldAll" type="button" hidden>Reprendre tout le bilan</button>
+        </section>
+
+        <section class="step">
+          <h4><span class="n">2</span>Résultats du laboratoire</h4>
+          <label class="opts"><span style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="ldOut"> Bilan entrée et sortie de station (rendements)</span></label>
+          <div class="tablewrap ldin"><table class="num"><thead id="ldHead"></thead><tbody id="ldBody"></tbody></table></div>
+          <p class="help">En mg/l. Une valeur sous la limite de quantification se saisit avec « &lt; », par exemple <b>&lt; 3</b>.</p>
+          <label class="field">Laboratoire, n° de rapport (facultatif)<input id="ldLab" maxlength="80"></label>
+        </section>
+
+        <section class="step">
+          <h4><span class="n">3</span>Station (facultatif)</h4>
+          <div class="row2">
+            <label class="field">Capacité nominale (EH)<input id="ldCap" inputmode="decimal"></label>
+            <label class="field">Débit de référence (m³/j)<input id="ldQnom" inputmode="decimal"></label>
+          </div>
+          <details><summary>Ratios par équivalent-habitant</summary>
+            <p class="help">1 EH = 60 g de DBO<sub>5</sub> par jour (définition réglementaire). Les autres ratios sont des valeurs d'usage : adaptez-les à votre référentiel, ils sont mémorisés sur cet ordinateur.</p>
+            <div class="ratios">
+              <label class="field">DCO (g/EH/j)<input id="r_dco" inputmode="decimal"></label>
+              <label class="field">MES (g/EH/j)<input id="r_mes" inputmode="decimal"></label>
+              <label class="field">NTK (g/EH/j)<input id="r_ntk" inputmode="decimal"></label>
+              <label class="field">P<sub>t</sub> (g/EH/j)<input id="r_pt" inputmode="decimal"></label>
+              <label class="field">Volume (l/EH/j)<input id="r_vol" inputmode="decimal"></label>
+            </div>
+            <button class="link" id="ldRatioReset" type="button">Revenir aux valeurs par défaut</button>
+          </details>
+        </section>
+
+        <section class="step" aria-live="polite">
+          <h4><span class="n">4</span>Résultats</h4>
+          <div id="ldRes" class="stack"></div>
+        </section>
+      </div>
+
+      <div id="vLevels" class="stack" hidden>
+        <button class="back" data-back type="button">‹ Toutes les modifications</button>
+        <h3 class="vtitle">Corriger des niveaux</h3>
+
+        <section class="step" id="st1">
+          <h4><span class="n">1</span>Table H/Q du site</h4>
+          <p class="help">Chargez la table hauteur/débit utilisée par le BUL'R2 sur ce site. Elle est comparée à l'enregistrement avant toute correction.</p>
+          <div class="minidrop" id="tableDrop">
+            <button class="btn small" id="btnTableFile" type="button">Choisir la table (.xlsx ou .csv)</button>
+            <span>ou glissez-la ici</span>
+          </div>
+          <input type="file" id="tableInput" accept=".xlsx,.csv,.txt" hidden>
+          <details><summary>Coller la table depuis Excel</summary>
+            <div class="stack">
+              <textarea id="pasteTable" placeholder="Hauteur (mm)	Débit (m³/h)&#10;0	0&#10;5	0,13&#10;10	0,36"></textarea>
+              <div class="inline">
+                <label class="field" style="flex-direction:row;align-items:center;gap:6px">Débit en
+                  <select id="pasteTableUnit" style="width:auto"><option value="m3h">m³/h</option><option value="ls">l/s</option></select></label>
+                <button class="btn small" id="btnPasteTable" type="button">Vérifier cette table</button>
+              </div>
+            </div>
+          </details>
+          <button class="link" id="btnDemoTable" type="button" hidden>Utiliser la table de démonstration de l'exemple</button>
+          <div id="checkBox" hidden></div>
+          <div id="checkChart" hidden role="img" aria-label="Mesures de l'enregistrement comparées à la table"></div>
+        </section>
+
+        <section class="step" id="st2">
+          <h4><span class="n">2</span>Période à corriger</h4>
+          <div class="inline">
+            <button class="btn small" id="btnBrush" type="button" aria-pressed="false">Sélectionner sur la courbe</button>
+            <span class="help">ou saisissez les heures</span>
+          </div>
+          <div class="row2">
+            <label class="field">Début<input type="datetime-local" id="rgFrom" step="1"></label>
+            <label class="field">Fin<input type="datetime-local" id="rgTo" step="1"></label>
+          </div>
+          <p class="help num" id="rgInfo">Aucune période sélectionnée.</p>
+        </section>
+
+        <section class="step" id="st3">
+          <h4><span class="n">3</span>Nouveau niveau</h4>
+          <div class="opts">
+            <label><input type="radio" name="op" value="interp" checked> <span>Relier en ligne droite le niveau d'avant et d'après la période <small>bouchon, trou de mesure</small></span></label>
+            <label><input type="radio" name="op" value="fixe"> <span>Remplacer par une valeur fixe</span></label>
+            <label><input type="radio" name="op" value="decal"> <span>Décaler le niveau (+ ou −)</span></label>
+          </div>
+          <label class="field" id="opValWrap" hidden><span id="opValLab">Niveau (mm)</span><input id="opVal" inputmode="decimal"></label>
+          <button class="btn primary" id="btnCorr" type="button">Appliquer la correction</button>
+          <details id="gridDetails"><summary>Modifier mesure par mesure</summary>
+            <p class="help" id="gridInfo"></p>
+            <div class="tablewrap"><table class="num"><thead><tr><th>Heure</th><th>Fichier (mm)</th><th>Corrigé (mm)</th><th>Débit (m³/h)</th></tr></thead><tbody id="gridBody"></tbody></table></div>
+          </details>
+        </section>
+        <div id="corrList" class="modlist"></div>
+      </div>
+
+      <div id="vLaw" class="stack" hidden>
+        <button class="back" data-back type="button">‹ Toutes les modifications</button>
+        <h3 class="vtitle">Changer la loi hauteur/débit</h3>
+        <p class="help">Importez la bonne table hauteur/débit. Tout le bilan sera recalculé à partir des niveaux mesurés, et l'enregistrement d'origine reste visible pour comparaison.</p>
+        <div class="minidrop big" id="lawDrop">
+          <button class="btn primary" id="btnLawFile" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 15V3m0 0-5 5m5-5 5 5M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>Importer une loi H/Q</button>
+          <span>Fichier Excel (.xlsx) ou CSV (.csv) uniquement · ou glissez-le ici</span>
+        </div>
+        <input type="file" id="lawInput" accept=".xlsx,.csv" hidden>
+        <div id="lawBox" hidden></div>
+        <div id="lawPreview" class="stack" hidden>
+          <div id="hqchart" role="img" aria-label="Nouvelle loi comparée aux mesures de l'enregistrement"></div>
+          <div id="lawImpact" class="impact"></div>
+          <details><summary id="lawPtsSum">Voir les points de la table</summary>
+            <div class="tablewrap"><table class="num"><thead><tr><th>Hauteur (mm)</th><th>Débit (m³/h)</th><th>Débit (l/s)</th></tr></thead><tbody id="lawBody"></tbody></table></div>
+          </details>
+          <button class="btn primary" id="btnApply" type="button">Recalculer tout le bilan avec cette loi</button>
+        </div>
+        <div id="lawApplied" class="check info" hidden></div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="bottom">
+    <section class="card vol" aria-labelledby="t-vol">
+      <div class="rubrique"><h2 id="t-vol">Volumes par intervalle</h2>
+        <label class="field" style="flex-direction:row;align-items:center;gap:8px">Pas de totalisation
+          <select id="stepSelect" style="width:auto">
+            <option value="300">5 min</option><option value="600">10 min</option><option value="900">15 min</option>
+            <option value="1800">30 min</option><option value="3600" selected>1 heure</option><option value="7200">2 heures</option>
+            <option value="86400">24 heures</option>
+          </select></label>
+      </div>
+      <div class="tablewrap">
+        <table class="num">
+          <thead id="volHead"></thead>
+          <tbody id="volBody"></tbody>
+          <tfoot id="volFoot"></tfoot>
+        </table>
+      </div>
+    </section>
+    <section class="card journal" aria-labelledby="t-journal">
+      <div class="rubrique"><h2 id="t-journal">Journal des modifications</h2><span class="hint">Repris dans l'export Excel</span></div>
+      <ol id="journal"></ol>
+    </section>
+  </div>
+  </div>
+  <footer>COMETEC · Instrumentation des eaux · ZA de Longifan, 38530 Chapareillan</footer>
+</div>
+<div class="modal" id="reportModal" hidden role="dialog" aria-modal="true" aria-labelledby="t-report">
+  <form class="modal-box" id="reportForm">
+    <div class="rubrique"><h2 id="t-report">Rapport PDF du bilan</h2><button class="link" type="button" id="reportClose">Fermer</button></div>
+    <p class="help">Ces informations apparaissent sur le rapport. Toutes sont facultatives et restent mémorisées sur cet ordinateur pour les prochains rapports.</p>
+    <div class="formgrid">
+      <label class="field">Titre du rapport<input id="rpTitle" value="Fiche de bilan de mesure de débit"></label>
+      <label class="field">Point de mesure<input id="rpPoint"></label>
+      <label class="field">Maître d'ouvrage / commune<input id="rpOwner"></label>
+      <label class="field">Référence de l'étude<input id="rpRef" placeholder="ex. Schéma directeur d'assainissement – phase 2"></label>
+      <label class="field">Établi par (société)<input id="rpCompany"></label>
+      <label class="field">Opérateur<input id="rpOperator"></label>
+    </div>
+    <label class="field">Observations<textarea id="rpNotes" rows="3" placeholder="Conditions météo, remarques sur le site, événements particuliers…"></textarea></label>
+    <div class="inline">
+      <input type="file" id="rpLogoInput" accept="image/png,image/jpeg" hidden>
+      <button class="btn small" type="button" id="rpLogoBtn">Ajouter votre logo (facultatif)</button>
+      <span class="help" id="rpLogoName"></span>
+      <button class="link" type="button" id="rpLogoDel" hidden>Retirer</button>
+    </div>
+    <div class="inline modal-actions">
+      <span class="help" id="rpInfo"></span>
+      <button class="btn primary" type="submit" id="rpGo">Générer le rapport PDF</button>
+    </div>
+  </form>
+</div>
+<div id="pdfCharts" aria-hidden="true" style="position:fixed;left:-20000px;top:0;width:1600px;height:720px"></div>
+<div class="drop" id="drop" hidden>Déposez le fichier du BUL'R2 (.xlsx ou .csv)</div>
+<div class="toast" id="toast" hidden role="status"></div>
+
+%%LIBS%%
+<script>
+%%APP%%
+</script>
