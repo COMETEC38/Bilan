@@ -1607,9 +1607,10 @@ function showHub(anim){
   if(anim&&!matchMedia("(prefers-reduced-motion: reduce)").matches){
     lg.style.setProperty("--hub-dy","0px"); const r=lg.getBoundingClientRect();
     lg.style.setProperty("--hub-dy",Math.max(0,innerHeight/2-(r.top+r.height/2))+"px"); void h.offsetWidth; h.classList.add("hub-anim") }
+  document.body.classList.remove("hub-pre");
 }
 function simOn(){ return document.body.classList.contains("onsim") }
-function enterApp(push){ if(!hubOn()&&!simOn()) return; document.body.classList.remove("onhub","onsim"); $("hub").classList.remove("hub-anim"); if(push!==false) try{ history.pushState({app:1},"") }catch(e){} window.scrollTo({top:0}) }
+function enterApp(push){ if(!hubOn()&&!simOn()) return; document.body.classList.remove("onhub","onsim","hub-pre"); $("hub").classList.remove("hub-anim"); if(push!==false) try{ history.pushState({app:1},"") }catch(e){} window.scrollTo({top:0}) }
 $("hubOpen").onclick=()=>enterApp();
 $("hubDemo").onclick=()=>{ enterApp(); startDemo() };
 document.querySelectorAll("header.top .logo, header.top .appicon").forEach(el=>{ el.classList.add("tohub"); el.title="Accueil COMETEC";

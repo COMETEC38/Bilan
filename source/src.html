@@ -451,6 +451,7 @@ tr.diff td:nth-child(3){font-weight:700}
 /* ================= Accueil COMETEC (page d'ouverture) ================= */
 .hub{display:none}
 body.onhub .hub{display:flex}
+body.hub-pre .hub-logo,body.hub-pre .hub-body{visibility:hidden}
 body.onhub>.wrap,body.onhub .mnav{display:none!important}
 body.onhub{padding-bottom:0!important}
 .hub{flex-direction:column;align-items:center;gap:24px;max-width:1040px;margin:0 auto;min-height:100vh;min-height:100dvh;padding:calc(36px + env(safe-area-inset-top,0px)) 0 calc(28px + env(safe-area-inset-bottom,0px))}
@@ -635,6 +636,7 @@ body.onsim{padding-bottom:0!important}
 </style>
 
 
+<script>document.body.classList.add("onhub","hub-pre")</script>
 <section class="hub" id="hub" aria-label="Accueil COMETEC">
   <div class="hub-logo" id="hubLogo" role="img" aria-label="COMETEC – instrumentation des eaux">
     <div class="hl"><img class="hl-base" src="%%HUB_BASE%%" alt=""><img class="hl-wave" src="%%HUB_WAVE%%" alt=""><img class="hl-o" src="%%HUB_O%%" alt=""></div>
