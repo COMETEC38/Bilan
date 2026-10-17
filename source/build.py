@@ -1,7 +1,8 @@
 import base64, json, sys
-VERSION='2.0.1'
+VERSION='2.1.0'
 s=open('src.html').read().replace('%%VERSION%%',VERSION).replace('%%APP%%',open('app.js').read()).replace('%%DEMO%%',open('demo.json').read())
 logo='data:image/png;base64,'+base64.b64encode(open('logo_new.png','rb').read()).decode()
+for _k in ['base','wave','o']: s=s.replace('%%HUB_'+_k.upper()+'%%','data:image/png;base64,'+base64.b64encode(open('hub/l_'+_k+'.png','rb').read()).decode())  # logo d'accueil en 3 calques animés
 import os
 ex=open('example.json').read() if os.path.exists('example.json') else 'null'  # exemple facultatif (données client, non publié)
 s0=s.replace('%%LOGO%%',logo).replace('%%EXAMPLE%%','null')

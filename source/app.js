@@ -1599,6 +1599,24 @@ $("mPdf").onclick=()=>$("btnReport").click();
 MQ.addEventListener?.("change",()=>{ mSync(); if(S.ds) renderVolumes(); if(!isM()) window.scrollTo({top:0}) });
 document.body.dataset.mtab=document.body.dataset.mtab||"bilan";
 
+
+/* ---------- Accueil COMETEC : page d'ouverture avec logo animé ---------- */
+function hubOn(){ return document.body.classList.contains("onhub") }
+function showHub(anim){
+  const h=$("hub"), lg=$("hubLogo"); document.body.classList.add("onhub"); h.classList.remove("hub-anim"); window.scrollTo({top:0});
+  if(anim&&!matchMedia("(prefers-reduced-motion: reduce)").matches){
+    lg.style.setProperty("--hub-dy","0px"); const r=lg.getBoundingClientRect();
+    lg.style.setProperty("--hub-dy",Math.max(0,innerHeight/2-(r.top+r.height/2))+"px"); void h.offsetWidth; h.classList.add("hub-anim") }
+}
+function enterApp(push){ if(!hubOn()) return; document.body.classList.remove("onhub"); $("hub").classList.remove("hub-anim"); if(push!==false) try{ history.pushState({app:1},"") }catch(e){} window.scrollTo({top:0}) }
+$("hubOpen").onclick=()=>enterApp();
+$("hubDemo").onclick=()=>{ enterApp(); startDemo() };
+document.querySelectorAll("header.top .logo, header.top .appicon").forEach(el=>{ el.classList.add("tohub"); el.title="Accueil COMETEC";
+  el.addEventListener("click",()=>{ if(history.state&&history.state.app) history.back(); else showHub(false) }) });
+addEventListener("popstate",()=>{ const st=history.state; if(!hubOn()&&!(st&&(st.app||st.mview))) showHub(false); else if(hubOn()&&st&&st.app) enterApp(false) });
+{ const ld=loadDataset; loadDataset=function(){ if(hubOn()) enterApp(); return ld.apply(this,arguments) } }
+showHub(true);
+
 /* ---------- Application installable (version publiée sur un site web) ---------- */
 let installEvt=null;
 addEventListener("beforeinstallprompt",e=>{ e.preventDefault(); installEvt=e; $("btnInstall").hidden=false });
