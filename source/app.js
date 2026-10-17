@@ -1020,7 +1020,7 @@ let cardTimer=null;
 function showCard(a,px){
   const c=$("anomCard"); clearTimeout(cardTimer);
   if(!a){ cardTimer=setTimeout(()=>{ if(c.matches(":hover")) return; c.hidden=true; if(S.anomHover!=null){ S.anomHover=null; renderChart() } },260); return }
-  if(S.anomHover!==a.id||c.hidden){ S.anomHover=a.id; c.innerHTML=anomDetail(a); c.hidden=false; renderChart() }
+  if(S.anomHover!==a.id||c.hidden){ S.anomHover=a.id; c.innerHTML=`<button class="ad-close" type="button" data-closecard aria-label="Fermer">×</button>`+anomDetail(a); c.hidden=false; renderChart() }
   // la carte se place à côté de la zone, sans la masquer
   const box=$("chartSec").getBoundingClientRect(), w=c.offsetWidth, chartX=$("chart").offsetLeft, d=S.ds;
   const x0=chart.convertToPixel({gridIndex:0},[d.t[a.i0],0])[0], x1=chart.convertToPixel({gridIndex:0},[d.t[a.i1],0])[0];
@@ -1053,6 +1053,7 @@ function renderVolumes(){
   $("volBody").innerHTML=rows.map(r=>`<tr class="${r.partial?"partiel":""}${ch&&Math.abs(r.vn-r.vo)>5e-4?" diff":""}"><td>${lab(r)}</td><td>${nf(r.vo)}</td><td>${ch?nf(r.vn):"–"}</td><td>${pct(r.vo,r.vn)}</td>
       <td class="bar"><div class="bars">${ch?`<i class="n" style="width:${r.vn/max*100}%"></i>`:""}<i class="o" style="width:${r.vo/max*100}%"></i></div></td></tr>`).join("");
   const to=rows.reduce((s,r)=>s+r.vo,0), tn=rows.reduce((s,r)=>s+r.vn,0);
+  if(isM()) $("volBody").closest("table").classList.toggle("unchanged",!ch);
   $("volFoot").innerHTML=`<tr><td>Total (${rows.length} intervalles)</td><td>${nf(to)}</td><td>${ch?nf(tn):"–"}</td><td>${pct(to,tn)}</td><td></td></tr>`;
 }
 $("stepSelect").onchange=e=>{S.step=+e.target.value; if(S.ds) renderVolumes()};
@@ -1521,16 +1522,16 @@ $("btnDemoLab").onclick=()=>{ const L=DEMO.lab; Object.assign(S.lab.c,{dco:L.dco
 
 /* Visite guidée : 4 bulles, au premier lancement de la démo, rejouable depuis le bandeau */
 const TOUR=[
-  {el:"actLevels",title:"Corriger des niveaux",text:"La table H/Q de SITE TEST est déjà chargée et validée. Repérez le pic parasite à 140 mm vers 06:00, sélectionnez-le sur la courbe et reliez-le en ligne droite."},
-  {el:"actLaw",title:"Changer la loi hauteur/débit",text:"Cliquez sur « Utiliser la loi de démonstration » : tout le bilan est recalculé avec la nouvelle loi. Les charges polluantes ont aussi des analyses d'exemple prêtes à l'emploi."},
-  {el:"actDiag",title:"Diagnostic du bilan",text:"Le diagnostic a repéré 4 anomalies : canne bouchée, canne hors de l'eau, une mesure à 0 et un niveau figé la nuit, invisible à l'œil. Ouvrez-le pour les voir sur la courbe et les réparer d'un clic."},
-  {el:["btnExport","btnReport"],title:"Exporter en Excel et rapport PDF",text:"Exportez l'Excel complet (graphiques, anomalies, corrections, journal) ou le rapport PDF prêt à remettre. Les exports de démonstration sont marqués comme tels."}];
-const tourEls=st=>[].concat(st.el).map(id=>$(id)).filter(Boolean);
+  {el:"actLevels",mtab:"outils",title:"Corriger des niveaux",text:"La table H/Q de SITE TEST est déjà chargée et validée. Repérez le pic parasite à 140 mm vers 06:00, sélectionnez-le sur la courbe et reliez-le en ligne droite."},
+  {el:"actLaw",mtab:"outils",title:"Changer la loi hauteur/débit",text:"Cliquez sur « Utiliser la loi de démonstration » : tout le bilan est recalculé avec la nouvelle loi. Les charges polluantes ont aussi des analyses d'exemple prêtes à l'emploi."},
+  {el:"actDiag",mtab:"outils",title:"Diagnostic du bilan",text:"Le diagnostic a repéré 4 anomalies : canne bouchée, canne hors de l'eau, une mesure à 0 et un niveau figé la nuit, invisible à l'œil. Ouvrez-le pour les voir sur la courbe et les réparer d'un clic."},
+  {el:["btnExport","btnReport"],mel:["mExcel","mPdf"],mtab:"export",title:"Exporter en Excel et rapport PDF",text:"Exportez l'Excel complet (graphiques, anomalies, corrections, journal) ou le rapport PDF prêt à remettre. Les exports de démonstration sont marqués comme tels."}];
+const tourEls=st=>[].concat(isM()&&st.mel?st.mel:st.el).map(id=>$(id)).filter(Boolean);
 let tourI=-1;
 function startTour(){ if(!S.ds) return; setView("home"); tourI=-1; nextTour() }
 function nextTour(){ document.querySelectorAll(".tour-target").forEach(x=>x.classList.remove("tour-target")); tourI++; if(tourI>=TOUR.length) return endTour(true); showTour() }
 function showTour(){
-  const st=TOUR[tourI], els=tourEls(st), el=els[0], box=$("tour");
+  const st=TOUR[tourI]; if(isM()&&st.mtab) setMTab(st.mtab); const els=tourEls(st), el=els[0], box=$("tour");
   $("tourStep").textContent=`Visite guidée · ${tourI+1} / ${TOUR.length}`; $("tourTitle").textContent=st.title; $("tourText").textContent=st.text;
   $("tourNext").textContent=tourI===TOUR.length-1?"Terminer":"Suivant";
   document.querySelectorAll(".tour-target").forEach(x=>x.classList.remove("tour-target")); els.forEach(x=>x.classList.add("tour-target"));
@@ -1547,10 +1548,52 @@ function placeTour(){
 function endTour(done){
   document.querySelectorAll(".tour-target").forEach(x=>x.classList.remove("tour-target")); $("tour").hidden=true; tourI=-1;
   if(done!==false) try{ localStorage.setItem("cometecBilanTour","1") }catch(e){}
+  if(isM()&&S.ds&&document.body.dataset.mtab!=="bilan") setMTab("bilan");
 }
 $("tourNext").onclick=nextTour; $("tourSkip").onclick=()=>endTour(true);
 addEventListener("resize",placeTour); addEventListener("scroll",placeTour,{passive:true});
 addEventListener("keydown",e=>{ if(e.key==="Escape"&&!$("tour").hidden) endTour(true) });
+
+
+/* ---------- Version téléphone : onglets, écrans plein écran, retour ----------
+   Actif uniquement sur écran étroit (même requête que le CSS) ; PC et tablette ne sont pas concernés. */
+const MQ=matchMedia("(max-width:700px), (pointer:coarse) and (max-height:500px)");
+function isM(){ return MQ.matches }
+const VIEW_TITLE={levels:"Corriger des niveaux",law:"Loi hauteur/débit",diag:"Diagnostic du bilan",loads:"Charges polluantes"};
+let mPushed=false;
+function setMTab(t){
+  const b=document.body; if(!t) t="bilan"; if(!isM()){ b.dataset.mtab=t; return }
+  if(t!=="outils"&&S.view&&S.view!=="home") setView("home");
+  b.dataset.mtab=t;
+  document.querySelectorAll("#mnav [data-mtab]").forEach(x=>{ if(x.dataset.mtab===t) x.setAttribute("aria-current","page"); else x.removeAttribute("aria-current") });
+  window.scrollTo({top:0});
+}
+function mSync(){
+  const b=document.body, v=S.view||"home", tool=isM()&&v!=="home";
+  if(isM()){ b.dataset.view=v; b.classList.toggle("mtool",tool); b.classList.toggle("mchart",tool&&(v==="levels"||v==="diag")) }
+  else if(b.classList.contains("mtool")||b.classList.contains("mchart")) b.classList.remove("mtool","mchart");
+  $("mTitle").textContent=VIEW_TITLE[v]||"";
+  $("mSub").textContent=S.ds?[S.ds.meta.site,fmtDT(S.ds.t[0]),fmtShort((S.ds.t[S.ds.t.length-1]-S.ds.t[0])/1000)].filter(Boolean).join(" · "):"";
+  const open=(S.anoms||[]).filter(a=>a.status==="open").length; $("mDot").hidden=!open; $("mDot").textContent=open||"";
+}
+document.querySelectorAll("#mnav [data-mtab]").forEach(x=>x.onclick=()=>{ if(document.body.dataset.mtab===x.dataset.mtab&&S.view==="home"){ window.scrollTo({top:0,behavior:"smooth"}); return } setMTab(x.dataset.mtab) });
+{ // les fonctions de l'application gardent leur comportement ; on y accroche seulement la mise en page téléphone
+  const sv=setView; setView=function(v){ const prev=S.view; sv(v); mSync();
+    if(!isM()) return;
+    if(v!=="home"){ if(document.body.dataset.mtab!=="outils") setMTab("outils"); if(!mPushed){ try{ history.pushState({mview:v},"") }catch(e){} mPushed=true } if(prev!==v) window.scrollTo({top:0}) }
+    else if(mPushed){ mPushed=false; try{ history.back() }catch(e){} } };
+  const rp=renderPanel; renderPanel=function(){ rp.apply(this,arguments); mSync() };
+  const ld=loadDataset; loadDataset=function(){ const r=ld.apply(this,arguments); if(isM()){ document.body.classList.remove("mfiche-open"); setMTab("bilan") } mSync(); return r };
+  const nd=setNoData; setNoData=function(on){ const r=nd.apply(this,arguments); if(on){ document.body.dataset.mtab="bilan"; mSync() } return r };
+}
+addEventListener("popstate",()=>{ if(mPushed){ mPushed=false; if(S.view!=="home") setView("home") } });
+$("mBack").onclick=()=>setView("home");
+document.addEventListener("click",e=>{ if(e.target.closest("[data-closecard]")){ $("anomCard").hidden=true; if(S.anomHover!=null){ S.anomHover=null; renderChart() } } });
+$("mFicheMore").onclick=()=>{ const o=document.body.classList.toggle("mfiche-open"); $("mFicheMore").setAttribute("aria-expanded",o); $("mFicheMore").textContent=o?"Moins de détails":"Détails de l'enregistrement" };
+$("mExcel").onclick=()=>$("btnExport").click();
+$("mPdf").onclick=()=>$("btnReport").click();
+MQ.addEventListener?.("change",()=>{ mSync(); if(S.ds) renderVolumes(); if(!isM()) window.scrollTo({top:0}) });
+document.body.dataset.mtab=document.body.dataset.mtab||"bilan";
 
 /* ---------- Application installable (version publiée sur un site web) ---------- */
 let installEvt=null;

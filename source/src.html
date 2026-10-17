@@ -312,15 +312,150 @@ tr.diff td:nth-child(3){font-weight:700}
 .modal textarea{font-family:var(--f-body);font-size:14px;min-height:70px}
 .modal-actions{justify-content:flex-end}
 .modal-actions .help{margin-right:auto}
+
+/* ================= Version téléphone (écrans étroits uniquement ; PC et tablette inchangés) ================= */
+.mnav,.mexport,.mback,.mtitle,.mfiche-more,.msub,.mshow,.ad-close{display:none}
+@media (max-width:700px), (pointer:coarse) and (max-height:500px){
+  body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px));-webkit-tap-highlight-color:transparent}
+  body.nodata{padding-bottom:24px}
+  .wrap{gap:12px}
+  input,select,textarea{font-size:16px!important}
+  .btn{min-height:40px;padding:8px 14px;font-size:14px}
+  .btn.small{min-height:34px}
+
+  /* barre du haut façon application */
+  header.top{position:sticky;top:0;z-index:45;background:var(--bg);margin-inline:-16px;padding:calc(8px + env(safe-area-inset-top,0px)) 12px 8px 16px;flex-wrap:nowrap;gap:10px;border-bottom:1px solid var(--line);min-height:56px}
+  .logo{display:none}
+  .appname{gap:10px;flex:1}
+  .appicon{width:32px;height:32px;filter:none}
+  .apptitle h1{font-size:20px}
+  .apptitle>span{display:none}
+  .actions #btnReport,.actions #btnExport{display:none}
+  .actions #btnOpen{font-size:0;gap:0;padding:0;width:42px;height:42px;justify-content:center;border-radius:21px}
+  .actions #btnOpen svg{width:22px;height:22px}
+  #btnInstall{font-size:0;gap:0;padding:0;width:42px;height:42px;justify-content:center;border-radius:21px}
+  #btnInstall svg{width:20px;height:20px}
+  body.nodata header.top{position:static;flex-wrap:wrap;border-bottom:none;padding-top:calc(16px + env(safe-area-inset-top,0px))}
+  body.nodata .logo{display:block;height:46px;max-width:60vw}
+  body.nodata .appname{flex-basis:100%}
+  body.nodata .apptitle>span{display:block;font-size:13px}
+  body.nodata .actions{display:none}
+  /* écran d'un outil : retour + titre */
+  .mback{display:none;align-items:center;justify-content:center;width:40px;height:40px;margin-left:-8px;border:none;background:none;color:var(--brand);border-radius:20px;cursor:pointer}
+  .mback svg{width:26px;height:26px}
+  .mtitle{display:none;font-family:var(--f-display);font-size:19px;font-weight:600;color:var(--brand);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  body.mtool .mback,body.mtool .mtitle{display:inline-flex}
+  body.mtool .appicon,body.mtool .apptitle{display:none}
+
+  /* onglets du bas */
+  body:not(.nodata) .mnav{display:grid}
+  .mnav{position:fixed;left:0;right:0;bottom:0;z-index:50;grid-template-columns:repeat(4,1fr);background:var(--surface);border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px));box-shadow:0 -6px 24px rgba(10,30,30,.07)}
+  .mnav button{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;font-size:12px;font-weight:600;color:var(--muted);padding:2px 0;min-height:56px;cursor:pointer}
+  .mnav .ico{position:relative;display:flex;align-items:center;justify-content:center;width:60px;height:32px;border-radius:16px;transition:background .15s}
+  .mnav svg{width:23px;height:23px}
+  .mnav button[aria-current="page"]{color:var(--brand)}
+  .mnav button[aria-current="page"] .ico{background:var(--brand-soft)}
+  .mnav .dot{position:absolute;top:-2px;right:6px;min-width:18px;height:18px;border-radius:9px;background:var(--an-red);color:#fff;font-size:11px;font-style:normal;font-weight:700;line-height:18px;text-align:center;padding:0 5px}
+  .mnav .dot[hidden]{display:none}
+
+  /* ce qui s'affiche dans chaque onglet */
+  body:not(.nodata):not([data-mtab="bilan"]) :is(#intro,#fiche,#mFicheMore,#kpis,#alerts){display:none!important}
+  body:not(.nodata):not([data-mtab="outils"]) .main>aside.mods{display:none}
+  body:not(.nodata):not([data-mtab="volumes"]) .bottom .vol{display:none}
+  body:not(.nodata):not([data-mtab="export"]) :is(.bottom .journal,.bottom .mexport){display:none}
+  body:not(.nodata)[data-mtab="export"] .mexport{display:flex}
+  body:not(.nodata):not([data-mtab="export"]) footer{display:none}
+  body:not(.nodata):is([data-mtab="volumes"],[data-mtab="export"]) .main{display:none}
+  body:not(.nodata)[data-mtab="outils"]:not(.mchart) .main>#chartSec{display:none}
+  body.nodata :is(.main>aside.mods,.bottom){display:none}
+  .main{gap:12px}
+
+  /* onglet Bilan */
+  .demobar{padding:8px 12px;font-size:12.5px;gap:6px 10px}
+  .demobar .btn{min-height:34px;padding:5px 12px;font-size:13px}
+  #fiche{grid-template-columns:1fr 1fr}
+  #fiche>div{padding:9px 12px}
+  body:not(.mfiche-open) #fiche{display:none}
+  body.nodata #mFicheMore{display:none}
+  .mhide{display:none}
+  .mshow{display:inline}
+  /* onglet Bilan : chiffres clés et courbe d'abord, détails de l'enregistrement ensuite */
+  #content>#kpis{order:1} #content>#alerts{order:2} #content>.main{order:3} #content>#mFicheMore{order:4} #content>#fiche{order:5} #content>.bottom{order:6}
+  body:not(.nodata):not(.mtool) .apptitle>.msub{display:block;font-size:12px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+  .apptitle{flex:1;min-width:0}
+  .apptitle h1{line-height:1.05}
+  .chart-tools .btn.small{min-height:30px;padding:3px 10px;font-size:12px}
+  .chart-tools{flex-wrap:wrap;row-gap:6px}
+  .chart-tools .legend{flex-basis:100%}
+  body.mchart .chart-tools .legend{flex-basis:auto}
+  body.nodata #chartSec>.rubrique{display:none}
+  body.mtool :is(#vLevels,#vLaw,#vDiag)>.vtitle{display:none}
+  .mfiche-more{display:block;align-self:flex-start;margin-top:0;background:none;border:none;color:var(--brand);font-weight:600;font-size:13.5px;padding:4px 0;cursor:pointer}
+  .mfiche-more::after{content:" ▾"}
+  body.mfiche-open .mfiche-more::after{content:" ▴"}
+  .kpis{grid-template-columns:1fr 1fr;gap:8px}
+  .kpi{padding:10px 12px;min-width:0}
+  .kpi .val{font-size:21px}
+  .kpi .sub{font-size:11.5px}
+  .kpi .lab{font-size:12px}
+  #chartSec .rubrique .hint{display:none}
+  #chartSec .private{display:none}
+
+  /* courbe compacte et fixe dans Corriger des niveaux / Diagnostic */
+  body.mchart .main>#chartSec{position:sticky;top:calc(56px + env(safe-area-inset-top,0px));z-index:30;margin-inline:-16px;border-radius:0;border-left:none;border-right:none;padding:6px 10px 2px;box-shadow:0 8px 18px rgba(10,30,30,.10)}
+  body.mchart #chartSec .rubrique{display:none}
+  body.mchart #chartSec .chart-tools{margin:0;gap:6px}
+  body.mchart #chartSec .legend{font-size:11px;gap:4px 10px}
+  body.mchart #chart{height:clamp(230px,38vh,330px)!important}
+  body.mtool .main>aside.mods{border:none;background:none;box-shadow:none;padding:4px 0 0}
+  body.mtool .main>aside.mods>.rubrique{display:none}
+  body.mtool [data-back]{display:none}
+
+  /* volumes */
+  .vol .rubrique{flex-wrap:wrap;gap:6px}
+  .vol .tablewrap{max-height:none;overflow:visible;border:none}
+  .vol table{font-size:13px}
+  .vol thead th{position:sticky;top:calc(56px + env(safe-area-inset-top,0px));z-index:2}
+  .vol :is(th,td).bar,.vol tr>:nth-child(5){display:none}
+  .vol table.unchanged tr>:is(:nth-child(3),:nth-child(4)){display:none}
+
+  /* exporter */
+  .mexport{flex-direction:column;gap:10px}
+  .mbig{display:grid;grid-template-columns:48px minmax(0,1fr) 18px;align-items:center;gap:14px;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 14px;cursor:pointer;color:var(--ink);min-height:76px}
+  .mbig:active{background:var(--surface-2)}
+  .mbig-ico{display:flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:12px;background:var(--brand-soft);color:var(--brand)}
+  .mbig-ico.pdf{background:var(--ko-bg);color:var(--rule)}
+  .mbig-ico svg{width:24px;height:24px}
+  .mbig-txt{display:flex;flex-direction:column;gap:3px;min-width:0}
+  .mbig-txt b{font-size:16px}
+  .mbig-txt small{font-size:12.5px;color:var(--ink-2);line-height:1.35}
+  .mbig .chev{width:18px;height:18px;color:var(--muted)}
+  footer{text-align:center;font-size:11.5px}
+
+  /* feuilles du bas : rapport, analyse d'anomalie, visite, messages */
+  .modal{align-items:flex-end;padding:0}
+  .modal-box{width:100%;max-height:92vh;overflow:auto;border-radius:18px 18px 0 0;padding:8px 16px calc(20px + env(safe-area-inset-bottom,0px))}
+  .modal-box::before{content:"";display:block;width:40px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 6px}
+  .modal-actions{position:sticky;bottom:calc(-20px - env(safe-area-inset-bottom,0px));background:var(--surface);padding:10px 0 4px}
+  .modal-actions .btn{flex:1;justify-content:center;min-height:46px}
+  .anomcard{position:fixed!important;left:8px!important;right:8px!important;top:auto!important;bottom:calc(80px + env(safe-area-inset-bottom,0px))!important;width:auto!important;max-height:48vh;overflow:auto;border-radius:14px;z-index:55}
+  .ad-close{display:flex;align-items:center;justify-content:center;position:sticky;top:0;float:right;width:36px;height:36px;margin:-6px -6px 0 6px;border:none;border-radius:18px;background:var(--surface-2);color:var(--ink);font-size:22px;line-height:1;cursor:pointer;z-index:1}
+  .tour{bottom:calc(84px + env(safe-area-inset-bottom,0px))!important}
+  .toast{bottom:calc(88px + env(safe-area-inset-bottom,0px))}
+  body.nodata .toast{bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+}
 </style>
 
 <div class="wrap">
   <header class="top">
     <img class="logo" src="%%LOGO%%" alt="COMETEC – instrumentation des eaux">
     <div class="appname">
+    <button class="mback" id="mBack" type="button" aria-label="Retour"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <span class="mtitle" id="mTitle"></span>
     <svg class="appicon" viewBox="0 0 120 120" role="img" aria-label="Icône COMETEC Bilan"><rect x="2" y="2" width="116" height="116" rx="25" fill="#FFFFFF" stroke="#D2DDDD" stroke-width="3"/><path d="M 85.5 34.5 A 36 36 0 1 0 85.5 85.5" fill="none" stroke="#556364" stroke-width="15"/><path d="M 30 70 C 44 70, 50 46, 62 46 S 78 74, 104 52" fill="none" stroke="#E3000B" stroke-width="7" stroke-linecap="round"/></svg>
     <div class="apptitle">
       <h1>COMETEC <span class="prod">Bilan</span></h1>
+      <span class="msub num" id="mSub"></span>
       <span>Traitement des bilans pour <span style="white-space:nowrap">débitmètres portables <b>BUL'R2</b></span></span>
     </div>
     </div>
@@ -335,11 +470,12 @@ tr.diff td:nth-child(3){font-weight:700}
 
   <div class="dz-err filerr" id="fileErr" role="alert" hidden></div>
   <div class="demobar" id="intro" hidden>
-    <span><b>Mode démonstration</b> · SITE TEST, données fictives. Ouvrez votre propre enregistrement quand vous voulez.</span>
+    <span class="mhide"><b>Mode démonstration</b> · SITE TEST, données fictives. Ouvrez votre propre enregistrement quand vous voulez.</span><span class="mshow"><b>Mode démonstration</b> · SITE TEST, données fictives.</span>
     <span class="inline"><button class="link" id="btnTour" type="button">Revoir la visite</button><button class="btn small" id="btnQuitDemo" type="button">Quitter la démo</button></span>
   </div>
   <div id="content" class="wrap">
   <dl class="fiche" id="fiche"></dl>
+  <button class="mfiche-more" id="mFicheMore" type="button" aria-expanded="false">Détails de l'enregistrement</button>
   <div class="kpis" id="kpis"></div>
   <div id="alerts" class="stack"></div>
 
@@ -395,7 +531,7 @@ tr.diff td:nth-child(3){font-weight:700}
       <div id="vDiag" class="stack" hidden>
         <button class="back" data-back type="button">‹ Toutes les modifications</button>
         <h3 class="vtitle">Diagnostic du bilan</h3>
-        <p class="help">Repère toutes les mesures où le niveau tombe à 0, et les périodes où il reste figé sur exactement la même valeur. Survolez-les sur la courbe ou choisissez-les ci-dessous : la zone est reconstituée d'après le reste de la courbe, avec son effet sur le bilan.</p>
+        <p class="help">Repère toutes les mesures où le niveau tombe à 0, et les périodes où il reste figé sur exactement la même valeur. <span class="mhide">Survolez-les</span><span class="mshow">Touchez-les</span> sur la courbe ou choisissez-les ci-dessous : la zone est reconstituée d'après le reste de la courbe, avec son effet sur le bilan.</p>
         <label class="field" style="flex-direction:row;align-items:center;gap:8px;flex-wrap:wrap">Niveau figé signalé à partir de
           <select id="dgX" style="width:auto"><option value="5">5 min</option><option value="10">10 min</option><option value="15">15 min</option><option value="30">30 min</option><option value="60">1 heure</option></select>
           <span class="help" id="dgXHelp"></span></label>
@@ -552,12 +688,23 @@ tr.diff td:nth-child(3){font-weight:700}
         </table>
       </div>
     </section>
+    <section class="card mexport" aria-labelledby="t-mexp">
+      <div class="rubrique"><h2 id="t-mexp">Exporter le bilan</h2></div>
+      <button class="mbig" id="mExcel" type="button"><span class="mbig-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8l8 8M16 8l-8 8"/></svg></span><span class="mbig-txt"><b>Fichier Excel complet</b><small>Bilan, graphiques, volumes, anomalies, corrections et journal</small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></button>
+      <button class="mbig" id="mPdf" type="button"><span class="mbig-ico pdf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6M9 13h8M9 17h8"/></svg></span><span class="mbig-txt"><b>Rapport PDF</b><small>Fiche de bilan prête à remettre au client</small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></button>
+    </section>
     <section class="card journal" aria-labelledby="t-journal">
       <div class="rubrique"><h2 id="t-journal">Journal des modifications</h2><span class="hint">Repris dans l'export Excel</span></div>
       <ol id="journal"></ol>
     </section>
   </div>
   </div>
+  <nav class="mnav" id="mnav" aria-label="Navigation">
+    <button type="button" data-mtab="bilan" aria-current="page"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l4-6 4 3 4-8 6 9"/><path d="M3 21h18"/></svg></span>Bilan</button>
+    <button type="button" data-mtab="outils"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg><i class="dot" id="mDot" hidden></i></span>Corriger</button>
+    <button type="button" data-mtab="volumes"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 20V11M12 20V5M18 20v-7"/></svg></span>Volumes</button>
+    <button type="button" data-mtab="export"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 20h16"/></svg></span>Exporter</button>
+  </nav>
   <footer>COMETEC · Instrumentation des eaux · ZA de Longifan, 38530 Chapareillan · COMETEC Bilan version %%VERSION%%</footer>
 </div>
 <div class="modal" id="reportModal" hidden role="dialog" aria-modal="true" aria-labelledby="t-report">
