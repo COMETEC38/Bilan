@@ -217,6 +217,19 @@ tr.diff td:nth-child(3){font-weight:700}
 .swbox{display:inline-block;width:14px;height:10px;border-radius:2px;opacity:.5}
 
 .beta{display:inline-block;vertical-align:middle;margin-left:6px;padding:1px 6px;border-radius:4px;background:var(--beta-bg);color:var(--beta-ink);font:700 10px/1.5 var(--f-body);font-style:normal;letter-spacing:.06em;text-transform:uppercase;position:relative;top:-1px}
+.demobar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;background:var(--beta-bg);color:var(--beta-ink);border-radius:var(--r);padding:9px 14px;font-size:13px}
+.demobar b{font-weight:700}
+.demobar .link{color:inherit;font-weight:700}
+.demobar .btn{background:var(--surface);color:var(--ink)}
+.btn.demo{background:var(--surface);border-color:color-mix(in srgb,var(--brand) 45%,var(--line));color:var(--brand);margin-top:0}
+.btn.demo svg{width:14px;height:14px}
+.tour{position:fixed;z-index:90;width:min(330px,calc(100vw - 24px));background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:12px;box-shadow:0 18px 50px rgba(10,30,30,.28);padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.tour b{font-family:var(--f-display);font-size:17px;font-weight:600;color:var(--brand)}
+.tour p{margin:0;font-size:13.5px;line-height:1.45}
+.tour .tour-step{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.tour-actions{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
+.tour-target{box-shadow:0 0 0 3px var(--focus),0 0 0 7px color-mix(in srgb,var(--focus) 25%,transparent)!important;border-radius:8px;position:relative;z-index:2}
+@media (max-width:700px){.tour{left:12px!important;right:12px;top:auto!important;bottom:calc(12px + env(safe-area-inset-bottom,0px));width:auto}}
 .sep{margin:8px 0 0;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);border-top:1px solid var(--line);padding-top:10px}
 .ldin{max-height:none}
 .ldin td{padding:3px 6px}
@@ -316,7 +329,10 @@ tr.diff td:nth-child(3){font-weight:700}
   </header>
 
   <div class="dz-err filerr" id="fileErr" role="alert" hidden></div>
-  <div class="intro" id="intro"><span><b>Exemple chargé.</b> Glissez votre propre fichier du BUL'R2 sur la page pour le traiter. Pour essayer une correction, ouvrez <b>Modifications › Corriger des niveaux</b> et utilisez la table de démonstration.</span></div>
+  <div class="demobar" id="intro" hidden>
+    <span><b>Mode démonstration</b> · SITE TEST, données fictives. Ouvrez votre propre enregistrement quand vous voulez.</span>
+    <span class="inline"><button class="link" id="btnTour" type="button">Revoir la visite</button><button class="btn small" id="btnQuitDemo" type="button">Quitter la démo</button></span>
+  </div>
   <div id="content" class="wrap">
   <dl class="fiche" id="fiche"></dl>
   <div class="kpis" id="kpis"></div>
@@ -339,6 +355,7 @@ tr.diff td:nth-child(3){font-weight:700}
           <h2 id="t-empty">Ouvrez un enregistrement du BUL'R2</h2>
           <p>Glissez ici le fichier Excel (.xlsx) ou CSV exporté par l'appareil.</p>
           <button class="btn primary big" id="btnOpen2" type="button">Ouvrir un enregistrement</button>
+          <button class="btn big demo" id="btnDemo" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 4v16l13-8z"/></svg>Essayer avec un bilan de démonstration</button>
           <div class="dz-err" id="emptyErr" role="alert" hidden></div>
           <p class="private"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Le fichier est traité sur cet ordinateur et n'est envoyé nulle part.</p>
         </div>
@@ -402,6 +419,7 @@ tr.diff td:nth-child(3){font-weight:700}
           <label class="opts"><span style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="ldOut"> Bilan entrée et sortie de station (rendements)</span></label>
           <div class="tablewrap ldin"><table class="num"><thead id="ldHead"></thead><tbody id="ldBody"></tbody></table></div>
           <p class="help">En mg/l. Une valeur sous la limite de quantification se saisit avec « &lt; », par exemple <b>&lt; 3</b>.</p>
+          <button class="link" id="btnDemoLab" type="button" hidden>Remplir avec des analyses d'exemple</button>
           <label class="field">Laboratoire, n° de rapport (facultatif)<input id="ldLab" maxlength="80"></label>
         </section>
 
@@ -452,7 +470,7 @@ tr.diff td:nth-child(3){font-weight:700}
               </div>
             </div>
           </details>
-          <button class="link" id="btnDemoTable" type="button" hidden>Utiliser la table de démonstration de l'exemple</button>
+          <button class="link" id="btnDemoTable" type="button" hidden>Utiliser la table de démonstration</button>
           <div id="checkBox" hidden></div>
           <div id="checkChart" hidden role="img" aria-label="Mesures de l'enregistrement comparées à la table"></div>
         </section>
@@ -496,6 +514,7 @@ tr.diff td:nth-child(3){font-weight:700}
           <span>Fichier Excel (.xlsx) ou CSV (.csv) uniquement · ou glissez-le ici</span>
         </div>
         <input type="file" id="lawInput" accept=".xlsx,.csv" hidden>
+        <button class="link" id="btnDemoLaw" type="button" hidden>Utiliser la loi de démonstration</button>
         <div id="lawBox" hidden></div>
         <div id="lawPreview" class="stack" hidden>
           <div id="hqchart" role="img" aria-label="Nouvelle loi comparée aux mesures de l'enregistrement"></div>
@@ -564,6 +583,12 @@ tr.diff td:nth-child(3){font-weight:700}
 <div id="pdfCharts" aria-hidden="true" style="position:fixed;left:-20000px;top:0;width:1600px;height:720px"></div>
 <div class="drop" id="drop" hidden>Déposez le fichier du BUL'R2 (.xlsx ou .csv)</div>
 <div class="toast" id="toast" hidden role="status"></div>
+<div class="tour" id="tour" hidden role="dialog" aria-labelledby="tourTitle">
+  <p class="tour-step" id="tourStep"></p>
+  <b id="tourTitle"></b>
+  <p id="tourText"></p>
+  <div class="tour-actions"><button class="link" id="tourSkip" type="button">Passer la visite</button><button class="btn primary small" id="tourNext" type="button">Suivant</button></div>
+</div>
 
 %%LIBS%%
 <script>

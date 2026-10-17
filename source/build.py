@@ -1,11 +1,11 @@
 import base64, json, sys
-VERSION='1.8.2'
-s=open('src.html').read().replace('%%VERSION%%',VERSION).replace('%%APP%%',open('app.js').read()).replace('%%DEMOTABLE%%',open('demo_table.json').read())
+VERSION='1.9.0'
+s=open('src.html').read().replace('%%VERSION%%',VERSION).replace('%%APP%%',open('app.js').read()).replace('%%DEMO%%',open('demo.json').read())
 logo='data:image/png;base64,'+base64.b64encode(open('logo_new.png','rb').read()).decode()
 import os
 ex=open('example.json').read() if os.path.exists('example.json') else 'null'  # exemple facultatif (données client, non publié)
-s0=s.replace('%%LOGO%%',logo).replace('%%EXAMPLE%%','null').replace(open('demo_table.json').read(),'null',1)
-s=s.replace('%%LOGO%%',logo).replace('%%EXAMPLE%%',ex)
+s0=s.replace('%%LOGO%%',logo).replace('%%EXAMPLE%%','null')
+s=s.replace('%%LOGO%%',logo).replace('%%EXAMPLE%%','null')  # plus de données client : la démo SITE TEST les remplace
 cdn=('<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>\n'
      '<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>\n'
      '<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>\n'

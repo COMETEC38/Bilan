@@ -1,6 +1,7 @@
 "use strict";
 const EXAMPLE = %%EXAMPLE%%;
-const DEMO_TABLE = %%DEMOTABLE%%;
+const DEMO = %%DEMO%%; // bilan fictif SITE TEST, table H/Q, seconde loi et analyses d'exemple
+const DEMO_TABLE = DEMO?DEMO.table:null;
 const MAX_GRID = 300;
 
 /* ---------- Format ---------- */
@@ -349,7 +350,7 @@ function refreshAfterChange(){S.imp=new Map();compute();renderKpis();renderChart
 function renderFiche(){
   const d=S.ds,m=d.meta,n=d.t.length;
   const items=[
-    ["Site", esc(m.site||"—")+(S.isExample?'<span class="badge">Exemple</span>':"")],
+    ["Site", esc(m.site||"—")+(S.isExample?'<span class="badge">Démonstration</span>':"")],
     ["Début", fmtDT(d.t[0])],["Fin", fmtDT(d.t[n-1])],["Durée", fmtDur((d.t[n-1]-d.t[0])/1000)],
     ["Pas d'enregistrement", (d.step>=60?`${nf(d.step/60,d.step%60?1:0)} min`:`${d.step} s`)+(d.rebuilt?' <span class="badge" title="Heures reconstituées à la seconde">recalculé</span>':"")],
     ["Mesures", n.toLocaleString("fr-FR")],["Mode", esc(m.mode||"—")],["Fichier", esc(d.fileName)]
@@ -597,7 +598,7 @@ async function loadSiteTableFile(f){
   catch(err){ const box=$("checkBox"); box.hidden=false; box.className="check ko"; box.innerHTML=`<p class="ttl">« ${esc(f.name)} » n'a pas pu être lu</p><p>${esc(err.message||err)}</p>` }
 }
 $("btnPasteTable").onclick=()=>{ const pts=parseTableRows(parseCSVText($("pasteTable").value),$("pasteTableUnit").value); if(pts.length<2){ const box=$("checkBox"); box.hidden=false; box.className="check ko"; box.innerHTML="<p>Aucune table reconnue : collez deux colonnes (hauteur en mm, débit).</p>"; return } useSiteTable(pts,"Table collée") };
-$("btnDemoTable").onclick=()=>useSiteTable(DEMO_TABLE.map(p=>p.slice()),"Table démo MANCHON");
+$("btnDemoTable").onclick=()=>useSiteTable(DEMO_TABLE.map(p=>p.slice()),"Table SITE TEST");
 const tDrop=$("tableDrop");
 tDrop.addEventListener("dragover",e=>{e.preventDefault();e.stopPropagation();tDrop.classList.add("over")});
 tDrop.addEventListener("dragleave",()=>tDrop.classList.remove("over"));
@@ -671,6 +672,7 @@ function lawEffect(pts){
   return {vol:V[V.length-1],qmax:q[iq],over,same:rel.length&&rel[Math.floor(rel.length/2)]<0.02};
 }
 function renderLawView(){
+  $("btnDemoLaw").hidden=!(S.isExample&&DEMO);
   if(!S.ds) return;
   const P=S.pendingLaw; $("lawPreview").hidden=!P;
   const ap=$("lawApplied");
@@ -756,6 +758,7 @@ function loadsCalc(){
     dcoDbo:ok(cd)&&ok(cb)&&!cd.lt&&!cb.lt&&cb.v>0?cd.v/cb.v:null, hasOut:L.out&&rows.some(r=>r.fo!=null), lab:L.lab};
 }
 function renderLoadsForm(){
+  $("btnDemoLab").hidden=!(S.isExample&&DEMO);
   if(!S.ds) return; const L=S.lab, d=S.ds, n=d.t.length;
   $("ldOut").checked=L.out;
   $("ldHead").innerHTML=`<tr><th>Paramètre</th><th>${L.out?"Entrée":"Concentration"} (mg/l)</th>${L.out?"<th>Sortie (mg/l)</th>":""}</tr>`;
@@ -1162,7 +1165,7 @@ async function exportExcel(){
     if(S.mod[i]) for(const c of [3,5,7,8]) row.getCell(c).fill={type:"pattern",pattern:"solid",fgColor:{argb:AMB}};
   }
   for(let i=0;i<n;i++){ const row=ws.getRow(2+i); row.getCell(1).numFmt="dd/mm/yyyy hh:mm:ss"; [2,3].forEach(c=>row.getCell(c).numFmt="0.0"); [4,5,6,7].forEach(c=>row.getCell(c).numFmt="0.000") }
-  const info=[["Site",d.meta.site||""],["Début",asDate(d.t[0])],["Fin",asDate(d.t[n-1])],["Pas d'enregistrement (s)",d.step],["Mode d'origine",d.meta.mode||""],["Fichier source",d.fileName],
+  const info=[...(S.isExample?[["Données","DÉMONSTRATION – SITE TEST, données fictives"]]:[]),["Site",d.meta.site||""],["Début",asDate(d.t[0])],["Fin",asDate(d.t[n-1])],["Pas d'enregistrement (s)",d.step],["Mode d'origine",d.meta.mode||""],["Fichier source",d.fileName],
     ["Table H/Q du site",S.siteLaw?`${S.siteLaw.name}${S.check&&S.check.ok?` (vérifiée, écart médian ${nf(S.check.median*100,1)} %)`:""}`:"—"],
     ["Nouvelle loi H/Q",S.newLaw?S.newLaw.name:"—"],["Anomalies détectées",S.anoms&&S.anoms.length?`${S.anoms.length} (${S.anoms.filter(a=>a.status==="fixed").length} réparée(s), ${S.anoms.filter(a=>a.status==="ignored").length} ignorée(s)) – voir l'onglet « Anomalies »`:"aucune"],["Corrections de niveau",S.corr.length?`${S.corr.length} correction(s), ${S.mod.reduce((a,b)=>a+b,0)} mesure(s) modifiée(s)`:"aucune"],
     ["Volume total – fichier (m³)",+s.vo.toFixed(3)],["Volume total – corrigé (m³)",+s.vn.toFixed(3)],["Débit maximal corrigé (m³/h)",+S.qn[s.iq].toFixed(3)],["Débit moyen corrigé (m³/h)",+s.qmoy.toFixed(3)]];
@@ -1215,7 +1218,7 @@ async function exportExcel(){
   // Onglet « Graphiques » : en-tête, puis volumes par intervalle et débit dans le temps
   wg.getCell("A1").value=`Bilan ${d.meta.site||""} – BUL'R2`; wg.getCell("A1").font={bold:true,size:16,color:{argb:BR}};
   wg.getCell("A2").value=`Du ${fmtDT(d.t[0])} au ${fmtDT(d.t[n-1])} · volume total ${ch?"corrigé ":""}${nf(s.vn,2)} m³${ch?` (fichier : ${nf(s.vo,2)} m³)`:""}`; wg.getCell("A2").font={size:11,color:{argb:"FF456161"}};
-  wg.getCell("A3").value=ch?`Courbes corrigées${S.newLaw?` avec la loi ${S.newLaw.name}`:""}${S.corr.length?`, ${S.corr.length} correction(s) de niveau`:""} – COMETEC Bilan`:"Données enregistrées par l'appareil – COMETEC Bilan"; wg.getCell("A3").font={italic:true,size:9,color:{argb:"FF6F8787"}};
+  wg.getCell("A3").value=(S.isExample?"Données de démonstration (fictives) – ":"")+(ch?`Courbes corrigées${S.newLaw?` avec la loi ${S.newLaw.name}`:""}${S.corr.length?`, ${S.corr.length} correction(s) de niveau`:""} – COMETEC Bilan`:"Données enregistrées par l'appareil – COMETEC Bilan"); wg.getCell("A3").font={italic:true,size:9,color:{argb:"FF6F8787"}};
   const buf0=await wb.xlsx.writeBuffer();
   let buf=buf0;
   if(window.JSZip){ try{
@@ -1356,7 +1359,7 @@ async function buildReport(){
     doc.setDrawColor(...ACC); doc.setLineWidth(0.6); doc.line(M,27,W-M,27);
   };
   const footer=(p,tot)=>{ doc.setDrawColor(...LINE); doc.setLineWidth(0.2); doc.line(M,H-14,W-M,H-14); set(8,"normal",MUT);
-    T([f.company&&`Établi par ${f.company}`,f.operator&&`Opérateur : ${f.operator}`,`Édité le ${todayS}`].filter(Boolean).join("  ·  "),M,H-9); T(`Page ${p} / ${tot}`,W-M,H-9,{align:"right"}) };
+    T([S.isExample&&"Données de démonstration (fictives)",f.company&&`Établi par ${f.company}`,f.operator&&`Opérateur : ${f.operator}`,`Édité le ${todayS}`].filter(Boolean).join("  ·  "),M,H-9); T(`Page ${p} / ${tot}`,W-M,H-9,{align:"right"}) };
   const section=(title,y)=>{ set(11,"bold",INK); T(title,M,y); doc.setDrawColor(...LINE); doc.setLineWidth(0.3); doc.line(M,y+2,W-M,y+2); return y+8 };
   const kv=(rows,y,colW)=>{ // tableau clé / valeur sur deux colonnes
     const half=CW/2, lw=colW||34; let yy=y;
@@ -1480,6 +1483,57 @@ async function buildReport(){
 }
 
 
+/* ---------- Bilan de démonstration SITE TEST ----------
+   Données fictives intégrées à l'application : on peut tout essayer sans enregistrement. La table H/Q est préchargée. */
+function startDemo(){
+  if(!DEMO) return;
+  const ds=parseNative(parseCSVText(DEMO.csv),"SITE_TEST.csv"); loadDataset(ds,true);
+  logAction("Bilan de démonstration","SITE TEST : données fictives fournies par COMETEC pour découvrir l'application.");
+  useSiteTable(DEMO.table.map(p=>p.slice()),"Table SITE TEST");
+  $("rpPoint").value="SITE TEST";
+  window.scrollTo({top:0});
+  let done=false; try{ done=localStorage.getItem("cometecBilanTour")==="1" }catch(e){}
+  if(!done) setTimeout(()=>startTour(),600);
+}
+function quitDemo(){ endTour(false); S.ds=null; S.isExample=false; setNoData(true); window.scrollTo({top:0}) }
+$("btnDemo").onclick=e=>{ e.stopPropagation(); startDemo() };
+$("btnQuitDemo").onclick=quitDemo;
+$("btnTour").onclick=()=>startTour();
+$("btnDemoLaw").onclick=()=>{ S.pendingLaw={name:"Loi démo SITE TEST",pts:DEMO.law2.map(p=>p.slice())}; lawMsg("",""); renderLawView() };
+$("btnDemoLab").onclick=()=>{ const L=DEMO.lab; Object.assign(S.lab.c,{dco:L.dco,dbo5:L.dbo5,mes:L.mes,ntk:L.ntk}); S.lab.cap=L.cap; renderLoadsForm(); renderKpis(); renderPanelHome() };
+
+/* Visite guidée : 4 bulles, au premier lancement de la démo, rejouable depuis le bandeau */
+const TOUR=[
+  {el:"actDiag",title:"Diagnostic du bilan",text:"Le diagnostic a repéré 4 anomalies : canne bouchée, canne hors de l'eau, une mesure à 0 et un niveau figé la nuit, invisible à l'œil. Ouvrez-le pour les voir sur la courbe et les réparer d'un clic."},
+  {el:"actLevels",title:"Corriger des niveaux",text:"La table H/Q de SITE TEST est déjà chargée et validée. Repérez le pic parasite à 140 mm vers 06:00, sélectionnez-le sur la courbe et reliez-le en ligne droite."},
+  {el:"actLaw",title:"Changer la loi hauteur/débit",text:"Cliquez sur « Utiliser la loi de démonstration » : tout le bilan est recalculé avec la nouvelle loi. Les charges polluantes ont aussi des analyses d'exemple prêtes à l'emploi."},
+  {el:"btnExport",title:"Exporter",text:"Exportez l'Excel complet (graphiques, anomalies, corrections, journal) ou le rapport PDF prêt à remettre. Les exports de démonstration sont marqués comme tels."}];
+let tourI=-1;
+function startTour(){ if(!S.ds) return; setView("home"); tourI=-1; nextTour() }
+function nextTour(){ $(TOUR[tourI]?.el)?.classList.remove("tour-target"); tourI++; if(tourI>=TOUR.length) return endTour(true); showTour() }
+function showTour(){
+  const st=TOUR[tourI], el=$(st.el), box=$("tour");
+  $("tourStep").textContent=`Visite guidée · ${tourI+1} / ${TOUR.length}`; $("tourTitle").textContent=st.title; $("tourText").textContent=st.text;
+  $("tourNext").textContent=tourI===TOUR.length-1?"Terminer":"Suivant";
+  document.querySelectorAll(".tour-target").forEach(x=>x.classList.remove("tour-target")); el.classList.add("tour-target");
+  el.scrollIntoView({block:"center",behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"});
+  box.hidden=false; setTimeout(placeTour,380); placeTour(); $("tourNext").focus({preventScroll:true});
+}
+function placeTour(){
+  if(tourI<0||$("tour").hidden) return; const el=$(TOUR[tourI].el), box=$("tour"), r=el.getBoundingClientRect(), w=box.offsetWidth, h=box.offsetHeight, vw=innerWidth, vh=innerHeight;
+  if(vw<=700) return; // sur mobile : bulle fixée en bas de l'écran (CSS)
+  let left=r.left-w-16, top=r.top+r.height/2-h/2;                         // à gauche de l'élément
+  if(left<12){ left=Math.min(Math.max(12,r.left),vw-w-12); top=r.bottom+12; if(top+h>vh-12) top=r.top-h-12 } // sinon dessous ou dessus
+  box.style.left=left+"px"; box.style.top=Math.max(12,Math.min(top,vh-h-12))+"px";
+}
+function endTour(done){
+  document.querySelectorAll(".tour-target").forEach(x=>x.classList.remove("tour-target")); $("tour").hidden=true; tourI=-1;
+  if(done!==false) try{ localStorage.setItem("cometecBilanTour","1") }catch(e){}
+}
+$("tourNext").onclick=nextTour; $("tourSkip").onclick=()=>endTour(true);
+addEventListener("resize",placeTour); addEventListener("scroll",placeTour,{passive:true});
+addEventListener("keydown",e=>{ if(e.key==="Escape"&&!$("tour").hidden) endTour(true) });
+
 /* ---------- Application installable (version publiée sur un site web) ---------- */
 let installEvt=null;
 addEventListener("beforeinstallprompt",e=>{ e.preventDefault(); installEvt=e; $("btnInstall").hidden=false });
@@ -1496,7 +1550,7 @@ new MutationObserver(rethem).observe(document.documentElement,{attributes:true,a
 
 /* ---------- Démarrage ---------- */
 (function start(){
-  if(!EXAMPLE){ setNoData(true); return }
+  if(!EXAMPLE||true){ setNoData(true); return } // plus d'exemple client : la démo SITE TEST est proposée sur l'écran d'accueil
   const rows=EXAMPLE.rows.map(r=>r.map(v=>(typeof v==="number"&&v>1e11)?new Date(v):v));
   const ds=parseNative(rows,EXAMPLE.name); ds.sheet=EXAMPLE.sheet; loadDataset(ds,true);
   if(!window.echarts) toast("Le module graphique n'a pas pu être chargé.");
