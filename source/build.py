@@ -1,5 +1,5 @@
 import base64, json, sys
-VERSION='1.9.3'
+VERSION='1.9.4'
 s=open('src.html').read().replace('%%VERSION%%',VERSION).replace('%%APP%%',open('app.js').read()).replace('%%DEMO%%',open('demo.json').read())
 logo='data:image/png;base64,'+base64.b64encode(open('logo_new.png','rb').read()).decode()
 import os

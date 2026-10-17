@@ -1,5 +1,5 @@
-// COMETEC Bilan 1.9.3 – fonctionnement hors ligne
-const CACHE='cometec-bilan-1.9.3-3ea73be3';
+// COMETEC Bilan 1.9.4 – fonctionnement hors ligne
+const CACHE='cometec-bilan-1.9.4-dc4d204d';
 const FILES=['./','index.html','manifest.webmanifest','icons/icon-192.png','icons/icon-512.png','icons/icon-maskable-512.png','icons/apple-touch-icon.png','icons/favicon-64.png'];
 self.addEventListener('install',e=>{ e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting())) });
 self.addEventListener('activate',e=>{ e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(n=>n!==CACHE).map(n=>caches.delete(n)))).then(()=>self.clients.claim())) });
