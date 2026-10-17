@@ -525,6 +525,113 @@ body.onhub{padding-bottom:0!important}
 @keyframes hubIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 @keyframes hwDraw{from{stroke-dashoffset:1600}to{stroke-dashoffset:0}}
 @media (prefers-reduced-motion: reduce){.hub-anim *{animation:none!important}}
+
+/* ================= Simulateur de débit ================= */
+.sim{display:none}
+body.onsim .sim{display:flex}
+body.onsim>.wrap,body.onsim .mnav,body.onsim .hub{display:none!important}
+body.onsim{padding-bottom:0!important}
+.hub-tool{display:grid;grid-template-columns:56px minmax(0,1fr) 20px;align-items:center;gap:16px;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 20px;cursor:pointer;color:var(--ink);transition:border-color .15s,box-shadow .15s,transform .15s}
+.hub-tool:hover{border-color:var(--brand);box-shadow:0 10px 26px rgba(18,56,56,.10);transform:translateY(-1px)}
+.ht-ico{display:flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:14px;background:var(--brand-soft);color:var(--brand)}
+.ht-ico svg{width:36px;height:36px}
+.ht-txt{display:flex;flex-direction:column;gap:4px;min-width:0}
+.ht-txt b{font-family:var(--f-display);font-size:19px;font-weight:600;color:var(--brand)}
+.ht-txt small{font-size:13.5px;color:var(--ink-2);line-height:1.4}
+.ht-chev{width:20px;height:20px;color:var(--muted)}
+.hub-soon{grid-template-columns:repeat(3,minmax(0,1fr))}
+.hub-anim .hub-tool{animation-delay:2.15s}
+.sim{flex-direction:column;max-width:1040px;margin:0 auto;min-height:100vh;min-height:100dvh;padding-bottom:calc(24px + env(safe-area-inset-bottom,0px))}
+.sim-bar{position:sticky;top:0;z-index:10;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;background:var(--bg);padding:calc(14px + env(safe-area-inset-top,0px)) 0 12px;border-bottom:1.5px solid var(--rule)}
+.sim-back{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);background:var(--surface);color:var(--brand);border-radius:999px;padding:7px 14px 7px 8px;font-weight:600;font-size:14px;cursor:pointer}
+.sim-back svg{width:20px;height:20px}
+.sim-bar h1{margin:0;font-family:var(--f-display);font-weight:600;font-size:26px;color:var(--brand);text-align:center}
+.sim-logo{height:44px;width:auto;background:var(--logo-plate);border-radius:8px;padding:var(--logo-pad)}
+.sim-body{display:flex;flex-direction:column;gap:18px;padding-top:18px}
+.sim-intro{margin:0;color:var(--ink-2);font-size:15px;max-width:720px}
+.sim-intro b{color:var(--ink)}
+.sim-modes{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.sim-mode{display:flex;align-items:center;gap:14px;text-align:left;background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:14px 16px;cursor:pointer;color:var(--ink)}
+.sim-mode svg{width:44px;height:44px;flex:none;color:var(--muted)}
+.sim-mode span{display:flex;flex-direction:column;gap:2px}
+.sim-mode b{font-size:16px}
+.sim-mode small{font-size:12.5px;color:var(--ink-2)}
+.sim-mode[aria-checked="true"]{border-color:var(--brand);background:var(--brand-soft);box-shadow:inset 0 0 0 1px var(--brand)}
+.sim-mode[aria-checked="true"] svg{color:var(--brand)}
+.sim-main{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:20px;align-items:start}
+.sim-fig{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 14px 10px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.sim-fig svg{width:100%;max-width:460px;height:auto;display:block}
+.sim-fig figcaption{font-size:12.5px;color:var(--muted)}
+.sim-form{display:flex;flex-direction:column;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px}
+.sim-field{display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:14px}
+.sim-in{display:flex;align-items:center;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);overflow:hidden}
+.sim-in:focus-within{border-color:var(--brand);box-shadow:0 0 0 3px color-mix(in srgb,var(--brand) 18%,transparent)}
+.sim-in input{flex:1;min-width:0;border:none;background:none;padding:12px 12px;font-size:18px;font-weight:600;outline:none;font-variant-numeric:tabular-nums}
+.sim-in em{font-style:normal;font-weight:600;color:var(--muted);padding:0 14px;font-size:14px}
+.sim-err{margin:0;background:var(--ko-bg);color:var(--ko-ink);border-radius:8px;padding:9px 12px;font-size:13.5px}
+.sim-go{min-height:50px;border:none;border-radius:12px;background:var(--brand);color:var(--on-brand);font-weight:700;font-size:16px;cursor:pointer}
+.sim-go:hover{filter:brightness(1.08)}
+.sim-res{display:flex;flex-direction:column;gap:12px;border-top:1px solid var(--line);padding-top:14px}
+.sr-main{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 18px;background:linear-gradient(135deg,#1A4D4D,#123838);color:#fff;border-radius:14px;padding:16px 18px}
+.sr-lab{flex-basis:100%;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#CCDCDC}
+.sr-q{font-size:17px}
+.sr-q b{font-family:var(--f-display);font-size:38px;font-weight:600;letter-spacing:.01em}
+.sr-q2{font-size:15px;color:#DCE8E8}
+.sr-q2 b{font-size:24px;font-weight:700;color:#fff}
+.sr-det{margin:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.sr-det div{background:var(--surface-2);border-radius:10px;padding:9px 11px}
+.sr-det dt{font-size:11.5px;color:var(--ink-2)}
+.sr-det dd{margin:2px 0 0;font-weight:700;font-size:15px;font-variant-numeric:tabular-nums}
+.sr-note{margin:0;font-size:12.5px;color:var(--warn-ink)}
+.sr-note:empty{display:none}
+.sim-foot{margin:0;font-size:12.5px;color:var(--muted)}
+.res-pop{animation:resPop .35s cubic-bezier(.2,1.3,.4,1)}
+@keyframes resPop{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+/* schéma */
+#simSvg .wall{fill:#B9C6C6}
+#simSvg .wall-edge{fill:none;stroke:#7D8F8F;stroke-width:1.2}
+#simSvg .inner{fill:var(--surface-2)}
+#simSvg .water{fill:url(#simWater)}
+#simSvg .surf{stroke:#5FC0C7;stroke-width:2;fill:none}
+#simSvg .dim{stroke:var(--rule);stroke-width:1.6;fill:none}
+#simSvg .ext{stroke:var(--rule);stroke-width:1;stroke-dasharray:3 3;fill:none;opacity:.8}
+#simSvg .dimtxt{fill:var(--rule);font-weight:700;font-size:15px;font-family:var(--f-body)}
+#simSvg .htxt{fill:#00838C;font-weight:700;font-size:14px;font-family:var(--f-body)}
+#simSvg .hdim{stroke:#00838C;stroke-width:1.6;fill:none}
+#simSvg .hext{stroke:#00838C;stroke-width:1;stroke-dasharray:3 3;fill:none;opacity:.8}
+#simSvg .vsym{fill:#fff;stroke:#0E5E63;stroke-width:2}
+#simSvg .vdot{fill:#0E5E63}
+#simSvg .vtxt{fill:#fff;font-weight:700;font-size:13px;font-family:var(--f-body);paint-order:stroke;stroke:#0E5E63;stroke-width:3px}
+#simSvg .ghost{opacity:.45}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) #simSvg .wall{fill:#4A5E5E} :root:not([data-theme="light"]) #simSvg .htxt{fill:#5FC9D0} :root:not([data-theme="light"]) #simSvg .hdim,:root:not([data-theme="light"]) #simSvg .hext{stroke:#5FC9D0}}
+:root[data-theme="dark"] #simSvg .wall{fill:#4A5E5E}
+@media (max-width:860px){.hub-soon{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:700px), (pointer:coarse) and (max-height:500px){
+  .hub-soon{grid-template-columns:1fr 1fr}
+  .hub-tool{grid-template-columns:48px minmax(0,1fr) 18px;padding:16px;gap:12px}
+  .ht-ico{width:48px;height:48px}.ht-ico svg{width:30px;height:30px}
+  .sim-bar{margin-inline:-16px;padding:calc(8px + env(safe-area-inset-top,0px)) 12px 8px;border-bottom:1px solid var(--line);grid-template-columns:auto 1fr;min-height:56px}
+  .sim-bar h1{font-size:19px;text-align:left}
+  .sim-logo{display:none}
+  .sim-back{border:none;background:none;padding:6px 4px 6px 0}
+  .sim-back span{display:none}
+  .sim-back svg{width:26px;height:26px}
+  .sim-body{gap:14px;padding-top:14px}
+  .sim-intro{font-size:14px}
+  .sim-modes{gap:8px}
+  .sim-mode{flex-direction:column;align-items:flex-start;gap:8px;padding:12px}
+  .sim-mode svg{width:36px;height:36px}
+  .sim-mode b{font-size:14.5px}
+  .sim-main{grid-template-columns:1fr;gap:14px}
+  .sim-fig{padding:6px 8px 4px;position:sticky;top:calc(56px + env(safe-area-inset-top,0px));z-index:5;margin-inline:-16px;border-radius:0;border-left:none;border-right:none;box-shadow:0 8px 18px rgba(10,30,30,.10)}
+  .sim-fig svg{max-height:30vh}
+  .sim-fig figcaption{display:none}
+  .sim-form{padding:14px}
+  .sim-in input{font-size:18px!important}
+  .sr-q b{font-size:34px}
+  .sr-det{grid-template-columns:1fr 1fr}
+  .sr-det div:last-child{grid-column:1/-1}
+}
 </style>
 
 
@@ -548,14 +655,47 @@ body.onhub{padding-bottom:0!important}
       </div>
       <div class="hh-icon"><svg viewBox="0 0 120 120" aria-hidden="true"><rect x="2" y="2" width="116" height="116" rx="25" fill="#FFFFFF" stroke="#D2DDDD" stroke-width="3"/><path d="M 85.5 34.5 A 36 36 0 1 0 85.5 85.5" fill="none" stroke="#556364" stroke-width="15"/><path d="M 30 70 C 44 70, 50 46, 62 46 S 78 74, 104 52" fill="none" stroke="#E3000B" stroke-width="7" stroke-linecap="round"/></svg></div>
     </article>
+    <h3 class="hub-sub">Outils de calcul</h3>
+    <button class="hub-tool" id="hubSim" type="button">
+      <span class="ht-ico"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="18" fill="none" stroke="currentColor" stroke-width="3.5"/><path d="M8.5 31a18 18 0 0 0 31 0z" fill="currentColor" opacity=".35"/><path d="M8 31h32" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><path d="M6 6h36" stroke="#E3000B" stroke-width="2.5" stroke-linecap="round"/><path d="M6 3v6M42 3v6" stroke="#E3000B" stroke-width="2.5" stroke-linecap="round"/></svg></span>
+      <span class="ht-txt"><b>Simulateur de débit</b><small>Calculez un débit Q = S × V en conduite circulaire ou en canal rectangulaire, à partir du niveau d'eau et de la vitesse.</small></span>
+      <svg class="ht-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+    </button>
     <h3 class="hub-sub">Bientôt dans l'application</h3>
     <ul class="hub-soon">
-      <li><span class="hs-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span><b>Catalogue produits</b><small>Toute la gamme COMETEC, fiches et documentation</small><em>Bientôt</em></li>
-      <li><span class="hs-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.2 5.8L20 11l-5.8 2.2L12 19l-2.2-5.8L4 11l5.8-2.2z"/></svg></span><b>Nouveautés</b><small>Nouveaux produits et actualités</small><em>Bientôt</em></li>
-      <li><span class="hs-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M8 6h8M8 11h2M12 11h2M16 11h0M8 15h2M12 15h2M8 19h2M12 19h4"/></svg></span><b>Calcul de débit</b><small>Outils de calcul pour vos points de mesure</small><em>Bientôt</em></li>
       <li><span class="hs-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></span><b>Aide au paramétrage</b><small>Réglage pas à pas de vos appareils</small><em>Bientôt</em></li>
     </ul>
     <p class="hub-foot">COMETEC · Instrumentation des eaux · Chapareillan (38) · version %%VERSION%%</p>
+  </div>
+</section>
+<section class="sim" id="sim" aria-labelledby="simTitle">
+  <header class="sim-bar">
+    <button class="sim-back" id="simBack" type="button" aria-label="Retour à l'accueil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg><span>Accueil</span></button>
+    <h1 id="simTitle">Simulateur de débit</h1>
+    <img class="sim-logo" src="%%LOGO%%" alt="COMETEC">
+  </header>
+  <div class="sim-body">
+    <p class="sim-intro">Choisissez la forme de l'écoulement, renseignez les dimensions, le niveau d'eau et la vitesse moyenne : le débit est calculé par <b>Q = S × V</b>.</p>
+    <div class="sim-modes" role="radiogroup" aria-label="Forme de l'écoulement">
+      <button class="sim-mode" type="button" role="radio" aria-checked="true" data-shape="circ"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="17" fill="none" stroke="currentColor" stroke-width="3.5"/><path d="M9.3 31a17 17 0 0 0 29.4 0z" fill="currentColor" opacity=".35"/></svg><span><b>Conduite circulaire</b><small>Diamètre DN, niveau, vitesse</small></span></button>
+      <button class="sim-mode" type="button" role="radio" aria-checked="false" data-shape="rect"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 8v30h32V8" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/><rect x="10" y="24" width="28" height="12" fill="currentColor" opacity=".35"/></svg><span><b>Canal rectangulaire</b><small>Largeur, niveau, vitesse</small></span></button>
+    </div>
+    <div class="sim-main">
+      <figure class="sim-fig"><svg id="simSvg" viewBox="0 0 360 300" role="img" aria-label="Schéma de la section d'écoulement"></svg><figcaption id="simCap">Coupe de la conduite</figcaption></figure>
+      <form class="sim-form" id="simForm" novalidate>
+        <label class="sim-field"><span id="simDimLab">Diamètre de la conduite (DN)</span><span class="sim-in"><input id="simDim" inputmode="decimal" autocomplete="off" placeholder="ex. 300"><em>mm</em></span></label>
+        <label class="sim-field"><span>Niveau d'eau</span><span class="sim-in"><input id="simH" inputmode="decimal" autocomplete="off" placeholder="ex. 120"><em>mm</em></span></label>
+        <label class="sim-field"><span>Vitesse moyenne</span><span class="sim-in"><input id="simV" inputmode="decimal" autocomplete="off" placeholder="ex. 0,85"><em>m/s</em></span></label>
+        <p class="sim-err" id="simErr" role="alert" hidden></p>
+        <button class="sim-go" id="simGo" type="submit">Calculer</button>
+        <div class="sim-res" id="simRes" hidden aria-live="polite">
+          <div class="sr-main"><span class="sr-lab">Débit</span><span class="sr-q"><b id="srQh">–</b> m³/h</span><span class="sr-q2"><b id="srQs">–</b> l/s</span></div>
+          <dl class="sr-det"><div><dt>Section mouillée S</dt><dd id="srS">–</dd></div><div><dt id="srFillLab">Taux de remplissage</dt><dd id="srFill">–</dd></div><div><dt>Débit journalier équivalent</dt><dd id="srQj">–</dd></div></dl>
+          <p class="sr-note" id="srNote"></p>
+        </div>
+      </form>
+    </div>
+    <p class="sim-foot">Résultat théorique : la vitesse saisie est considérée comme la vitesse moyenne sur toute la section mouillée.</p>
   </div>
 </section>
 <div class="wrap">

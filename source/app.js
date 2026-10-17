@@ -1603,18 +1603,108 @@ document.body.dataset.mtab=document.body.dataset.mtab||"bilan";
 /* ---------- Accueil COMETEC : page d'ouverture avec logo animé ---------- */
 function hubOn(){ return document.body.classList.contains("onhub") }
 function showHub(anim){
-  const h=$("hub"), lg=$("hubLogo"); document.body.classList.add("onhub"); h.classList.remove("hub-anim"); window.scrollTo({top:0});
+  const h=$("hub"), lg=$("hubLogo"); document.body.classList.remove("onsim"); document.body.classList.add("onhub"); h.classList.remove("hub-anim"); window.scrollTo({top:0});
   if(anim&&!matchMedia("(prefers-reduced-motion: reduce)").matches){
     lg.style.setProperty("--hub-dy","0px"); const r=lg.getBoundingClientRect();
     lg.style.setProperty("--hub-dy",Math.max(0,innerHeight/2-(r.top+r.height/2))+"px"); void h.offsetWidth; h.classList.add("hub-anim") }
 }
-function enterApp(push){ if(!hubOn()) return; document.body.classList.remove("onhub"); $("hub").classList.remove("hub-anim"); if(push!==false) try{ history.pushState({app:1},"") }catch(e){} window.scrollTo({top:0}) }
+function simOn(){ return document.body.classList.contains("onsim") }
+function enterApp(push){ if(!hubOn()&&!simOn()) return; document.body.classList.remove("onhub","onsim"); $("hub").classList.remove("hub-anim"); if(push!==false) try{ history.pushState({app:1},"") }catch(e){} window.scrollTo({top:0}) }
 $("hubOpen").onclick=()=>enterApp();
 $("hubDemo").onclick=()=>{ enterApp(); startDemo() };
 document.querySelectorAll("header.top .logo, header.top .appicon").forEach(el=>{ el.classList.add("tohub"); el.title="Accueil COMETEC";
   el.addEventListener("click",()=>{ if(history.state&&history.state.app) history.back(); else showHub(false) }) });
-addEventListener("popstate",()=>{ const st=history.state; if(!hubOn()&&!(st&&(st.app||st.mview))) showHub(false); else if(hubOn()&&st&&st.app) enterApp(false) });
+addEventListener("popstate",()=>{ const st=history.state;
+  if(st&&st.sim){ if(!simOn()) showSim(false) }
+  else if(st&&(st.app||st.mview)){ if(hubOn()||simOn()) enterApp(false) }
+  else if(!hubOn()) showHub(false) });
 { const ld=loadDataset; loadDataset=function(){ if(hubOn()) enterApp(); return ld.apply(this,arguments) } }
+
+/* ---------- Simulateur de débit : Q = S × V ---------- */
+const SIM={shape:"circ",dims:{circ:"",rect:""},shown:false};
+function simNum(id){ const v=$(id).value.trim().replace(/\s/g,"").replace(",","."); if(v==="") return null; const n=Number(v); return isFinite(n)?n:NaN }
+function circArea(D,h){ const r=D/2; if(h>=D) return Math.PI*r*r/1e6; if(h<=0) return 0; const th=2*Math.acos((r-h)/r); return r*r/2*(th-Math.sin(th))/1e6 } // mm → m²
+function showSim(push){ document.body.classList.remove("onhub"); $("hub").classList.remove("hub-anim"); document.body.classList.add("onsim"); if(push!==false) try{ history.pushState({sim:1},"") }catch(e){} window.scrollTo({top:0}); simDraw() }
+$("hubSim").onclick=()=>showSim();
+$("simBack").onclick=()=>{ if(history.state&&history.state.sim) history.back(); else showHub(false) };
+function simSetShape(sh){
+  SIM.dims[SIM.shape]=$("simDim").value; SIM.shape=sh; $("simDim").value=SIM.dims[sh]||"";
+  document.querySelectorAll(".sim-mode").forEach(b=>b.setAttribute("aria-checked",b.dataset.shape===sh));
+  $("simDimLab").textContent=sh==="circ"?"Diamètre de la conduite (DN)":"Largeur du canal";
+  $("simDim").placeholder=sh==="circ"?"ex. 300":"ex. 400";
+  $("simCap").textContent=sh==="circ"?"Coupe de la conduite circulaire":"Coupe du canal rectangulaire";
+  $("simErr").hidden=true; $("simRes").hidden=true; SIM.shown=false; simDraw(); simSave() }
+document.querySelectorAll(".sim-mode").forEach(b=>b.onclick=()=>simSetShape(b.dataset.shape));
+const f1=(x,d)=>nf(x,d);
+function simDraw(){
+  const sh=SIM.shape, D=simNum("simDim"), H=simNum("simH"), V=simNum("simV");
+  const okD=D>0, okH=H!=null&&H>=0&&!isNaN(H), okV=V!=null&&!isNaN(V);
+  const defs=`<defs><linearGradient id="simWater" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3FB3BC"/><stop offset="1" stop-color="#0E6E75"/></linearGradient>
+    <marker id="arR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#E3000B"/></marker>
+    <marker id="arT" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#00838C"/></marker>
+    <clipPath id="simClip"><circle cx="160" cy="160" r="100"/></clipPath></defs>`;
+  let g="";
+  const vsym=(x,y)=>`<g class="${okV?"":"ghost"}"><circle class="vsym" cx="${x}" cy="${y}" r="9"/><circle class="vdot" cx="${x}" cy="${y}" r="3"/><text class="vtxt" x="${x+15}" y="${y+5}">V${okV?" = "+f1(V,2)+" m/s":""}</text></g>`;
+  if(sh==="circ"){
+    const cx=160, cy=160, R=100, W=13, Dv=okD?D:300;
+    let fill=okH?Math.min(1,H/Dv):0.4; const ys=cy+R-fill*2*R;
+    g+=`<circle class="wall" cx="${cx}" cy="${cy}" r="${R+W}"/><circle class="wall-edge" cx="${cx}" cy="${cy}" r="${R+W}"/><circle class="inner" cx="${cx}" cy="${cy}" r="${R}"/>`;
+    g+=`<g class="${okH?"":"ghost"}"><rect class="water" clip-path="url(#simClip)" x="${cx-R}" y="${ys}" width="${2*R}" height="${cy+R-ys+1}"/>`;
+    if(fill>0&&fill<1){ const half=Math.sqrt(Math.max(0,R*R-(ys-cy)**2)); g+=`<line class="surf" x1="${cx-half}" y1="${ys}" x2="${cx+half}" y2="${ys}"/>` }
+    g+=`</g><circle class="wall-edge" cx="${cx}" cy="${cy}" r="${R}"/>`;
+    // cote DN (rouge, au-dessus)
+    g+=`<g class="${okD?"":"ghost"}"><line class="ext" x1="${cx-R}" y1="${cy}" x2="${cx-R}" y2="36"/><line class="ext" x1="${cx+R}" y1="${cy}" x2="${cx+R}" y2="36"/>
+      <line class="dim" x1="${cx-R+1}" y1="42" x2="${cx+R-1}" y2="42" marker-start="url(#arR)" marker-end="url(#arR)"/>
+      <text class="dimtxt" x="${cx}" y="33" text-anchor="middle">DN ${okD?f1(D,0):"?"}${okD?" mm":""}</text></g>`;
+    // cote h (turquoise, à droite)
+    const xd=cx+R+W+26, yb=cy+R, half=Math.sqrt(Math.max(0,R*R-(ys-cy)**2));
+    if(fill>0){ g+=`<g class="${okH?"":"ghost"}"><line class="hext" x1="${cx}" y1="${yb}" x2="${xd+6}" y2="${yb}"/><line class="hext" x1="${cx+half}" y1="${ys}" x2="${xd+6}" y2="${ys}"/>
+      <line class="hdim" x1="${xd}" y1="${yb-1}" x2="${xd}" y2="${ys+1}" marker-start="url(#arT)" marker-end="url(#arT)"/>
+      <text class="htxt" transform="translate(${xd+18} ${(yb+ys)/2}) rotate(-90)" text-anchor="middle">h${okH?" = "+f1(H,0)+" mm":""}</text></g>` }
+    if(cy+R-ys>30) g+=vsym(cx-18,(ys+cy+R)/2+ (fill>0.9?0:4));
+  } else {
+    const Lv=okD?D:400, Hv=okH?Math.max(H,0):Lv*0.35, maxW=220, maxH=165;
+    const sc=Math.min(maxW/Lv, Hv>0?maxH/Hv:Infinity), Wp=Lv*sc, Hp=Hv*sc, W=12, yf=262, cx=160, x0=cx-Wp/2;
+    const wallH=Math.min(200,Math.max(Hp+40,90));
+    g+=`<rect class="wall" x="${x0-W}" y="${yf-wallH}" width="${W}" height="${wallH+W}"/><rect class="wall" x="${x0+Wp}" y="${yf-wallH}" width="${W}" height="${wallH+W}"/><rect class="wall" x="${x0-W}" y="${yf}" width="${Wp+2*W}" height="${W}"/>
+      <rect class="inner" x="${x0}" y="${yf-wallH}" width="${Wp}" height="${wallH}"/>
+      <path class="wall-edge" d="M${x0-W} ${yf-wallH}V${yf+W}H${x0+Wp+W}V${yf-wallH}H${x0+Wp}V${yf}H${x0}V${yf-wallH}Z"/>`;
+    g+=`<g class="${okH?"":"ghost"}"><rect class="water" x="${x0}" y="${yf-Hp}" width="${Wp}" height="${Hp}"/>${Hp>0?`<line class="surf" x1="${x0}" y1="${yf-Hp}" x2="${x0+Wp}" y2="${yf-Hp}"/>`:""}</g>`;
+    const yt=yf-wallH;
+    g+=`<g class="${okD?"":"ghost"}"><line class="ext" x1="${x0}" y1="${yt}" x2="${x0}" y2="${Math.min(36,yt-6)}"/><line class="ext" x1="${x0+Wp}" y1="${yt}" x2="${x0+Wp}" y2="${Math.min(36,yt-6)}"/>
+      <line class="dim" x1="${x0+1}" y1="${Math.min(42,yt-12)}" x2="${x0+Wp-1}" y2="${Math.min(42,yt-12)}" marker-start="url(#arR)" marker-end="url(#arR)"/>
+      <text class="dimtxt" x="${cx}" y="${Math.min(33,yt-21)}" text-anchor="middle">L ${okD?"= "+f1(D,0)+" mm":"?"}</text></g>`;
+    const xd=x0+Wp+W+26;
+    if(Hp>0) g+=`<g class="${okH?"":"ghost"}"><line class="hext" x1="${x0+Wp}" y1="${yf}" x2="${xd+6}" y2="${yf}"/><line class="hext" x1="${x0+Wp}" y1="${yf-Hp}" x2="${xd+6}" y2="${yf-Hp}"/>
+      <line class="hdim" x1="${xd}" y1="${yf-1}" x2="${xd}" y2="${yf-Hp+1}" marker-start="url(#arT)" marker-end="url(#arT)"/>
+      <text class="htxt" transform="translate(${xd+18} ${yf-Hp/2}) rotate(-90)" text-anchor="middle">h${okH?" = "+f1(H,0)+" mm":""}</text></g>`;
+    if(Hp>30) g+=vsym(cx-18,yf-Hp/2+4);
+  }
+  $("simSvg").innerHTML=defs+g;
+}
+function simCalc(show){
+  const sh=SIM.shape, D=simNum("simDim"), H=simNum("simH"), V=simNum("simV"); const err=m=>{ if(show){ $("simErr").textContent=m; $("simErr").hidden=false; $("simRes").hidden=true; SIM.shown=false } return false };
+  if(D==null||isNaN(D)||D<=0) return err(sh==="circ"?"Indiquez le diamètre de la conduite (DN) en mm.":"Indiquez la largeur du canal en mm.");
+  if(H==null||isNaN(H)||H<0) return err("Indiquez le niveau d'eau en mm.");
+  if(V==null||isNaN(V)) return err("Indiquez la vitesse moyenne en m/s.");
+  if(V<0) return err("La vitesse doit être positive.");
+  if(sh==="circ"&&H>D) return err(`Le niveau d'eau (${f1(H,0)} mm) dépasse le diamètre de la conduite (DN ${f1(D,0)}). Vérifiez les valeurs.`);
+  const S=sh==="circ"?circArea(D,H):D*H/1e6, Qs=S*V*1000, Qh=S*V*3600;
+  $("simErr").hidden=true;
+  const dq=q=>q<100?2:q<1000?1:0;
+  $("srQh").textContent=f1(Qh,dq(Qh)); $("srQs").textContent=f1(Qs,dq(Qs)); $("srS").textContent=f1(S,S<0.1?4:3)+" m²";
+  $("srQj").textContent=f1(Qh*24,Qh*24<100?1:0)+" m³/j";
+  if(sh==="circ"){ $("srFillLab").textContent="Taux de remplissage (h / DN)"; $("srFill").textContent=f1(H/D*100,0)+" %" }
+  else { $("srFillLab").textContent="Section L × h"; $("srFill").textContent=`${f1(D,0)} × ${f1(H,0)} mm` }
+  const notes=[]; if(sh==="circ"&&H===D) notes.push("Conduite pleine : toute la section est prise en compte.");
+  if(V>5) notes.push("Vitesse inhabituellement élevée pour un écoulement gravitaire : vérifiez la valeur.");
+  $("srNote").textContent=notes.join(" ");
+  const r=$("simRes"); if(r.hidden||show){ r.hidden=false; r.classList.remove("res-pop"); void r.offsetWidth; r.classList.add("res-pop") } SIM.shown=true; return true }
+$("simForm").onsubmit=e=>{ e.preventDefault(); if(simCalc(true)&&isM()) $("simRes").scrollIntoView({block:"nearest",behavior:"smooth"}); simSave() };
+["simDim","simH","simV"].forEach(id=>$(id).addEventListener("input",()=>{ simDraw(); if(SIM.shown){ if(!simCalc(false)) { $("simRes").hidden=true; SIM.shown=false } } $("simErr").hidden=true; simSave() }));
+function simSave(){ try{ SIM.dims[SIM.shape]=$("simDim").value; localStorage.setItem("cometecSim",JSON.stringify({shape:SIM.shape,dims:SIM.dims,h:$("simH").value,v:$("simV").value})) }catch(e){} }
+try{ const o=JSON.parse(localStorage.getItem("cometecSim")||"null"); if(o){ const t=o.shape==="rect"?"rect":"circ"; SIM.dims=Object.assign({circ:"",rect:""},o.dims||{}); $("simH").value=o.h||""; $("simV").value=o.v||""; SIM.shape=t; $("simDim").value=SIM.dims[t]||""; simSetShape(t) } }catch(e){}
+simDraw();
 showHub(true);
 
 /* ---------- Application installable (version publiée sur un site web) ---------- */
