@@ -558,12 +558,12 @@ tr.diff td:nth-child(3){font-weight:700}
     </section>
   </div>
   </div>
-  <footer>COMETEC · Instrumentation des eaux · ZA de Longifan, 38530 Chapareillan · COMETEC Bilan version 1.9.4</footer>
+  <footer>COMETEC · Instrumentation des eaux · ZA de Longifan, 38530 Chapareillan · COMETEC Bilan version 1.9.5</footer>
 </div>
 <div class="modal" id="reportModal" hidden role="dialog" aria-modal="true" aria-labelledby="t-report">
   <form class="modal-box" id="reportForm">
     <div class="rubrique"><h2 id="t-report">Rapport PDF du bilan</h2><button class="link" type="button" id="reportClose">Fermer</button></div>
-    <p class="help">Ces informations apparaissent sur le rapport. Toutes sont facultatives et restent mémorisées sur cet ordinateur pour les prochains rapports.</p>
+    <p class="help" id="rpHelp">Ces informations apparaissent sur le rapport. Toutes sont facultatives et restent mémorisées sur cet ordinateur pour les prochains rapports.</p>
     <div class="formgrid">
       <label class="field">Titre du rapport<input id="rpTitle" value="Fiche de bilan de mesure de débit"></label>
       <label class="field">Point de mesure<input id="rpPoint"></label>
@@ -2412,9 +2412,26 @@ $("btnExport").onclick=()=>S.ds&&exportExcel().catch(e=>{console.error(e);toast(
 const RP_FIELDS=["rpTitle","rpPoint","rpOwner","rpRef","rpCompany","rpOperator"];
 let rpLogo=null; // {data, w, h}
 function rpLoad(){ try{ const o=JSON.parse(localStorage.getItem("cometecBilanReport")||"{}"); for(const k of ["rpTitle","rpOwner","rpRef","rpCompany","rpOperator"]) if(o[k]) $(k).value=o[k]; if(o.logo) rpLogo=o.logo }catch(e){} rpLogoUi() }
-function rpSave(){ try{ const o={}; for(const k of ["rpTitle","rpOwner","rpRef","rpCompany","rpOperator"]) o[k]=$(k).value; if(rpLogo) o.logo=rpLogo; localStorage.setItem("cometecBilanReport",JSON.stringify(o)) }catch(e){} }
-function rpLogoUi(){ $("rpLogoName").textContent=rpLogo?"Logo ajouté":""; $("rpLogoDel").hidden=!rpLogo; $("rpLogoBtn").textContent=rpLogo?"Changer le logo":"Ajouter votre logo (facultatif)" }
-$("btnReport").onclick=()=>{ if(!S.ds) return; rpLoad(); $("rpPoint").value=$("rpPoint").value||S.ds.meta.site||""; $("rpNotes").value=$("rpNotes").value||""; $("rpInfo").textContent=changed()?"Le rapport présente uniquement les valeurs corrigées.":""; $("reportModal").hidden=false; $("rpPoint").focus() };
+function rpSave(){ if(S.isExample) return; try{ const o={}; for(const k of ["rpTitle","rpOwner","rpRef","rpCompany","rpOperator"]) o[k]=$(k).value; if(rpLogo) o.logo=rpLogo; localStorage.setItem("cometecBilanReport",JSON.stringify(o)) }catch(e){} }
+function rpLogoUi(){ $("rpLogoName").textContent=rpLogo?(S.isExample&&rpLogo.demo?"Logo COMETEC (démonstration)":"Logo ajouté"):""; $("rpLogoDel").hidden=!rpLogo; $("rpLogoBtn").textContent=rpLogo?"Changer le logo":"Ajouter votre logo (facultatif)" }
+/* Bilan de démonstration : rapport pré-rempli (jamais mémorisé). Hors démo : réglages de l'utilisateur. */
+const RP_HELP="Ces informations apparaissent sur le rapport. Toutes sont facultatives et restent mémorisées sur cet ordinateur pour les prochains rapports.";
+const DEMO_RP={rpTitle:"Fiche de bilan de mesure de débit",rpOwner:"Communauté de Communes X",rpRef:"Schéma directeur d'assainissement – Phase 2",rpCompany:"COMETEC",rpOperator:"Monsieur X",rpNotes:"Ceci est un TEST"};
+let rpMode=null;
+function demoLogo(){ return new Promise(res=>{ const el=document.querySelector("img.logo"); if(!el) return res(null);
+  const img=new Image(); img.onload=()=>{ const sc=Math.min(1,300/img.height), c=document.createElement("canvas"); c.width=Math.round(img.width*sc); c.height=Math.round(img.height*sc);
+    const g=c.getContext("2d"); g.fillStyle="#fff"; g.fillRect(0,0,c.width,c.height); g.drawImage(img,0,0,c.width,c.height);
+    res({data:c.toDataURL("image/jpeg",0.92),w:c.width,h:c.height,demo:true}) }; img.onerror=()=>res(null); img.src=el.src }) }
+async function rpPrepare(){
+  const mode=S.isExample?"demo":"user";
+  if(mode!==rpMode){
+    for(const k of ["rpOwner","rpRef","rpCompany","rpOperator","rpNotes"]) $(k).value=""; $("rpTitle").value="Fiche de bilan de mesure de débit"; rpLogo=null;
+    if(mode==="demo"){ for(const k in DEMO_RP) $(k).value=DEMO_RP[k]; rpLogo=await demoLogo() }
+    rpMode=mode }
+  if(mode==="user") rpLoad();
+  $("rpHelp").textContent=mode==="demo"?"Bilan de démonstration : ces informations sont pré-remplies pour l'exemple. Vous pouvez les modifier ; elles ne seront pas mémorisées.":RP_HELP;
+  rpLogoUi() }
+$("btnReport").onclick=async()=>{ if(!S.ds) return; await rpPrepare(); $("rpPoint").value=$("rpPoint").value||S.ds.meta.site||""; $("rpNotes").value=$("rpNotes").value||""; $("rpInfo").textContent=changed()?"Le rapport présente uniquement les valeurs corrigées.":""; $("reportModal").hidden=false; $("rpPoint").focus() };
 $("reportClose").onclick=()=>$("reportModal").hidden=true;
 $("reportModal").addEventListener("click",e=>{ if(e.target.id==="reportModal") $("reportModal").hidden=true });
 addEventListener("keydown",e=>{ if(e.key==="Escape"&&!$("reportModal").hidden) $("reportModal").hidden=true });
@@ -2591,7 +2608,7 @@ function startDemo(){
   const ds=parseNative(parseCSVText(DEMO.csv),"SITE_TEST.csv"); loadDataset(ds,true);
   logAction("Bilan de démonstration","SITE TEST : données fictives fournies par COMETEC pour découvrir l'application.");
   useSiteTable(DEMO.table.map(p=>p.slice()),"Table SITE TEST");
-  $("rpPoint").value="SITE TEST";
+  $("rpPoint").value="SITE TEST"; rpMode=null;
   window.scrollTo({top:0});
   let done=false; try{ done=localStorage.getItem("cometecBilanTour")==="1" }catch(e){}
   if(!done) setTimeout(()=>startTour(),600);
