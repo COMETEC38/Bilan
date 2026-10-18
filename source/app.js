@@ -1670,7 +1670,32 @@ const PROD_CATS=[{id:"debitmetrie",name:"Débitmétrie",desc:"Débitmètres pour
   items:[
   ["venturi-amv","Canal Venturi AMV","Mesure de débit en canal ouvert à surface libre, liquides clairs ou chargés, de 5 à 3 300 m³/h","",0.4,"Canal ouvert · ISO 4359"],
   ["palmer-bowlus","Canal jaugeur Palmer-Bowlus","Canal circulaire en fibre de verre, à poser dans un conduit gravitaire DN 100 à 800 depuis un regard, jusqu'à 1 800 m³/h","",0.3,"Conduite circulaire"]
-  ].map(([id,n,s,t,mo,x])=>({id,n,s,t:t?t.split(" "):[],mo,x,f:`canaux/${id}.pdf`}))}];
+  ].map(([id,n,s,t,mo,x])=>({id,n,s,t:t?t.split(" "):[],mo,x,f:`canaux/${id}.pdf`}))},
+ {id:"capteurs",name:"Capteurs / Détecteurs",desc:"Pluviomètres, détection d'hydrocarbures, de surverse et de boue, mesure de niveau en piézomètre.",ico:'<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="24" cy="22" r="4.5"/><path d="M24 27v15"/><path d="M16 14a11 11 0 0 0 0 16M32 14a11 11 0 0 1 0 16"/><path d="M10 8a19 19 0 0 0 0 28M38 8a19 19 0 0 1 0 28" stroke="#E3000B"/></svg>',
+  groups:[],
+  items:[
+  ["pluvio-pro","Pluviomètre à auget basculant Pluvio PRO","Pluviomètre professionnel, orifice 200 cm², résolution 0,1 à 0,5 mm, étalonné manuellement (± 2 %)",0.7,"Pluie"],
+  ["pluvio-meteo","Pluviomètre à auget basculant Pluvio METEO","Pluviomètre météorologique, orifice 200 cm², avec drain pour récupérer l'eau en vue d'analyse",0.3,"Pluie"],
+  ["ldi-row","Détecteur optique d'hydrocarbure LDI ROW","Détection sans contact d'un film d'hydrocarbure dès 1 µm, sorties contact, 4-20 mA et RS485",1.3,"Hydrocarbures"],
+  ["enviroflu","Sonde HAP TriOS enviroFlu","Fluoromètre UV : concentration d'hydrocarbures dans l'eau, sans réactif ni prélèvement, sortie 4-20 mA",0.4,"Hydrocarbures"],
+  ["dts01","Détecteur de surverse DTS01","Détection par conductivité, relais pour mesurer les temps de surverse et déclencher un préleveur",0.1,"Surverse"],
+  ["dtr01","Détecteur de niveau de boue DTR01","Détecteur optique à sonde lestée pour contrôler le niveau de boue des fosses, en assainissement collectif ou non",0.5,"Boues"],
+  ["piezo-bf","Sondes piézométriques à ruban série BF","Mesure manuelle du niveau d'eau en piézomètre, puits ou forage : ruban gradué au mm, signal sonore et lumineux",0.5,"Niveau"]
+  ].map(([id,n,s,mo,x])=>({id,n,s,t:[],mo,x,f:`capteurs/${id}.pdf`}))},
+ {id:"qualite",name:"Qualité de l'eau",desc:"Sondes, transmetteurs et analyseurs physico-chimiques CHEMITEC, MESmètre portable et sonde HAP.",ico:'<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 6h14M20 6v13L9.5 37.5A4 4 0 0 0 13 43.5h22a4 4 0 0 0 3.5-6L28 19V6"/><path d="M14.5 31h19" stroke="#E3000B"/><circle cx="21" cy="37" r="1.6" fill="#E3000B" stroke="none"/><circle cx="27.5" cy="35.5" r="1.2" fill="#E3000B" stroke="none"/></svg>',
+  groups:[],
+  items:[
+  ["gamme-physico-chimique","Sondes et contrôleurs physico-chimiques","Présentation de la gamme CHEMITEC : pH/redox, conductivité, chlore, oxygène dissous, turbidité, MES, transmetteurs et analyseurs",0.6,"Gamme complète"],
+  ["serie-4001","Analyseur photométrique en ligne SÉRIE 4001","Chlore libre, total et combiné, dioxyde de chlore, ozone, acide peracétique ; étalonnage à chaque cycle",0.2,"Analyseur"],
+  ["serie-46","Transmetteur analogique SÉRIE 46","1 ou 2 capteurs (pH, redox, conductivité, chlore, oxygène, turbidité, MES), 4-20 mA, relais, Modbus",0.3,"Transmetteur"],
+  ["serie-50","Transmetteur numérique SÉRIE 50","2 à 4 capteurs numériques plug & play, écran couleur, enregistreur 250 000 valeurs",0.6,"Transmetteur"],
+  ["s401-dig-n","Électrode de pH/T° numérique S401 DIG/N","pH 0 à 14 et température, précision ± 0,05 pH, sortie Modbus RTU",0.3,"Sonde"],
+  ["s401-vg","Électrode de pH analogique S401/VG","Électrode en verre, signal mV, adaptée aux eaux peu conductrices (dès 5 µS/cm)",0.3,"Sonde"],
+  ["s423-c-opt","Sonde optique d'oxygène dissous S423/C/OPT","0 à 20 mg/L par luminescence, sans pièce mobile, Modbus RTU ou 4-20 mA",0.4,"Sonde"],
+  ["s461-tn","Sonde de turbidité numérique S461/TN","0 à 1 000 ou 4 000 NTU, infrarouge à 90° selon ISO 7027, RS485 ou 4-20 mA",0.5,"Sonde"],
+  ["r812","MESmètre portable R812","Portable de terrain multi-paramètres : MES, oxygène dissous, pH, redox ; capteurs interchangeables, enregistrement",0.3,"Portable"]
+  ].map(([id,n,s,mo,x])=>({id,n,s,t:[],mo,x,f:`qualite/${id}.pdf`}))}];
+PROD_CATS.find(c=>c.id==="qualite").items.push({...PROD_CATS.find(c=>c.id==="capteurs").items.find(i=>i.id==="enviroflu")});  /* la sonde HAP figure dans les deux familles (même PDF) */
 const PF={cat:null,sel:{},q:""};
 function prodOn(){ return document.body.classList.contains("onprod") }
 function curCat(){ return PROD_CATS.find(x=>x.id===PF.cat) }
