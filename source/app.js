@@ -1648,6 +1648,7 @@ const PROD_CATS=[{id:"debitmetrie",name:"Débitmétrie",desc:"Débitmètres pour
   ["phoenix","Débitmètre radar hauteur-vitesse PHOENIX","Rivières et grands canaux, sans contact avec l'écoulement","SL FI EB",0.7],
   ["flostick","Courantomètre électromagnétique FloStick","Lecture instantanée de la vitesse, enregistrement 2 000 valeurs","SL PO EU EB PL",0.5],
   ["fluvia","Courantomètre électromagnétique FLUVIA","Vitesse et calcul du débit, rivière, irrigation, assainissement","SL PO EU EB PL",2.3],
+  ["radar-mate","Radar de vitesse portable RADAR‑MATE 2","Mesure de vitesse rapide et instantanée, sans contact, par radar de surface","SL PO EU EP EB PL",0.2],
   ["easyflow","Débitmètre par traçage au sel EASYFLOW","Jaugeage en quelques minutes sur cours d'eau à fort brassage","SL PO EB",0.4],
   ["torpee-mag","Débitmètre multipoint à insertion TORPEE-MAG","Électromagnétique, DN 100 à DN 2500, pose sans interruption du débit","EC FI EP EB",0.4],
   ["kf100","Débitmètre à temps de transit KF100","Poste fixe, capteur non intrusif, DN 10 à 3 000 mm","EC FI EP EB",0.3],
