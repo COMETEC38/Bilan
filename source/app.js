@@ -1638,9 +1638,9 @@ const PROD_CATS=[{id:"debitmetrie",name:"Débitmétrie",desc:"Débitmètres pour
   groups:[{k:"m",l:"Mesure",o:[["SL","Surface libre"],["EC","En charge"]],main:true},G_INSTALL,{k:"w",l:"Type d'eau",o:[["EU","Eaux usées"],["EP","Eau potable"],["EB","Eau brute"],["PL","Eaux pluviales"]],water:true}],
   items:[
   ["raven-eye","Débitmètre radar hauteur-vitesse RAVEN-EYE","Sans contact, installation au-dessus du conduit, insensible à la nature de l'effluent","SL FI EU EP EB PL",0.8],
-  ["beluga-av","Débitmètre Doppler hauteur-vitesse BELUGA AV","Capteur Doppler et pression, ultra-compact, Modbus","SL PO FI EU EB PL",0.5],
-  ["beluga","Débitmètre Doppler hauteur-vitesse BELUGA","Installation sans modification du conduit, fonctionne en refoulement","SL PO FI EU EB PL",0.7],
-  ["raven-eye-beluga-solutions-autonomes","RAVEN-EYE & BELUGA Solutions autonomes","Valise batterie et enregistreur pour pose temporaire sous tampon","SL PO EU EB PL",0.4],
+  ["beluga-av","Débitmètre Doppler hauteur-vitesse BELUGA AV","Capteur Doppler et pression, ultra-compact, Modbus","SL FI EU EB PL",0.5],
+  ["beluga","Débitmètre Doppler hauteur-vitesse BELUGA","Installation sans modification du conduit, fonctionne en refoulement","SL FI EU EB PL",0.7],
+  ["raven-eye-beluga-solutions-autonomes","RAVEN-EYE & BELUGA Solutions autonomes","Solutions autonomes hauteur / vitesse sur datalogger","SL PO FI EU EB PL",0.4],
   ["logr","Débitmètre portable LOG'R","Doppler hauteur-vitesse autonome pour le diagnostic de réseau, Wi-Fi","SL PO EU PL",0.5],
   ["bulr2","Débitmètre portable bulle à bulle BUL'R2","Débit sur canal de comptage, enregistreur intégré, asservissement préleveur","SL PO EU EB PL",0.3],
   ["debulle","Débitmètre bulle à bulle DEBULLE","Poste fixe sur canal de comptage, enregistreur intégré","SL FI EU EB PL",0.9],
