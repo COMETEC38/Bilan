@@ -606,6 +606,30 @@ body.onsim{padding-bottom:0!important}
 #simSvg .ghost{opacity:.45}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) #simSvg .wall{fill:#4A5E5E} :root:not([data-theme="light"]) #simSvg .htxt{fill:#5FC9D0} :root:not([data-theme="light"]) #simSvg .hdim,:root:not([data-theme="light"]) #simSvg .hext{stroke:#5FC9D0}}
 :root[data-theme="dark"] #simSvg .wall{fill:#4A5E5E}
+
+.sim-meth{display:grid;grid-template-columns:1fr 1fr;background:var(--surface-2);border-radius:14px;padding:4px;gap:4px}
+.sim-meth button{display:flex;flex-direction:column;align-items:center;gap:1px;border:none;background:none;border-radius:11px;padding:9px 8px;cursor:pointer;color:var(--ink-2)}
+.sim-meth b{font-size:15px}
+.sim-meth small{font-size:12px}
+.sim-meth button[aria-checked="true"]{background:var(--surface);color:var(--brand);box-shadow:0 2px 8px rgba(18,56,56,.12)}
+.sim-ms{display:flex;flex-direction:column;gap:14px}
+.sim-ms[hidden]{display:none}
+.sim-ms .sim-field>label{font-weight:600;font-size:14px}
+.sim-in select{flex:1;min-width:0;border:none;background:none;padding:12px;font-size:16px;font-weight:600;outline:none;color:var(--ink)}
+.sim-unit{display:flex;gap:2px;margin-right:6px;background:var(--surface-2);border-radius:8px;padding:3px}
+.sim-unit button{border:none;background:none;border-radius:6px;padding:6px 9px;font-weight:700;font-size:13px;color:var(--muted);cursor:pointer}
+.sim-unit button[aria-checked="true"]{background:var(--surface);color:var(--brand);box-shadow:0 1px 4px rgba(18,56,56,.15)}
+.sim-hint{font-weight:400;font-size:12px;color:var(--muted)}
+.sr-tab{border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.sr-tab table{width:100%;border-collapse:collapse;font-size:13.5px;font-variant-numeric:tabular-nums}
+.sr-tab th{background:var(--surface-2);font-size:12px;color:var(--ink-2);font-weight:600;text-align:right;padding:7px 10px}
+.sr-tab th:first-child,.sr-tab td:first-child{text-align:left}
+.sr-tab td{padding:6px 10px;text-align:right;border-top:1px solid var(--line)}
+.sr-tab caption{caption-side:top;text-align:left;font-size:12.5px;font-weight:700;color:var(--ink-2);padding:8px 10px 6px}
+.sr-tab tr.cur td{background:var(--brand-soft);font-weight:700}
+
+.sr-det{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:700px), (pointer:coarse) and (max-height:500px){ .sr-det div:last-child{grid-column:auto} .sim-meth b{font-size:14px} }
 @media (max-width:860px){.hub-soon{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:700px), (pointer:coarse) and (max-height:500px){
   .hub-soon{grid-template-columns:1fr 1fr}
@@ -677,27 +701,47 @@ body.onsim{padding-bottom:0!important}
     <img class="sim-logo" src="%%LOGO%%" alt="COMETEC">
   </header>
   <div class="sim-body">
-    <p class="sim-intro">Choisissez la forme de l'écoulement, renseignez les dimensions, le niveau d'eau et la vitesse moyenne : le débit est calculé par <b>Q = S × V</b>.</p>
+    <div class="sim-meth" role="radiogroup" aria-label="Méthode de calcul">
+      <button type="button" role="radio" aria-checked="true" data-meth="sv"><b>Vitesse connue</b><small>Q = S × V</small></button>
+      <button type="button" role="radio" aria-checked="false" data-meth="ms"><b>Pente du radier</b><small>Manning-Strickler</small></button>
+    </div>
+    <p class="sim-intro" id="simIntro">Choisissez la forme de l'écoulement, renseignez les dimensions, le niveau d'eau et la vitesse moyenne : le débit est calculé par <b>Q = S × V</b>.</p>
     <div class="sim-modes" role="radiogroup" aria-label="Forme de l'écoulement">
-      <button class="sim-mode" type="button" role="radio" aria-checked="true" data-shape="circ"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="17" fill="none" stroke="currentColor" stroke-width="3.5"/><path d="M9.3 31a17 17 0 0 0 29.4 0z" fill="currentColor" opacity=".35"/></svg><span><b>Conduite circulaire</b><small>Diamètre DN, niveau, vitesse</small></span></button>
-      <button class="sim-mode" type="button" role="radio" aria-checked="false" data-shape="rect"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 8v30h32V8" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/><rect x="10" y="24" width="28" height="12" fill="currentColor" opacity=".35"/></svg><span><b>Canal rectangulaire</b><small>Largeur, niveau, vitesse</small></span></button>
+      <button class="sim-mode" type="button" role="radio" aria-checked="true" data-shape="circ"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="17" fill="none" stroke="currentColor" stroke-width="3.5"/><path d="M9.3 31a17 17 0 0 0 29.4 0z" fill="currentColor" opacity=".35"/></svg><span><b>Conduite circulaire</b><small class="smsub">Diamètre DN, niveau, vitesse</small></span></button>
+      <button class="sim-mode" type="button" role="radio" aria-checked="false" data-shape="rect"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 8v30h32V8" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/><rect x="10" y="24" width="28" height="12" fill="currentColor" opacity=".35"/></svg><span><b>Canal rectangulaire</b><small class="smsub">Largeur, niveau, vitesse</small></span></button>
     </div>
     <div class="sim-main">
       <figure class="sim-fig"><svg id="simSvg" viewBox="0 0 360 300" role="img" aria-label="Schéma de la section d'écoulement"></svg><figcaption id="simCap">Coupe de la conduite</figcaption></figure>
       <form class="sim-form" id="simForm" novalidate>
         <label class="sim-field"><span id="simDimLab">Diamètre de la conduite (DN)</span><span class="sim-in"><input id="simDim" inputmode="decimal" autocomplete="off" placeholder="ex. 300"><em>mm</em></span></label>
-        <label class="sim-field"><span>Niveau d'eau</span><span class="sim-in"><input id="simH" inputmode="decimal" autocomplete="off" placeholder="ex. 120"><em>mm</em></span></label>
-        <label class="sim-field"><span>Vitesse moyenne</span><span class="sim-in"><input id="simV" inputmode="decimal" autocomplete="off" placeholder="ex. 0,85"><em>m/s</em></span></label>
+        <label class="sim-field"><span id="simHLab">Niveau d'eau</span><span class="sim-in"><input id="simH" inputmode="decimal" autocomplete="off" placeholder="ex. 120"><em>mm</em></span></label>
+        <label class="sim-field" id="simVWrap"><span>Vitesse moyenne</span><span class="sim-in"><input id="simV" inputmode="decimal" autocomplete="off" placeholder="ex. 0,85"><em>m/s</em></span></label>
+        <div class="sim-ms" id="simMsWrap" hidden>
+          <div class="sim-field"><label for="simI">Pente du radier</label><span class="sim-in"><input id="simI" inputmode="decimal" autocomplete="off" placeholder="ex. 5"><span class="sim-unit" role="radiogroup" aria-label="Unité de pente"><button type="button" role="radio" aria-checked="true" data-iu="mm">mm/m</button><button type="button" role="radio" aria-checked="false" data-iu="pc">%</button></span></span><small class="sim-hint">1 % = 10 mm/m</small></div>
+          <div class="sim-field"><label for="simMat">Matériau et état de la paroi</label>
+            <span class="sim-in"><select id="simMat">
+              <option value="100">PVC / PEHD lisse</option>
+              <option value="90">PEHD annelé (paroi intérieure lisse)</option>
+              <option value="85">Fonte ou acier revêtus</option>
+              <option value="75">Béton lisse (préfabriqué)</option>
+              <option value="70" selected>Béton courant</option>
+              <option value="60">Béton brut ou dégradé, maçonnerie</option>
+              <option value="40">Canal en terre</option>
+              <option value="">Autre : saisir Ks</option>
+            </select></span></div>
+          <div class="sim-field"><label for="simKs">Rugosité</label><span class="sim-in"><input id="simKs" inputmode="decimal" autocomplete="off" value="70"><span class="sim-unit" role="radiogroup" aria-label="Type de coefficient"><button type="button" role="radio" aria-checked="true" data-ku="ks">Ks</button><button type="button" role="radio" aria-checked="false" data-ku="n">n</button></span></span><small class="sim-hint" id="simKsHint">Ks (Strickler, m<sup>1/3</sup>/s) = 1 / n (Manning). Valeurs indicatives, à adapter à l'état réel de la paroi (dépôts, joints, vieillissement).</small></div>
+        </div>
         <p class="sim-err" id="simErr" role="alert" hidden></p>
         <button class="sim-go" id="simGo" type="submit">Calculer</button>
         <div class="sim-res" id="simRes" hidden aria-live="polite">
           <div class="sr-main"><span class="sr-lab">Débit</span><span class="sr-q"><b id="srQh">–</b> m³/h</span><span class="sr-q2"><b id="srQs">–</b> l/s</span></div>
-          <dl class="sr-det"><div><dt>Section mouillée S</dt><dd id="srS">–</dd></div><div><dt id="srFillLab">Taux de remplissage</dt><dd id="srFill">–</dd></div><div><dt>Débit journalier équivalent</dt><dd id="srQj">–</dd></div></dl>
+          <dl class="sr-det" id="srDet"></dl>
+          <div class="sr-tab" id="srTab" hidden></div>
           <p class="sr-note" id="srNote"></p>
         </div>
       </form>
     </div>
-    <p class="sim-foot">Résultat théorique : la vitesse saisie est considérée comme la vitesse moyenne sur toute la section mouillée.</p>
+    <p class="sim-foot" id="simFoot">Résultat théorique : la vitesse saisie est considérée comme la vitesse moyenne sur toute la section mouillée.</p>
   </div>
 </section>
 <div class="wrap">

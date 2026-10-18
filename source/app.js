@@ -1621,48 +1621,73 @@ addEventListener("popstate",()=>{ const st=history.state;
   else if(!hubOn()) showHub(false) });
 { const ld=loadDataset; loadDataset=function(){ if(hubOn()) enterApp(); return ld.apply(this,arguments) } }
 
-/* ---------- Simulateur de débit : Q = S × V ---------- */
-const SIM={shape:"circ",dims:{circ:"",rect:""},shown:false};
+/* ---------- Simulateur de débit : Q = S × V ou Manning-Strickler ---------- */
+const SIM={meth:"sv",shape:"circ",dims:{circ:"",rect:""},iu:"mm",ku:"ks",shown:false,vCalc:null};
 function simNum(id){ const v=$(id).value.trim().replace(/\s/g,"").replace(",","."); if(v==="") return null; const n=Number(v); return isFinite(n)?n:NaN }
-function circArea(D,h){ const r=D/2; if(h>=D) return Math.PI*r*r/1e6; if(h<=0) return 0; const th=2*Math.acos((r-h)/r); return r*r/2*(th-Math.sin(th))/1e6 } // mm → m²
+function wetted(sh,D,H){ // D, H en mm → S (m²), P (m)
+  if(sh==="circ"){ const r=D/2000, h=Math.max(0,Math.min(H,D))/1000; if(h>=2*r) return {S:Math.PI*r*r,P:2*Math.PI*r}; if(h<=0) return {S:0,P:0};
+    const th=2*Math.acos((r-h)/r); return {S:r*r/2*(th-Math.sin(th)),P:r*th} }
+  const L=D/1000, h=Math.max(0,H)/1000; return {S:L*h,P:L+2*h} }
+function strickler(w,Ks,I){ if(!(w.S>0)) return 0; return Ks*Math.pow(w.S/w.P,2/3)*Math.sqrt(I) } // V en m/s
 function showSim(push){ document.body.classList.remove("onhub"); $("hub").classList.remove("hub-anim"); document.body.classList.add("onsim"); if(push!==false) try{ history.pushState({sim:1},"") }catch(e){} window.scrollTo({top:0}); simDraw() }
 $("hubSim").onclick=()=>showSim();
 $("simBack").onclick=()=>{ if(history.state&&history.state.sim) history.back(); else showHub(false) };
+function radio(sel,attr,val){ document.querySelectorAll(sel).forEach(b=>b.setAttribute("aria-checked",b.dataset[attr]===val)) }
+function simLabels(){
+  const ms=SIM.meth==="ms", c=SIM.shape==="circ";
+  $("simVWrap").hidden=ms; $("simMsWrap").hidden=!ms;
+  $("simHLab").textContent=ms&&c?"Niveau d'eau (facultatif)":"Niveau d'eau";
+  $("simH").placeholder=ms&&c?"vide = conduite pleine":"ex. 120";
+  document.querySelectorAll(".sim-mode .smsub").forEach(x=>{ const sh=x.closest(".sim-mode").dataset.shape; x.textContent=sh==="circ"?(ms?"Diamètre, pente, rugosité":"Diamètre DN, niveau, vitesse"):(ms?"Largeur, niveau, pente, rugosité":"Largeur, niveau, vitesse") });
+  $("simIntro").innerHTML=ms?(c?"Renseignez le diamètre, la pente du radier et la rugosité : la capacité de la conduite à pleine section est calculée par la formule de <b>Manning-Strickler</b>. Ajoutez un niveau d'eau pour connaître le débit à ce niveau.":"Renseignez la largeur, le niveau d'eau, la pente du radier et la rugosité : le débit est calculé par la formule de <b>Manning-Strickler</b>.")
+    :"Choisissez la forme de l'écoulement, renseignez les dimensions, le niveau d'eau et la vitesse moyenne : le débit est calculé par <b>Q = S × V</b>.";
+  $("simFoot").textContent=ms?"Résultat théorique en régime uniforme : écoulement à surface libre, pente du radier constante, sans mise en charge ni influence de l'aval (remous). V = Ks × Rh^(2/3) × √I, Q = S × V.":"Résultat théorique : la vitesse saisie est considérée comme la vitesse moyenne sur toute la section mouillée.";
+  $("simCap").textContent=c?"Coupe de la conduite circulaire":"Coupe du canal rectangulaire";
+}
+function simReset(){ $("simErr").hidden=true; $("simRes").hidden=true; SIM.shown=false; SIM.vCalc=null }
 function simSetShape(sh){
   SIM.dims[SIM.shape]=$("simDim").value; SIM.shape=sh; $("simDim").value=SIM.dims[sh]||"";
-  document.querySelectorAll(".sim-mode").forEach(b=>b.setAttribute("aria-checked",b.dataset.shape===sh));
+  radio(".sim-mode","shape",sh);
   $("simDimLab").textContent=sh==="circ"?"Diamètre de la conduite (DN)":"Largeur du canal";
   $("simDim").placeholder=sh==="circ"?"ex. 300":"ex. 400";
-  $("simCap").textContent=sh==="circ"?"Coupe de la conduite circulaire":"Coupe du canal rectangulaire";
-  $("simErr").hidden=true; $("simRes").hidden=true; SIM.shown=false; simDraw(); simSave() }
+  simLabels(); simReset(); simDraw(); simSave() }
+function simSetMeth(m){ SIM.meth=m; radio(".sim-meth button","meth",m); simLabels(); simReset(); simDraw(); simSave() }
 document.querySelectorAll(".sim-mode").forEach(b=>b.onclick=()=>simSetShape(b.dataset.shape));
+document.querySelectorAll(".sim-meth button").forEach(b=>b.onclick=()=>simSetMeth(b.dataset.meth));
+document.querySelectorAll("[data-iu]").forEach(b=>b.onclick=()=>{ SIM.iu=b.dataset.iu; radio("[data-iu]","iu",SIM.iu); simLive(); simSave() });
+document.querySelectorAll("[data-ku]").forEach(b=>b.onclick=()=>{ if(SIM.ku===b.dataset.ku) return; const v=simNum("simKs");
+  SIM.ku=b.dataset.ku; radio("[data-ku]","ku",SIM.ku); if(v>0) $("simKs").value=SIM.ku==="n"?nf(1/v,4):nf(1/v,0); simLive(); simSave() });
+$("simMat").onchange=()=>{ const k=+$("simMat").value; if(k>0) $("simKs").value=SIM.ku==="n"?nf(1/k,4):String(k); else { $("simKs").value=""; $("simKs").focus() } simLive(); simSave() };
+function ksVal(){ const v=simNum("simKs"); if(!(v>0)) return v; return SIM.ku==="n"?1/v:v }
+function slopeVal(){ const v=simNum("simI"); if(!(v>0)) return v; return SIM.iu==="pc"?v/100:v/1000 }
 const f1=(x,d)=>nf(x,d);
 function simDraw(){
-  const sh=SIM.shape, D=simNum("simDim"), H=simNum("simH"), V=simNum("simV");
-  const okD=D>0, okH=H!=null&&H>=0&&!isNaN(H), okV=V!=null&&!isNaN(V);
+  const sh=SIM.shape, ms=SIM.meth==="ms", D=simNum("simDim"), H=simNum("simH");
+  const V=ms?SIM.vCalc:simNum("simV");
+  const okD=D>0, hEmpty=H==null, full=ms&&sh==="circ"&&hEmpty, okH=full||(H!=null&&H>=0&&!isNaN(H)), okV=V!=null&&!isNaN(V);
+  const vLab=ms?(okV?"V ≈ "+f1(V,2)+" m/s":"V"):(okV?"V = "+f1(V,2)+" m/s":"V");
   const defs=`<defs><linearGradient id="simWater" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3FB3BC"/><stop offset="1" stop-color="#0E6E75"/></linearGradient>
     <marker id="arR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#E3000B"/></marker>
     <marker id="arT" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#00838C"/></marker>
     <clipPath id="simClip"><circle cx="160" cy="160" r="100"/></clipPath></defs>`;
   let g="";
-  const vsym=(x,y)=>`<g class="${okV?"":"ghost"}"><circle class="vsym" cx="${x}" cy="${y}" r="9"/><circle class="vdot" cx="${x}" cy="${y}" r="3"/><text class="vtxt" x="${x+15}" y="${y+5}">V${okV?" = "+f1(V,2)+" m/s":""}</text></g>`;
+  const vsym=(x,y)=>`<g class="${okV?"":"ghost"}"><circle class="vsym" cx="${x}" cy="${y}" r="9"/><circle class="vdot" cx="${x}" cy="${y}" r="3"/><text class="vtxt" x="${x+15}" y="${y+5}">${vLab}</text></g>`;
   if(sh==="circ"){
     const cx=160, cy=160, R=100, W=13, Dv=okD?D:300;
-    let fill=okH?Math.min(1,H/Dv):0.4; const ys=cy+R-fill*2*R;
+    let fill=full?1:(okH?Math.min(1,H/Dv):0.4); const ys=cy+R-fill*2*R;
     g+=`<circle class="wall" cx="${cx}" cy="${cy}" r="${R+W}"/><circle class="wall-edge" cx="${cx}" cy="${cy}" r="${R+W}"/><circle class="inner" cx="${cx}" cy="${cy}" r="${R}"/>`;
     g+=`<g class="${okH?"":"ghost"}"><rect class="water" clip-path="url(#simClip)" x="${cx-R}" y="${ys}" width="${2*R}" height="${cy+R-ys+1}"/>`;
     if(fill>0&&fill<1){ const half=Math.sqrt(Math.max(0,R*R-(ys-cy)**2)); g+=`<line class="surf" x1="${cx-half}" y1="${ys}" x2="${cx+half}" y2="${ys}"/>` }
     g+=`</g><circle class="wall-edge" cx="${cx}" cy="${cy}" r="${R}"/>`;
-    // cote DN (rouge, au-dessus)
     g+=`<g class="${okD?"":"ghost"}"><line class="ext" x1="${cx-R}" y1="${cy}" x2="${cx-R}" y2="36"/><line class="ext" x1="${cx+R}" y1="${cy}" x2="${cx+R}" y2="36"/>
       <line class="dim" x1="${cx-R+1}" y1="42" x2="${cx+R-1}" y2="42" marker-start="url(#arR)" marker-end="url(#arR)"/>
       <text class="dimtxt" x="${cx}" y="33" text-anchor="middle">DN ${okD?f1(D,0):"?"}${okD?" mm":""}</text></g>`;
-    // cote h (turquoise, à droite)
     const xd=cx+R+W+26, yb=cy+R, half=Math.sqrt(Math.max(0,R*R-(ys-cy)**2));
-    if(fill>0){ g+=`<g class="${okH?"":"ghost"}"><line class="hext" x1="${cx}" y1="${yb}" x2="${xd+6}" y2="${yb}"/><line class="hext" x1="${cx+half}" y1="${ys}" x2="${xd+6}" y2="${ys}"/>
+    if(fill>0&&!full){ g+=`<g class="${okH?"":"ghost"}"><line class="hext" x1="${cx}" y1="${yb}" x2="${xd+6}" y2="${yb}"/><line class="hext" x1="${cx+half}" y1="${ys}" x2="${xd+6}" y2="${ys}"/>
       <line class="hdim" x1="${xd}" y1="${yb-1}" x2="${xd}" y2="${ys+1}" marker-start="url(#arT)" marker-end="url(#arT)"/>
       <text class="htxt" transform="translate(${xd+18} ${(yb+ys)/2}) rotate(-90)" text-anchor="middle">h${okH?" = "+f1(H,0)+" mm":""}</text></g>` }
-    if(cy+R-ys>30) g+=vsym(cx-18,(ys+cy+R)/2+ (fill>0.9?0:4));
+    if(full) g+=`<text class="htxt" transform="translate(${xd+10} ${cy}) rotate(-90)" text-anchor="middle">Section pleine</text>`;
+    if(cy+R-ys>30) g+=vsym(cx-30,full?cy+4:(ys+cy+R)/2+(fill>0.9?0:4));
   } else {
     const Lv=okD?D:400, Hv=okH?Math.max(H,0):Lv*0.35, maxW=220, maxH=165;
     const sc=Math.min(maxW/Lv, Hv>0?maxH/Hv:Infinity), Wp=Lv*sc, Hp=Hv*sc, W=12, yf=262, cx=160, x0=cx-Wp/2;
@@ -1679,33 +1704,57 @@ function simDraw(){
     if(Hp>0) g+=`<g class="${okH?"":"ghost"}"><line class="hext" x1="${x0+Wp}" y1="${yf}" x2="${xd+6}" y2="${yf}"/><line class="hext" x1="${x0+Wp}" y1="${yf-Hp}" x2="${xd+6}" y2="${yf-Hp}"/>
       <line class="hdim" x1="${xd}" y1="${yf-1}" x2="${xd}" y2="${yf-Hp+1}" marker-start="url(#arT)" marker-end="url(#arT)"/>
       <text class="htxt" transform="translate(${xd+18} ${yf-Hp/2}) rotate(-90)" text-anchor="middle">h${okH?" = "+f1(H,0)+" mm":""}</text></g>`;
-    if(Hp>30) g+=vsym(cx-18,yf-Hp/2+4);
+    if(Hp>30) g+=vsym(cx-30,yf-Hp/2+4);
   }
   $("simSvg").innerHTML=defs+g;
 }
+const dq=q=>q<100?2:q<1000?1:0;
+const fQh=q=>f1(q,dq(q)), fS=S=>f1(S,S<0.1?4:3)+" m²";
 function simCalc(show){
-  const sh=SIM.shape, D=simNum("simDim"), H=simNum("simH"), V=simNum("simV"); const err=m=>{ if(show){ $("simErr").textContent=m; $("simErr").hidden=false; $("simRes").hidden=true; SIM.shown=false } return false };
+  const sh=SIM.shape, ms=SIM.meth==="ms", D=simNum("simDim"), H=simNum("simH");
+  const err=m=>{ if(show){ $("simErr").textContent=m; $("simErr").hidden=false; $("simRes").hidden=true; SIM.shown=false; SIM.vCalc=null; simDraw() } return false };
   if(D==null||isNaN(D)||D<=0) return err(sh==="circ"?"Indiquez le diamètre de la conduite (DN) en mm.":"Indiquez la largeur du canal en mm.");
-  if(H==null||isNaN(H)||H<0) return err("Indiquez le niveau d'eau en mm.");
-  if(V==null||isNaN(V)) return err("Indiquez la vitesse moyenne en m/s.");
-  if(V<0) return err("La vitesse doit être positive.");
-  if(sh==="circ"&&H>D) return err(`Le niveau d'eau (${f1(H,0)} mm) dépasse le diamètre de la conduite (DN ${f1(D,0)}). Vérifiez les valeurs.`);
-  const S=sh==="circ"?circArea(D,H):D*H/1e6, Qs=S*V*1000, Qh=S*V*3600;
+  const hOpt=ms&&sh==="circ";
+  if(!(hOpt&&H==null)&&(H==null||isNaN(H)||H<0)) return err("Indiquez le niveau d'eau en mm.");
+  if(sh==="circ"&&H!=null&&H>D) return err(`Le niveau d'eau (${f1(H,0)} mm) dépasse le diamètre de la conduite (DN ${f1(D,0)}). Vérifiez les valeurs.`);
+  let V, Ks, I;
+  if(ms){ I=slopeVal(); Ks=ksVal();
+    if(I==null||isNaN(I)||I<=0) return err("Indiquez la pente du radier (supérieure à 0).");
+    if(Ks==null||isNaN(Ks)||Ks<=0) return err("Indiquez la rugosité (Ks ou n).") }
+  else { V=simNum("simV"); if(V==null||isNaN(V)) return err("Indiquez la vitesse moyenne en m/s."); if(V<0) return err("La vitesse doit être positive.") }
+  const full=hOpt&&H==null, Hc=full?D:H, w=wetted(sh,D,Hc);
+  if(ms) V=strickler(w,Ks,I);
+  const S=w.S, Qs=S*V*1000, Qh=S*V*3600; SIM.vCalc=ms?V:null;
   $("simErr").hidden=true;
-  const dq=q=>q<100?2:q<1000?1:0;
-  $("srQh").textContent=f1(Qh,dq(Qh)); $("srQs").textContent=f1(Qs,dq(Qs)); $("srS").textContent=f1(S,S<0.1?4:3)+" m²";
-  $("srQj").textContent=f1(Qh*24,Qh*24<100?1:0)+" m³/j";
-  if(sh==="circ"){ $("srFillLab").textContent="Taux de remplissage (h / DN)"; $("srFill").textContent=f1(H/D*100,0)+" %" }
-  else { $("srFillLab").textContent="Section L × h"; $("srFill").textContent=`${f1(D,0)} × ${f1(H,0)} mm` }
-  const notes=[]; if(sh==="circ"&&H===D) notes.push("Conduite pleine : toute la section est prise en compte.");
+  $("srQh").textContent=fQh(Qh); $("srQs").textContent=f1(Qs,dq(Qs));
+  document.querySelector("#simRes .sr-lab").textContent=full?"Capacité à pleine section":(ms?"Débit au niveau saisi":"Débit");
+  const det=[["Section mouillée S",fS(S)]];
+  if(ms) det.push(["Vitesse moyenne calculée",f1(V,2)+" m/s"]);
+  if(sh==="circ") det.push(["Taux de remplissage (h / DN)",f1(Hc/D*100,0)+" %"]); else det.push(["Section L × h",`${f1(D,0)} × ${f1(H,0)} mm`]);
+  if(ms){ det.push(["Rayon hydraulique Rh",f1(w.P>0?w.S/w.P*1000:0,1)+" mm"]); det.push([SIM.ku==="n"?"Rugosité n (Ks)":"Rugosité Ks (n)",SIM.ku==="n"?`${f1(1/Ks,4)} (${f1(Ks,0)})`:`${f1(Ks,0)} (${f1(1/Ks,4)})`]);
+    det.push(["Pente",`${f1(I*1000,2)} mm/m · ${f1(I*100,3)} %`]) }
+  if(ms&&sh==="circ"&&!full){ const wf=wetted("circ",D,D), Vf=strickler(wf,Ks,I); det.push(["Capacité à pleine section",fQh(wf.S*Vf*3600)+" m³/h"]) }
+  det.push(["Débit journalier équivalent",f1(Qh*24,Qh*24<100?1:0)+" m³/j"]);
+  $("srDet").innerHTML=det.map(([k,v])=>`<div><dt>${k}</dt><dd>${v}</dd></div>`).join("");
+  // tableau débit / remplissage (Manning, conduite circulaire)
+  if(ms&&sh==="circ"){ const rows=[0.1,0.25,0.5,0.75,0.94,1]; const cur=full?1:Hc/D;
+    $("srTab").innerHTML=`<table><caption>Débit selon le remplissage (même pente, même rugosité)</caption><thead><tr><th>Remplissage</th><th>Niveau</th><th>Vitesse</th><th>Débit</th></tr></thead><tbody>`+
+      rows.map(p=>{ const ww=wetted("circ",D,p*D), vv=strickler(ww,Ks,I), q=ww.S*vv*3600; return `<tr${Math.abs(p-cur)<1e-6?' class="cur"':""}><td>${f1(p*100,0)} %${p===0.94?" (débit maxi)":""}</td><td>${f1(p*D,0)} mm</td><td>${f1(vv,2)} m/s</td><td>${fQh(q)} m³/h · ${f1(q/3.6,dq(q/3.6))} l/s</td></tr>` }).join("")+`</tbody></table>`;
+    $("srTab").hidden=false } else $("srTab").hidden=true;
+  const notes=[]; if(!ms&&sh==="circ"&&H===D) notes.push("Conduite pleine : toute la section est prise en compte.");
   if(V>5) notes.push("Vitesse inhabituellement élevée pour un écoulement gravitaire : vérifiez la valeur.");
+  if(ms&&I>0.1) notes.push("Pente très forte (plus de 10 %) : l'écoulement est probablement torrentiel, résultat à considérer avec prudence.");
+  if(ms&&(Ks<20||Ks>130)) notes.push("Rugosité en dehors des valeurs usuelles (Ks entre 20 et 130) : vérifiez la saisie.");
   $("srNote").textContent=notes.join(" ");
-  const r=$("simRes"); if(r.hidden||show){ r.hidden=false; r.classList.remove("res-pop"); void r.offsetWidth; r.classList.add("res-pop") } SIM.shown=true; return true }
+  const r=$("simRes"); if(r.hidden||show){ r.hidden=false; r.classList.remove("res-pop"); void r.offsetWidth; r.classList.add("res-pop") } SIM.shown=true; simDraw(); return true }
+function simLive(){ if(SIM.shown){ if(!simCalc(false)){ $("simRes").hidden=true; SIM.shown=false; SIM.vCalc=null } } $("simErr").hidden=true; simDraw() }
 $("simForm").onsubmit=e=>{ e.preventDefault(); if(simCalc(true)&&isM()) $("simRes").scrollIntoView({block:"nearest",behavior:"smooth"}); simSave() };
-["simDim","simH","simV"].forEach(id=>$(id).addEventListener("input",()=>{ simDraw(); if(SIM.shown){ if(!simCalc(false)) { $("simRes").hidden=true; SIM.shown=false } } $("simErr").hidden=true; simSave() }));
-function simSave(){ try{ SIM.dims[SIM.shape]=$("simDim").value; localStorage.setItem("cometecSim",JSON.stringify({shape:SIM.shape,dims:SIM.dims,h:$("simH").value,v:$("simV").value})) }catch(e){} }
-try{ const o=JSON.parse(localStorage.getItem("cometecSim")||"null"); if(o){ const t=o.shape==="rect"?"rect":"circ"; SIM.dims=Object.assign({circ:"",rect:""},o.dims||{}); $("simH").value=o.h||""; $("simV").value=o.v||""; SIM.shape=t; $("simDim").value=SIM.dims[t]||""; simSetShape(t) } }catch(e){}
-simDraw();
+["simDim","simH","simV","simI","simKs"].forEach(id=>$(id).addEventListener("input",()=>{ if(id==="simKs"){ const k=ksVal(); const m=[...$("simMat").options].find(o=>o.value&&k>0&&Math.abs(+o.value-k)<0.5); $("simMat").value=m?m.value:"" } simLive(); simSave() }));
+function simSave(){ try{ SIM.dims[SIM.shape]=$("simDim").value; localStorage.setItem("cometecSim",JSON.stringify({meth:SIM.meth,shape:SIM.shape,dims:SIM.dims,h:$("simH").value,v:$("simV").value,i:$("simI").value,iu:SIM.iu,ks:$("simKs").value,ku:SIM.ku,mat:$("simMat").value})) }catch(e){} }
+try{ const o=JSON.parse(localStorage.getItem("cometecSim")||"null"); if(o){ const t=o.shape==="rect"?"rect":"circ"; SIM.dims=Object.assign({circ:"",rect:""},o.dims||{}); $("simH").value=o.h||""; $("simV").value=o.v||"";
+  if(o.i!=null) $("simI").value=o.i; if(o.iu) { SIM.iu=o.iu; radio("[data-iu]","iu",SIM.iu) } if(o.ku){ SIM.ku=o.ku; radio("[data-ku]","ku",SIM.ku) } if(o.mat!=null) $("simMat").value=o.mat; if(o.ks!=null) $("simKs").value=o.ks;
+  SIM.meth=o.meth==="ms"?"ms":"sv"; radio(".sim-meth button","meth",SIM.meth); SIM.shape=t; $("simDim").value=SIM.dims[t]||""; simSetShape(t) } }catch(e){}
+simLabels(); simDraw();
 showHub(true);
 
 /* ---------- Application installable (version publiée sur un site web) ---------- */
