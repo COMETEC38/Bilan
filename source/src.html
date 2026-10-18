@@ -728,6 +728,109 @@ body.onsim{padding-bottom:0!important}
   .sr-det{grid-template-columns:1fr 1fr}
   .sr-det div:last-child{grid-column:1/-1}
 }
+/* ================= Constat de vérification RAVEN-EYE ================= */
+body.onctrl .ctrl{display:flex}
+body.onctrl>.wrap,body.onctrl .mnav,body.onctrl .hub,body.onctrl #sim,body.onctrl #prod{display:none!important}
+body.onsim #ctrl,body.onprod #ctrl{display:none!important}
+body.onctrl{padding-bottom:0!important}
+.ctrl .sim-body{max-width:760px;width:100%;margin:0 auto}
+.cv-start{display:flex;flex-direction:column;gap:16px}
+.cv-start-act{display:flex;flex-wrap:wrap;gap:10px}
+.cv-btn{min-height:48px;padding:10px 22px;border:none;border-radius:12px;background:var(--brand);color:var(--on-brand);font-weight:700;font-size:15.5px;cursor:pointer}
+.cv-btn:hover{filter:brightness(1.08)}
+.cv-btn.ghost{background:var(--surface);color:var(--brand);border:1.5px solid var(--line)}
+.cv-btn.big{width:100%;min-height:54px;font-size:16.5px}
+.cv-btn:disabled{opacity:.45;cursor:not-allowed;filter:none}
+.cv-btn[hidden]{display:none}
+.cv-resume{display:flex;align-items:center;justify-content:space-between;gap:14px;background:var(--brand-soft);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.cv-resume div{display:flex;flex-direction:column;gap:3px;min-width:0}
+.cv-resume small{color:var(--ink-2);font-size:13px}
+.cv-wiz{display:flex;flex-direction:column;gap:14px}
+.cv-prog{display:flex;flex-direction:column;gap:8px}
+.cv-prog-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.cv-prog-top b{font-family:var(--f-display);font-size:20px;font-weight:600;color:var(--brand)}
+.cv-prog-top span{font-size:13px;color:var(--muted);white-space:nowrap}
+.cv-bar{height:6px;border-radius:3px;background:var(--surface-2);overflow:hidden}
+.cv-bar i{display:block;height:100%;background:#E3000B;border-radius:3px;transition:width .25s}
+.cv-dots{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.cv-dots button{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);border-radius:999px;padding:4px 10px;font-size:12px;font-weight:600;cursor:pointer}
+.cv-dots button.done{color:var(--brand);border-color:color-mix(in srgb,var(--brand) 40%,var(--line))}
+.cv-dots button[aria-current="step"]{background:var(--brand);border-color:var(--brand);color:var(--on-brand)}
+.cv-step{border:none;margin:0;padding:0;min-width:0;display:flex;flex-direction:column;gap:14px}
+.cv-step[hidden]{display:none}
+.cv-step legend{padding:0;margin:0 0 4px;font-weight:700;font-size:17px;color:var(--ink)}
+.cv-help{margin:0;font-size:13.5px;color:var(--ink-2);line-height:1.45}
+.cv-card textarea,.cv-card select{font:inherit;color:var(--ink)}
+.cv-card textarea{border:1.5px solid var(--line);border-radius:10px;background:var(--bg);padding:11px 12px;font-size:15px;font-weight:400;line-height:1.45;resize:vertical;outline:none}
+.cv-card textarea:focus{border-color:var(--brand);box-shadow:0 0 0 3px color-mix(in srgb,var(--brand) 18%,transparent)}
+.cv-card textarea::placeholder,.cv-card input::placeholder{color:var(--muted);opacity:.8;font-weight:400}
+.cv-card .sim-in input{font-size:16px}
+.cv-card .sim-in select{flex:1;min-width:0;border:none;background:none;padding:12px;font-size:16px;font-weight:600;outline:none}
+.cv-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cv-info{background:var(--surface-2);border-radius:10px;padding:10px 12px;font-size:14px;color:var(--ink-2)}
+.cv-info b{color:var(--ink);font-variant-numeric:tabular-nums}
+.cv-fixed{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;background:var(--surface-2);border-radius:10px;padding:10px 12px;font-size:14px}
+.cv-fixed span{color:var(--ink-2)}
+.cv-3{display:flex;flex-direction:column;gap:6px}
+.cv-3lab{font-weight:600;font-size:14px}
+.cv-3in{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.cv-3in .sim-in input{padding:12px 8px}
+.cv-3in .sim-in em{padding:0 8px;font-size:12.5px}
+.cv-res:empty{display:none}
+.cv-res{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;border-radius:12px;padding:12px 14px;font-size:14px;background:var(--surface-2)}
+.cv-res b{font-size:18px;font-variant-numeric:tabular-nums}
+.cv-res.ok{background:var(--ok-bg);color:var(--ok-ink)}
+.cv-res.ko{background:var(--ko-bg);color:var(--ko-ink)}
+.cv-res .cv-v{margin-left:auto;font-weight:800;letter-spacing:.04em}
+.cv-photo{display:flex;flex-direction:column;gap:8px;border:1px dashed var(--line);border-radius:12px;padding:12px}
+.cv-ph-head{display:flex;flex-direction:column;gap:2px}
+.cv-ph-head small{color:var(--muted);font-size:12.5px}
+.cv-pick{position:relative;display:flex;align-items:center;justify-content:center;gap:10px;min-height:64px;border-radius:10px;background:var(--surface-2);color:var(--brand);font-weight:700;cursor:pointer}
+.cv-pick svg{width:26px;height:26px}
+.cv-pick input,.cv-mini input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.cv-ph-full{display:flex;flex-direction:column;gap:8px}
+.cv-ph-full[hidden],.cv-ph-empty[hidden]{display:none}
+.cv-ph-full img{max-width:100%;max-height:320px;object-fit:contain;align-self:flex-start;border-radius:8px;border:1px solid var(--line);background:#fff}
+.cv-ph-act,.cv-sig-act{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px}
+.cv-mini{position:relative;display:inline-flex;align-items:center;border:1px solid var(--line);background:var(--surface);color:var(--brand);border-radius:8px;padding:6px 12px;font-weight:600;font-size:13px;cursor:pointer}
+.cv-sigbox{position:relative;border:1.5px solid var(--line);border-radius:10px;background:#fff;overflow:hidden}
+.cv-sigbox canvas{display:block;width:100%;height:auto;aspect-ratio:3/1;touch-action:none;cursor:crosshair}
+.cv-sig-hint{position:absolute;left:0;right:0;bottom:10px;text-align:center;font-size:13px;color:#8A9A9A;pointer-events:none;font-weight:400}
+.cv-chk{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:400;color:var(--ink-2)}
+.cv-nav{display:flex;justify-content:space-between;gap:10px;position:sticky;bottom:0;z-index:4;padding:10px 0 calc(10px + env(safe-area-inset-bottom,0px));background:var(--bg);border-top:1px solid var(--line)}
+.cv-nav .cv-btn{flex:1;max-width:260px}
+.cv-nav #cvNext{margin-left:auto}
+.cv-sum{display:flex;flex-direction:column;gap:14px}
+.cv-sum-id{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:14px}
+.cv-sum-id span{color:var(--ink-2)}
+.cv-tabw{overflow-x:auto}
+.cv-tab{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+.cv-tab th{background:#1A4D4D;color:#fff;font-weight:700;font-size:12.5px;padding:7px 8px;text-align:left;white-space:nowrap}
+.cv-tab td{border-bottom:1px solid var(--line);padding:8px;white-space:nowrap}
+.cv-tab .ok{color:var(--ok-ink);font-weight:700}
+.cv-tab .ko{color:var(--ko-ink);font-weight:700}
+.cv-mean{margin:0;font-size:14.5px}
+.cv-mean b.ok{color:var(--ok-ink)} .cv-mean b.ko{color:var(--ko-ink)}
+.cv-verdict{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px 12px;border-radius:14px;padding:16px 18px;color:#fff;background:#1A4D4D}
+.cv-verdict.ko{background:#C8102E}
+.cv-verdict b{font-family:var(--f-display);font-size:24px;font-weight:600;letter-spacing:.03em}
+.cv-verdict small{font-size:13px;opacity:.92}
+.cv-warn{margin:0;padding:10px 12px 10px 30px;background:var(--warn-bg);color:var(--warn-ink);border-radius:10px;font-size:13.5px}
+.cv-warn li+li{margin-top:3px}
+.cv-err{margin:0;background:var(--ko-bg);color:var(--ko-ink);border-radius:10px;padding:10px 12px;font-size:13.5px}
+.cv-end{display:flex;flex-direction:column;gap:10px}
+.cv-end .cv-btn.ghost{min-height:44px}
+@media (max-width:700px), (pointer:coarse) and (max-height:500px){
+  .cv-dots{display:none}
+  .cv-2{grid-template-columns:1fr}
+  .cv-3in{gap:6px}
+  .cv-3in .sim-in em{display:none}
+  .cv-prog-top b{font-size:18px}
+  .cv-start-act .cv-btn{width:100%}
+  .cv-resume{flex-direction:column;align-items:stretch}
+  .cv-card{padding:14px}
+  .cv-tab{font-size:13px} .cv-tab th,.cv-tab td{padding:6px 4px} .cv-tab th{font-size:11.5px;white-space:normal}
+}
 </style>
 
 
@@ -765,12 +868,111 @@ body.onsim{padding-bottom:0!important}
       <svg class="ht-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
     </button>
     </div>
+    <h3 class="hub-sub">Espace COMETEC</h3>
+    <div class="hub-tools">
+    <button class="hub-tool" id="hubCtrl" type="button">
+      <span class="ht-ico"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 7h30"/><path d="M24 7v5"/><path d="M17 17a10 10 0 0 0 14 0"/><path d="M12 22a17 17 0 0 0 24 0"/><path d="M15 36l6 6 12-12" stroke="#E3000B"/></svg></span>
+      <span class="ht-txt"><b>Constat de vérification RAVEN-EYE</b><small>Contrôle métrologique au banc RAV-TRACK, guidé pas à pas, avec rapport PDF COMETEC prêt à envoyer.</small></span>
+      <svg class="ht-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+    </button>
+    </div>
     <h3 class="hub-sub">Bientôt dans l'application</h3>
     <ul class="hub-soon">
       <li><span class="hs-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.2 5.8L20 11l-5.8 2.2L12 19l-2.2-5.8L4 11l5.8-2.2z"/></svg></span><b>Nouveautés</b><small>Nouveaux produits et actualités</small><em>Bientôt</em></li>
       <li><span class="hs-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></span><b>Aide au paramétrage</b><small>Réglage pas à pas de vos appareils</small><em>Bientôt</em></li>
     </ul>
     <p class="hub-foot">COMETEC · Instrumentation des eaux · Chapareillan (38) · version %%VERSION%%</p>
+  </div>
+</section>
+<section class="sim ctrl" id="ctrl" aria-labelledby="ctrlTitle">
+  <header class="sim-bar">
+    <button class="sim-back" id="ctrlBack" type="button" aria-label="Retour à l'accueil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg><span>Accueil</span></button>
+    <h1 id="ctrlTitle">Constat RAVEN-EYE</h1>
+    <img class="sim-logo" src="%%LOGO%%" alt="COMETEC">
+  </header>
+  <div class="sim-body">
+    <div class="cv-start" id="cvStart">
+      <p class="sim-intro">Constat de vérification d'un débitmètre <b>RAVEN-EYE</b> au banc <b>RAV-TRACK</b> : l'assistant vous demande les informations une à une, calcule les écarts et produit le rapport PDF COMETEC. Tout reste enregistré sur cet appareil, vous pouvez reprendre plus tard.</p>
+      <div class="cv-resume" id="cvResume" hidden><div><b id="cvResumeT"></b><small id="cvResumeS"></small></div><button type="button" class="cv-btn" id="cvResumeGo">Reprendre</button></div>
+      <div class="cv-start-act"><button type="button" class="cv-btn" id="cvNew">Nouveau constat</button><button type="button" class="cv-btn ghost" id="cvDemo">Voir un exemple (données fictives)</button></div>
+    </div>
+    <div class="cv-wiz" id="cvWiz" hidden>
+      <div class="cv-prog"><div class="cv-prog-top"><b id="cvStepLab"></b><span id="cvStepN"></span></div><div class="cv-bar"><i id="cvBarFill"></i></div><ol class="cv-dots" id="cvDots"></ol></div>
+      <form class="sim-form cv-card" id="cvForm" novalidate autocomplete="off">
+      <fieldset class="cv-step" data-step="1"><legend>Dossier</legend>
+        <label class="sim-field"><span>Numéro du devis</span><span class="sim-in"><input data-k="devis" type="text" placeholder="7 chiffres" autocomplete="off" inputmode="numeric"></span></label>
+        <div class="cv-info" id="cvNoBox">Constat de vérification N° <b id="cvNo">–</b></div>
+        <label class="sim-field"><span>Date de l'intervention</span><span class="sim-in"><input data-k="date" type="date"></span></label>
+        <div class="cv-info">Prochaine inspection suggérée : <b id="cvNext1">–</b></div>
+        <label class="sim-field"><span>Lieu du contrôle</span><span class="sim-in"><input data-k="lieu" type="text" placeholder="Nom du site et adresse du point de mesure" autocomplete="off" ></span></label>
+      </fieldset>
+      <fieldset class="cv-step" data-step="2" hidden><legend>Client (délivré à)</legend>
+        <label class="sim-field"><span>Société</span><span class="sim-in"><input data-k="societe" type="text" placeholder="ex. Communauté de Communes…" autocomplete="off" ></span></label>
+        <label class="sim-field"><span>Adresse</span><span class="sim-in"><input data-k="adresse" type="text" placeholder="" autocomplete="off" ></span></label>
+        <div class="cv-2"><label class="sim-field"><span>Code postal</span><span class="sim-in"><input data-k="cp" type="text" placeholder="" autocomplete="off" inputmode="numeric" maxlength="5"></span></label><label class="sim-field"><span>Ville</span><span class="sim-in"><input data-k="ville" type="text" placeholder="" autocomplete="off" ></span></label></div>
+        <label class="sim-field"><span>Contact</span><span class="sim-in"><input data-k="contact" type="text" placeholder="Nom du contact" autocomplete="off" ></span></label>
+        <div class="cv-2"><label class="sim-field"><span>Téléphone</span><span class="sim-in"><input data-k="tel" type="tel" placeholder="" autocomplete="off" ></span></label><label class="sim-field"><span>Mail</span><span class="sim-in"><input data-k="mail" type="email" placeholder="" autocomplete="off" ></span></label></div>
+      </fieldset>
+      <fieldset class="cv-step" data-step="3" hidden><legend>Instrument vérifié</legend>
+        <div class="cv-fixed"><span>Désignation</span><b>Débitmètre RAVEN-EYE</b><span>Constructeur</span><b>Flow-Tronic</b></div>
+        <label class="sim-field"><span>Type</span><span class="sim-in"><select data-k="type"><option>RAVEN-EYE 2</option><option>RAVEN-EYE 2+</option><option>RAVEN-EYE</option></select></span></label>
+        <label class="sim-field"><span>Numéro de série</span><span class="sim-in"><input data-k="serie" type="text" placeholder="Relevé sur la plaque signalétique" autocomplete="off" ></span></label>
+        <label class="sim-field"><span>Référence interne</span><span class="sim-in"><input data-k="refint" type="text" placeholder="Facultatif" autocomplete="off" ></span></label>
+      </fieldset>
+      <fieldset class="cv-step" data-step="4" hidden><legend>Ouvrage et conditions hydrauliques</legend>
+        <div class="cv-photo" data-img="site"><div class="cv-ph-head"><b>Photo du point de mesure</b><small>Vue de l'ouvrage avec le RAVEN-EYE installé</small></div>
+          <div class="cv-ph-empty"><label class="cv-pick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span>Ajouter une image</span><input type="file" accept="image/*" data-pick="site"></label></div>
+          <div class="cv-ph-full" hidden><img alt="Photo du point de mesure"><div class="cv-ph-act"><label class="cv-mini">Remplacer<input type="file" accept="image/*" data-pick="site"></label><button type="button" class="cv-mini" data-drop="site">Retirer</button></div></div></div>
+        <label class="sim-field"><span>Description de l'ouvrage</span><textarea data-k="ouvrage" rows="4" placeholder="Type de profil (rectangulaire, circulaire, ovoïde…), type de point de mesure (A2, A3, DO…), nature de l'ouvrage, conditions d'écoulement…"></textarea></label>
+      </fieldset>
+      <fieldset class="cv-step" data-step="5" hidden><legend>Configuration de l'équipement</legend>
+        <label class="sim-field"><span>Configuration mise en place</span><textarea data-k="config" rows="6" placeholder="Sens d'installation (amont / aval), raccordement (automate, protocole), état de la communication, état du capteur, du câble et du support…"></textarea></label>
+      </fieldset>
+      <fieldset class="cv-step" data-step="6" hidden><legend>Réglage 1 sur 3</legend>
+        <p class="cv-help">Réglez le banc RAV-TRACK, puis relevez sur Fuzion <b>3 mesures successives</b> dans la colonne <b>Vraw [m/s]</b>. Leur moyenne est la vitesse retenue pour ce réglage.</p>
+        <label class="sim-field"><span>Vitesse du banc RAV-TRACK, Vtrack</span><span class="sim-in"><input data-k="vt1" type="text" placeholder="ex. 0,70" autocomplete="off" inputmode="decimal"><em>m/s</em></span></label>
+        <div class="cv-3"><span class="cv-3lab">Vitesses brutes Vraw relevées sur Fuzion</span>
+          <div class="cv-3in"><span class="sim-in"><input data-k="r1a" type="text" inputmode="decimal" autocomplete="off" placeholder="mesure 1" aria-label="Vraw mesure 1"><em>m/s</em></span><span class="sim-in"><input data-k="r1b" type="text" inputmode="decimal" autocomplete="off" placeholder="mesure 2" aria-label="Vraw mesure 2"><em>m/s</em></span><span class="sim-in"><input data-k="r1c" type="text" inputmode="decimal" autocomplete="off" placeholder="mesure 3" aria-label="Vraw mesure 3"><em>m/s</em></span></div></div>
+        <div class="cv-res" id="cvRes1"></div>
+        <div class="cv-photo" data-img="cap1"><div class="cv-ph-head"><b>Capture Fuzion du réglage 1</b><small>Copie d'écran montrant les 3 lignes relevées</small></div>
+          <div class="cv-ph-empty"><label class="cv-pick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span>Ajouter une image</span><input type="file" accept="image/*" data-pick="cap1"></label></div>
+          <div class="cv-ph-full" hidden><img alt="Capture Fuzion du réglage 1"><div class="cv-ph-act"><label class="cv-mini">Remplacer<input type="file" accept="image/*" data-pick="cap1"></label><button type="button" class="cv-mini" data-drop="cap1">Retirer</button></div></div></div>
+      </fieldset>
+      <fieldset class="cv-step" data-step="7" hidden><legend>Réglage 2 sur 3</legend>
+        <p class="cv-help">Réglez le banc RAV-TRACK, puis relevez sur Fuzion <b>3 mesures successives</b> dans la colonne <b>Vraw [m/s]</b>. Leur moyenne est la vitesse retenue pour ce réglage.</p>
+        <label class="sim-field"><span>Vitesse du banc RAV-TRACK, Vtrack</span><span class="sim-in"><input data-k="vt2" type="text" placeholder="ex. 0,50" autocomplete="off" inputmode="decimal"><em>m/s</em></span></label>
+        <div class="cv-3"><span class="cv-3lab">Vitesses brutes Vraw relevées sur Fuzion</span>
+          <div class="cv-3in"><span class="sim-in"><input data-k="r2a" type="text" inputmode="decimal" autocomplete="off" placeholder="mesure 1" aria-label="Vraw mesure 1"><em>m/s</em></span><span class="sim-in"><input data-k="r2b" type="text" inputmode="decimal" autocomplete="off" placeholder="mesure 2" aria-label="Vraw mesure 2"><em>m/s</em></span><span class="sim-in"><input data-k="r2c" type="text" inputmode="decimal" autocomplete="off" placeholder="mesure 3" aria-label="Vraw mesure 3"><em>m/s</em></span></div></div>
+        <div class="cv-res" id="cvRes2"></div>
+        <div class="cv-photo" data-img="cap2"><div class="cv-ph-head"><b>Capture Fuzion du réglage 2</b><small>Copie d'écran montrant les 3 lignes relevées</small></div>
+          <div class="cv-ph-empty"><label class="cv-pick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span>Ajouter une image</span><input type="file" accept="image/*" data-pick="cap2"></label></div>
+          <div class="cv-ph-full" hidden><img alt="Capture Fuzion du réglage 2"><div class="cv-ph-act"><label class="cv-mini">Remplacer<input type="file" accept="image/*" data-pick="cap2"></label><button type="button" class="cv-mini" data-drop="cap2">Retirer</button></div></div></div>
+      </fieldset>
+      <fieldset class="cv-step" data-step="8" hidden><legend>Réglage 3 sur 3</legend>
+        <p class="cv-help">Réglez le banc RAV-TRACK, puis relevez sur Fuzion <b>3 mesures successives</b> dans la colonne <b>Vraw [m/s]</b>. Leur moyenne est la vitesse retenue pour ce réglage.</p>
+        <label class="sim-field"><span>Vitesse du banc RAV-TRACK, Vtrack</span><span class="sim-in"><input data-k="vt3" type="text" placeholder="ex. 0,35" autocomplete="off" inputmode="decimal"><em>m/s</em></span></label>
+        <div class="cv-3"><span class="cv-3lab">Vitesses brutes Vraw relevées sur Fuzion</span>
+          <div class="cv-3in"><span class="sim-in"><input data-k="r3a" type="text" inputmode="decimal" autocomplete="off" placeholder="mesure 1" aria-label="Vraw mesure 1"><em>m/s</em></span><span class="sim-in"><input data-k="r3b" type="text" inputmode="decimal" autocomplete="off" placeholder="mesure 2" aria-label="Vraw mesure 2"><em>m/s</em></span><span class="sim-in"><input data-k="r3c" type="text" inputmode="decimal" autocomplete="off" placeholder="mesure 3" aria-label="Vraw mesure 3"><em>m/s</em></span></div></div>
+        <div class="cv-res" id="cvRes3"></div>
+        <div class="cv-photo" data-img="cap3"><div class="cv-ph-head"><b>Capture Fuzion du réglage 3</b><small>Copie d'écran montrant les 3 lignes relevées</small></div>
+          <div class="cv-ph-empty"><label class="cv-pick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span>Ajouter une image</span><input type="file" accept="image/*" data-pick="cap3"></label></div>
+          <div class="cv-ph-full" hidden><img alt="Capture Fuzion du réglage 3"><div class="cv-ph-act"><label class="cv-mini">Remplacer<input type="file" accept="image/*" data-pick="cap3"></label><button type="button" class="cv-mini" data-drop="cap3">Retirer</button></div></div></div>
+      </fieldset>
+      <fieldset class="cv-step" data-step="9" hidden><legend>Banc de contrôle et intervenant</legend>
+        <div class="cv-2"><label class="sim-field"><span>Banc RAV-TRACK N°</span><span class="sim-in"><input data-k="bancN" type="text" placeholder="001" autocomplete="off" ></span></label><label class="sim-field"><span>N° de série du banc</span><span class="sim-in"><input data-k="bancSerie" type="text" placeholder="001" autocomplete="off" ></span></label></div>
+        <div class="cv-2"><label class="sim-field"><span>Date de fabrication du banc</span><span class="sim-in"><input data-k="bancFab" type="text" placeholder="jj/mm/aaaa" autocomplete="off" ></span></label><label class="sim-field"><span>Dernier contrôle du banc</span><span class="sim-in"><input data-k="bancCtrl" type="text" placeholder="jj/mm/aaaa" autocomplete="off" ></span></label></div>
+        <label class="sim-field"><span>Intervenant</span><span class="sim-in"><input data-k="interv" type="text" placeholder="Prénom NOM" autocomplete="off" ></span></label>
+        <div class="sim-field"><span>Signature</span>
+          <div class="cv-sigbox"><canvas id="cvSig" width="900" height="300" aria-label="Zone de signature"></canvas><span class="cv-sig-hint" id="cvSigHint">Signez ici avec le doigt ou la souris</span></div>
+          <div class="cv-sig-act"><button type="button" class="cv-mini" id="cvSigClear">Effacer</button><label class="cv-chk"><input type="checkbox" id="cvSigMem"> Mémoriser ma signature et mon nom sur cet appareil</label></div>
+        </div>
+      </fieldset>
+      <fieldset class="cv-step" data-step="10" hidden><legend>Récapitulatif et rapport</legend>
+        <div id="cvSum"></div>
+      </fieldset>
+      </form>
+      <div class="cv-nav"><button type="button" class="cv-btn ghost" id="cvPrev">Précédent</button><button type="button" class="cv-btn" id="cvNext">Suivant</button></div>
+    </div>
   </div>
 </section>
 <section class="sim prod" id="prod" aria-labelledby="prodTitle">
