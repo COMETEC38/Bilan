@@ -770,7 +770,7 @@ body.onsim{padding-bottom:0!important}
       <li><span class="hs-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.2 5.8L20 11l-5.8 2.2L12 19l-2.2-5.8L4 11l5.8-2.2z"/></svg></span><b>Nouveautés</b><small>Nouveaux produits et actualités</small><em>Bientôt</em></li>
       <li><span class="hs-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></span><b>Aide au paramétrage</b><small>Réglage pas à pas de vos appareils</small><em>Bientôt</em></li>
     </ul>
-    <p class="hub-foot">COMETEC · Instrumentation des eaux · Chapareillan (38) · version 2.4.1</p>
+    <p class="hub-foot">COMETEC · Instrumentation des eaux · Chapareillan (38) · version 2.5.0</p>
   </div>
 </section>
 <section class="sim prod" id="prod" aria-labelledby="prodTitle">
@@ -782,7 +782,7 @@ body.onsim{padding-bottom:0!important}
   <div class="sim-body" id="prodCats">
     <p class="sim-intro">Choisissez une famille pour accéder aux documentations commerciales des produits COMETEC.</p>
     <div class="pc-grid" id="pcGrid"></div>
-    <p class="sim-foot">D'autres familles arrivent bientôt : préleveurs, qualité de l'eau, pluviométrie, détection…</p>
+    <p class="sim-foot">D'autres familles arrivent bientôt : qualité de l'eau, pluviométrie, détection…</p>
   </div>
   <div class="sim-body" id="prodList" hidden>
     <div class="pf-bar">
@@ -1114,7 +1114,7 @@ body.onsim{padding-bottom:0!important}
     <button type="button" data-mtab="volumes"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 20V11M12 20V5M18 20v-7"/></svg></span>Volumes</button>
     <button type="button" data-mtab="export"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 20h16"/></svg></span>Exporter</button>
   </nav>
-  <footer>COMETEC · Instrumentation des eaux · ZA de Longifan, 38530 Chapareillan · COMETEC Bilan version 2.4.1</footer>
+  <footer>COMETEC · Instrumentation des eaux · ZA de Longifan, 38530 Chapareillan · COMETEC Bilan version 2.5.0</footer>
 </div>
 <div class="modal" id="reportModal" hidden role="dialog" aria-modal="true" aria-labelledby="t-report">
   <form class="modal-box" id="reportForm">
@@ -3290,54 +3290,68 @@ const WATER={EU:{l:"Eaux usées",c:"#8A5A2B",b:"#F3E6D8",p:'<circle cx="12" cy="
   EB:{l:"Eau brute",c:"#1E7A5A",b:"#DFF2E9",p:'<path d="M4 10c1.3-1.2 2.7-1.2 4 0s2.7 1.2 4 0 2.7-1.2 4 0 2.7 1.2 4 0M4 15c1.3-1.2 2.7-1.2 4 0s2.7 1.2 4 0 2.7-1.2 4 0 2.7 1.2 4 0"/>'},
   PL:{l:"Eaux pluviales",c:"#4A5D9C",b:"#E6E9F6",p:'<path d="M7.5 13.5a3.5 3.5 0 0 1-.4-7A5 5 0 0 1 16.8 8a3 3 0 0 1 .2 5.5z"/><path d="M9 16l-1 2.5M12.5 16l-1 2.5M16 16l-1 2.5"/>'}};
 const wIcon=(k,title)=>{ const w=WATER[k]; return `<svg class="wi" viewBox="0 0 24 24" role="img" aria-label="${w.l}"><title>${title?w.l:w.l}</title><circle class="bg" cx="12" cy="12" r="12" fill="${w.b}"/><g fill="none" stroke="${w.c}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${w.p}</g></svg>` };
+const G_INSTALL={k:"i",l:"Installation",o:[["PO","Portable"],["FI","Fixe"]]};
 const PROD_CATS=[{id:"debitmetrie",name:"Débitmétrie",desc:"Débitmètres pour réseaux d'assainissement, rivières, canaux et conduites en charge.",ico:'<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 34c5-6 9-6 14 0s9 6 14 0 6-5 8-3"/><path d="M12 22l7-9 6 6 9-11"/><path d="M28 8h6v6"/></svg>',
+  groups:[{k:"m",l:"Mesure",o:[["SL","Surface libre"],["EC","En charge"]],main:true},G_INSTALL,{k:"w",l:"Type d'eau",o:[["EU","Eaux usées"],["EP","Eau potable"],["EB","Eau brute"],["PL","Eaux pluviales"]],water:true}],
   items:[
-  ["raven-eye","Débitmètre radar hauteur-vitesse RAVEN-EYE","Sans contact, installation au-dessus du conduit, insensible à la nature de l'effluent","SL FI","EU EP EB PL"],
-  ["beluga-av","Débitmètre Doppler hauteur-vitesse BELUGA AV","Capteur Doppler et pression, ultra-compact, Modbus","SL PO FI","EU EB PL"],
-  ["beluga","Débitmètre Doppler hauteur-vitesse BELUGA","Installation sans modification du conduit, fonctionne en refoulement","SL PO FI","EU EB PL"],
-  ["raven-eye-beluga-solutions-autonomes","RAVEN-EYE & BELUGA Solutions autonomes","Valise batterie et enregistreur pour pose temporaire sous tampon","SL PO","EU EB PL"],
-  ["logr","Débitmètre portable LOG'R","Doppler hauteur-vitesse autonome pour le diagnostic de réseau, Wi-Fi","SL PO","EU PL"],
-  ["bulr2","Débitmètre portable bulle à bulle BUL'R2","Débit sur canal de comptage, enregistreur intégré, asservissement préleveur","SL PO","EU EB PL"],
-  ["debulle","Débitmètre bulle à bulle DEBULLE","Poste fixe sur canal de comptage, enregistreur intégré","SL FI","EU EB PL"],
-  ["oc90","Débitmètre à ultrasons OC90","Canal de comptage, mesure de niveau à ultrasons, 2 voies","SL FI","EU EB PL"],
-  ["phoenix","Débitmètre radar hauteur-vitesse PHOENIX","Rivières et grands canaux, sans contact avec l'écoulement","SL FI","EB"],
-  ["flostick","Courantomètre électromagnétique FloStick","Lecture instantanée de la vitesse, enregistrement 2 000 valeurs","SL PO","EU EB PL"],
-  ["fluvia","Courantomètre électromagnétique FLUVIA","Vitesse et calcul du débit, rivière, irrigation, assainissement","SL PO","EU EB PL"],
-  ["easyflow","Débitmètre par traçage au sel EASYFLOW","Jaugeage en quelques minutes sur cours d'eau à fort brassage","SL PO","EB"],
-  ["torpee-mag","Débitmètre multipoint à insertion TORPEE-MAG","Électromagnétique, DN 100 à DN 2500, pose sans interruption du débit","EC FI","EP EB"],
-  ["kf100","Débitmètre à temps de transit KF100","Poste fixe, capteur non intrusif, DN 10 à 3 000 mm","EC FI","EP EB"],
-  ["kf200","Débitmètre portable à temps de transit KF200","Capteur non intrusif, DN 10 à 6 500 mm","EC PO","EP EB"],
-  ["kf210","Débitmètre portable à temps de transit KF210","Portable IP67, capteur non intrusif, DN 50 à 2 500 mm","EC PO","EP EB"]
-  ].map(([id,n,s,m,w])=>({id,n,s,m:m.split(" "),w:w.split(" "),f:`debitmetrie/${id}.pdf`}))}];
-const DOC_SIZE={"raven-eye":0.8,"beluga-av":0.5,"beluga":0.7,"raven-eye-beluga-solutions-autonomes":0.4,"logr":0.5,"bulr2":0.3,"debulle":0.9,"oc90":0.6,"phoenix":0.7,"flostick":0.5,"fluvia":2.3,"easyflow":0.4,"torpee-mag":0.4,"kf100":0.3,"kf200":0.6,"kf210":0.4};
-const PF_GROUPS=[{k:"m",l:"Mesure",o:[["SL","Surface libre"],["EC","En charge"]]},{k:"i",l:"Installation",o:[["PO","Portable"],["FI","Fixe"]]},{k:"w",l:"Type d'eau",o:[["EU","Eaux usées"],["EP","Eau potable"],["EB","Eau brute"],["PL","Eaux pluviales"]]}];
-const PF={cat:null,sel:{m:new Set(),i:new Set(),w:new Set()},q:""};
+  ["raven-eye","Débitmètre radar hauteur-vitesse RAVEN-EYE","Sans contact, installation au-dessus du conduit, insensible à la nature de l'effluent","SL FI EU EP EB PL",0.8],
+  ["beluga-av","Débitmètre Doppler hauteur-vitesse BELUGA AV","Capteur Doppler et pression, ultra-compact, Modbus","SL PO FI EU EB PL",0.5],
+  ["beluga","Débitmètre Doppler hauteur-vitesse BELUGA","Installation sans modification du conduit, fonctionne en refoulement","SL PO FI EU EB PL",0.7],
+  ["raven-eye-beluga-solutions-autonomes","RAVEN-EYE & BELUGA Solutions autonomes","Valise batterie et enregistreur pour pose temporaire sous tampon","SL PO EU EB PL",0.4],
+  ["logr","Débitmètre portable LOG'R","Doppler hauteur-vitesse autonome pour le diagnostic de réseau, Wi-Fi","SL PO EU PL",0.5],
+  ["bulr2","Débitmètre portable bulle à bulle BUL'R2","Débit sur canal de comptage, enregistreur intégré, asservissement préleveur","SL PO EU EB PL",0.3],
+  ["debulle","Débitmètre bulle à bulle DEBULLE","Poste fixe sur canal de comptage, enregistreur intégré","SL FI EU EB PL",0.9],
+  ["oc90","Débitmètre à ultrasons OC90","Canal de comptage, mesure de niveau à ultrasons, 2 voies","SL FI EU EB PL",0.6],
+  ["phoenix","Débitmètre radar hauteur-vitesse PHOENIX","Rivières et grands canaux, sans contact avec l'écoulement","SL FI EB",0.7],
+  ["flostick","Courantomètre électromagnétique FloStick","Lecture instantanée de la vitesse, enregistrement 2 000 valeurs","SL PO EU EB PL",0.5],
+  ["fluvia","Courantomètre électromagnétique FLUVIA","Vitesse et calcul du débit, rivière, irrigation, assainissement","SL PO EU EB PL",2.3],
+  ["easyflow","Débitmètre par traçage au sel EASYFLOW","Jaugeage en quelques minutes sur cours d'eau à fort brassage","SL PO EB",0.4],
+  ["torpee-mag","Débitmètre multipoint à insertion TORPEE-MAG","Électromagnétique, DN 100 à DN 2500, pose sans interruption du débit","EC FI EP EB",0.4],
+  ["kf100","Débitmètre à temps de transit KF100","Poste fixe, capteur non intrusif, DN 10 à 3 000 mm","EC FI EP EB",0.3],
+  ["kf200","Débitmètre portable à temps de transit KF200","Capteur non intrusif, DN 10 à 6 500 mm","EC PO EP EB",0.6],
+  ["kf210","Débitmètre portable à temps de transit KF210","Portable IP67, capteur non intrusif, DN 50 à 2 500 mm","EC PO EP EB",0.4]
+  ].map(([id,n,s,t,mo])=>({id,n,s,t:t.split(" "),mo,f:`debitmetrie/${id}.pdf`}))},
+ {id:"preleveurs",name:"Préleveurs",desc:"Préleveurs d'échantillons portables et fixes, réfrigérés ou non, pour l'autosurveillance et les bilans.",ico:'<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="12" width="30" height="30" rx="5"/><path d="M17 12V6h14v6"/><path d="M16 22h16M16 30h16"/><path d="M24 34.5c1.6 0 2.6-1.1 2.6-2.4 0-1.5-2.6-4.4-2.6-4.4s-2.6 2.9-2.6 4.4c0 1.3 1 2.4 2.6 2.4z" stroke="#E3000B"/></svg>',
+  groups:[{...G_INSTALL,main:true},{k:"p",l:"Prélèvement",o:[["VI","Pompe à vide"],["PE","Pompe péristaltique"],["EC","En charge"]]}],
+  items:[
+  ["eccomaxx-sp5c","Préleveur fixe réfrigéré ECCOMAXX SP5 C","Compact, mono ou multi-flacons, autosurveillance des stations d'épuration","FI VI",0.7],
+  ["maxx-sp5-dk","Préleveur sur conduite en charge MAXX SP5 DK","Eau ou boue sur conduit sous pression jusqu'à 20 bars, prélèvement par électrovannes","FI EC",0.4],
+  ["maxx-sp5b","Préleveur fixe réfrigéré MAXX SP5 B","Construction compacte en plastique, mono ou multi-flacons","FI PE",1.0],
+  ["maxx-tp5w","Préleveur mural MAXX TP5 W","Mono-flacon, montage mural, associable à un réfrigérateur","FI PE",0.4],
+  ["maxx-p6","Préleveur portable MAXX P6","Léger et compact, mono ou multi-flacons","PO VI PE",2.2],
+  ["maxx-tp5p","Préleveur portable MAXX TP5 P","Mono ou multi-flacons, isotherme ou réfrigéré","PO VI",1.3],
+  ["maxx-tp5c","Préleveur portable MAXX TP5 C","Préleveur de terrain, mono ou multi-flacons, isotherme ou réfrigéré","PO PE",1.8]
+  ].map(([id,n,s,t,mo,x])=>({id,n,s,t:t.split(" "),mo,x,f:`preleveurs/${id}.pdf`}))}];
+const PF={cat:null,sel:{},q:""};
 function prodOn(){ return document.body.classList.contains("onprod") }
+function curCat(){ return PROD_CATS.find(x=>x.id===PF.cat) }
 function showProd(cat,push){
   document.body.classList.remove("onhub","onsim"); $("hub").classList.remove("hub-anim"); document.body.classList.add("onprod");
   if(push!==false) try{ history.pushState({prod:cat||1},"") }catch(e){}
-  PF.cat=cat||null; $("prodCats").hidden=!!cat; $("prodList").hidden=!cat;
-  const c=PROD_CATS.find(x=>x.id===cat); $("prodTitle").textContent=c?c.name:"Nos produits"; $("prodBackLab").textContent=c?"Nos produits":"Accueil";
+  const changed=PF.cat!==(cat||null); PF.cat=cat||null; $("prodCats").hidden=!!cat; $("prodList").hidden=!cat;
+  const c=curCat(); $("prodTitle").textContent=c?c.name:"Nos produits"; $("prodBackLab").textContent=c?"Nos produits":"Accueil";
+  if(c&&changed){ PF.sel={}; c.groups.forEach(g=>PF.sel[g.k]=new Set()); PF.q=""; $("pfQ").value="";
+    $("pfGroups").innerHTML=c.groups.map(g=>`<div class="pf-g" role="group" aria-label="${g.l}"><span>${g.l}</span><div class="pf-chips">${g.o.map(([v,l])=>`<button class="pf-chip" type="button" aria-pressed="false" data-g="${g.k}" data-v="${v}">${g.water?wIcon(v):""}${l}</button>`).join("")}</div></div>`).join("") }
   if(c) renderProdList(); window.scrollTo({top:0}) }
 $("hubProd").onclick=()=>showProd(null);
 $("prodBack").onclick=()=>{ if(history.state&&history.state.prod) history.back(); else if(PF.cat) showProd(null,false); else showHub(false) };
 $("pcGrid").innerHTML=PROD_CATS.map(c=>`<button class="pc-card" type="button" data-cat="${c.id}"><span class="pc-ico">${c.ico}</span><b>${c.name}</b><small>${c.desc}</small><span class="pc-n">${c.items.length} documentations</span></button>`).join("");
 $("pcGrid").onclick=e=>{ const b=e.target.closest("[data-cat]"); if(b) showProd(b.dataset.cat) };
-$("pfGroups").innerHTML=PF_GROUPS.map(g=>`<div class="pf-g" role="group" aria-label="${g.l}"><span>${g.l}</span><div class="pf-chips">${g.o.map(([v,l])=>`<button class="pf-chip" type="button" aria-pressed="false" data-g="${g.k}" data-v="${v}">${g.k==="w"?wIcon(v):""}${l}</button>`).join("")}</div></div>`).join("");
 $("pfGroups").onclick=e=>{ const b=e.target.closest(".pf-chip"); if(!b) return; const set=PF.sel[b.dataset.g]; if(set.has(b.dataset.v)) set.delete(b.dataset.v); else set.add(b.dataset.v); b.setAttribute("aria-pressed",set.has(b.dataset.v)); renderProdList() };
 $("pfQ").addEventListener("input",()=>{ PF.q=$("pfQ").value; renderProdList() });
 $("pfReset").onclick=()=>{ for(const k in PF.sel) PF.sel[k].clear(); PF.q=""; $("pfQ").value=""; document.querySelectorAll(".pf-chip").forEach(b=>b.setAttribute("aria-pressed","false")); renderProdList() };
 const norm=t=>t.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
-const TAGL={SL:"Surface libre",EC:"En charge",PO:"Portable",FI:"Fixe"};
 function renderProdList(){
-  const c=PROD_CATS.find(x=>x.id===PF.cat); if(!c) return; const q=norm(PF.q.trim()), S=PF.sel;
-  const ok=it=>(!S.m.size||it.m.some(v=>S.m.has(v)))&&(!S.i.size||it.m.some(v=>S.i.has(v)))&&(!S.w.size||it.w.some(v=>S.w.has(v)))&&(!q||norm(it.n+" "+it.s).includes(q));
+  const c=curCat(); if(!c) return; const q=norm(PF.q.trim()), S=PF.sel;
+  const ok=it=>c.groups.every(g=>!S[g.k].size||it.t.some(v=>S[g.k].has(v)))&&(!q||norm(it.n+" "+it.s).includes(q));
   const list=c.items.filter(ok);
+  const tags=it=>(it.x?`<span class="tag m">${esc(it.x)}</span>`:"")+c.groups.filter(g=>!g.water).map(g=>g.o.filter(([v])=>it.t.includes(v)).map(([,l])=>`<span class="tag${g.main?" m":""}">${l}</span>`).join("")).join("")
+    +c.groups.filter(g=>g.water).map(g=>`<span class="pw">${g.o.filter(([v])=>it.t.includes(v)).map(([v])=>wIcon(v)).join("")}</span>`).join("");
   $("pl").innerHTML=list.map(it=>`<li><a href="${DOC_BASE+it.f}" target="_blank" rel="noopener" data-id="${it.id}" aria-label="${esc(it.n)} : documentation commerciale (PDF)">
     <span class="pn">${esc(it.n)}</span>
     <span class="ps">${esc(it.s)}</span>
-    <span class="pt">${it.m.filter(v=>v==="SL"||v==="EC").map(v=>`<span class="tag m">${TAGL[v]}</span>`).join("")}${it.m.filter(v=>v==="PO"||v==="FI").map(v=>`<span class="tag">${TAGL[v]}</span>`).join("")}<span class="pw">${it.w.map(k=>wIcon(k)).join("")}</span></span>
-    <span class="pdf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6"/><path d="M9 14h6M9 17.5h4"/></svg>PDF<small>${nf(DOC_SIZE[it.id]||0,1)} Mo</small></span></a></li>`).join("");
+    <span class="pt">${tags(it)}</span>
+    <span class="pdf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6"/><path d="M9 14h6M9 17.5h4"/></svg>PDF<small>${nf(it.mo||0,1)} Mo</small></span></a></li>`).join("");
   $("plEmpty").hidden=list.length>0;
   const nf_=Object.values(S).reduce((n,x)=>n+x.size,0)+(q?1:0);
   $("pfCount").textContent=`${list.length} appareil${list.length>1?"s":""}${nf_?` sur ${c.items.length}`:""}`; $("pfReset").hidden=!nf_;
