@@ -1,5 +1,5 @@
 import base64, json, sys
-VERSION='2.3.1'
+VERSION='2.4.0'
 s=open('src.html').read().replace('%%VERSION%%',VERSION).replace('%%APP%%',open('app.js').read()).replace('%%DEMO%%',open('demo.json').read())
 logo='data:image/png;base64,'+base64.b64encode(open('logo_new.png','rb').read()).decode()
 for _k in ['base','wave','o']: s=s.replace('%%HUB_'+_k.upper()+'%%','data:image/png;base64,'+base64.b64encode(open('hub/l_'+_k+'.png','rb').read()).decode())  # logo d'accueil en 3 calques animés
@@ -53,4 +53,5 @@ self.addEventListener('fetch',e=>{{ if(e.request.method!=='GET') return;
 """
 open(web+'/sw.js','w').write(sw)
 shutil.copy('LISEZMOI_web.txt',web+'/LISEZMOI.txt')
+shutil.copytree('docs',web+'/docs')  # documentations PDF (rubrique « Nos produits »), servies à côté de l'application
 print('web ok',VERSION,h)

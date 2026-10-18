@@ -1603,23 +1603,86 @@ document.body.dataset.mtab=document.body.dataset.mtab||"bilan";
 /* ---------- Accueil COMETEC : page d'ouverture avec logo animé ---------- */
 function hubOn(){ return document.body.classList.contains("onhub") }
 function showHub(anim){
-  const h=$("hub"), lg=$("hubLogo"); document.body.classList.remove("onsim"); document.body.classList.add("onhub"); h.classList.remove("hub-anim"); window.scrollTo({top:0});
+  const h=$("hub"), lg=$("hubLogo"); document.body.classList.remove("onsim","onprod"); document.body.classList.add("onhub"); h.classList.remove("hub-anim"); window.scrollTo({top:0});
   if(anim&&!matchMedia("(prefers-reduced-motion: reduce)").matches){
     lg.style.setProperty("--hub-dy","0px"); const r=lg.getBoundingClientRect();
     lg.style.setProperty("--hub-dy",Math.max(0,innerHeight/2-(r.top+r.height/2))+"px"); void h.offsetWidth; h.classList.add("hub-anim") }
   document.body.classList.remove("hub-pre");
 }
 function simOn(){ return document.body.classList.contains("onsim") }
-function enterApp(push){ if(!hubOn()&&!simOn()) return; document.body.classList.remove("onhub","onsim","hub-pre"); $("hub").classList.remove("hub-anim"); if(push!==false) try{ history.pushState({app:1},"") }catch(e){} window.scrollTo({top:0}) }
+function enterApp(push){ if(!hubOn()&&!simOn()&&!document.body.classList.contains("onprod")) return; document.body.classList.remove("onhub","onsim","onprod","hub-pre"); $("hub").classList.remove("hub-anim"); if(push!==false) try{ history.pushState({app:1},"") }catch(e){} window.scrollTo({top:0}) }
 $("hubOpen").onclick=()=>enterApp();
 $("hubDemo").onclick=()=>{ enterApp(); startDemo() };
 document.querySelectorAll("header.top .logo, header.top .appicon").forEach(el=>{ el.classList.add("tohub"); el.title="Accueil COMETEC";
   el.addEventListener("click",()=>{ if(history.state&&history.state.app) history.back(); else showHub(false) }) });
 addEventListener("popstate",()=>{ const st=history.state;
-  if(st&&st.sim){ if(!simOn()) showSim(false) }
-  else if(st&&(st.app||st.mview)){ if(hubOn()||simOn()) enterApp(false) }
+  if(st&&st.prod){ showProd(st.prod===1?null:st.prod,false) }
+  else if(st&&st.sim){ if(!simOn()) showSim(false) }
+  else if(st&&(st.app||st.mview)){ if(hubOn()||simOn()||prodOn()) enterApp(false) }
   else if(!hubOn()) showHub(false) });
 { const ld=loadDataset; loadDataset=function(){ if(hubOn()) enterApp(); return ld.apply(this,arguments) } }
+
+
+/* ---------- Nos produits : documentations par famille ---------- */
+// Adresse des PDF : dossier docs/ à côté de l'application publiée ; ailleurs (fichier local, aperçu) → site en ligne
+const DOC_BASE=(location.hostname==="cometec38.github.io")?"/Bilan/docs/":(location.protocol.startsWith("http")&&/^(localhost|127\.0\.0\.1)$/.test(location.hostname))?"docs/":"https://cometec38.github.io/Bilan/docs/";
+const WATER={EU:{l:"Eaux usées",c:"#8A5A2B",b:"#F3E6D8",p:'<circle cx="12" cy="12" r="6.5"/><path d="M7.2 9.5h9.6M6.2 12h11.6M7.2 14.5h9.6"/>'},
+  EP:{l:"Eau potable",c:"#1769C2",b:"#E2EEFA",p:'<path d="M12 5.2c2.8 3.4 4.4 5.6 4.4 7.8a4.4 4.4 0 0 1-8.8 0c0-2.2 1.6-4.4 4.4-7.8z"/><path d="M10.2 13.6a1.9 1.9 0 0 0 1.8 1.6"/>'},
+  EB:{l:"Eau brute",c:"#1E7A5A",b:"#DFF2E9",p:'<path d="M4 10c1.3-1.2 2.7-1.2 4 0s2.7 1.2 4 0 2.7-1.2 4 0 2.7 1.2 4 0M4 15c1.3-1.2 2.7-1.2 4 0s2.7 1.2 4 0 2.7-1.2 4 0 2.7 1.2 4 0"/>'},
+  PL:{l:"Eaux pluviales",c:"#4A5D9C",b:"#E6E9F6",p:'<path d="M7.5 13.5a3.5 3.5 0 0 1-.4-7A5 5 0 0 1 16.8 8a3 3 0 0 1 .2 5.5z"/><path d="M9 16l-1 2.5M12.5 16l-1 2.5M16 16l-1 2.5"/>'}};
+const wIcon=(k,title)=>{ const w=WATER[k]; return `<svg class="wi" viewBox="0 0 24 24" role="img" aria-label="${w.l}"><title>${title?w.l:w.l}</title><circle class="bg" cx="12" cy="12" r="12" fill="${w.b}"/><g fill="none" stroke="${w.c}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${w.p}</g></svg>` };
+const PROD_CATS=[{id:"debitmetrie",name:"Débitmétrie",desc:"Débitmètres pour réseaux d'assainissement, rivières, canaux et conduites en charge.",ico:'<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 34c5-6 9-6 14 0s9 6 14 0 6-5 8-3"/><path d="M12 22l7-9 6 6 9-11"/><path d="M28 8h6v6"/></svg>',
+  items:[
+  ["raven-eye","Débitmètre radar hauteur-vitesse RAVEN-EYE","Sans contact, installation au-dessus du conduit, insensible à la nature de l'effluent","SL FI","EU EP EB PL"],
+  ["beluga-av","Débitmètre Doppler hauteur-vitesse BELUGA AV","Capteur Doppler et pression, ultra-compact, Modbus","SL PO FI","EU EB PL"],
+  ["beluga","Débitmètre Doppler hauteur-vitesse BELUGA","Installation sans modification du conduit, fonctionne en refoulement","SL PO FI","EU EB PL"],
+  ["raven-eye-beluga-solutions-autonomes","RAVEN-EYE & BELUGA Solutions autonomes","Valise batterie et enregistreur pour pose temporaire sous tampon","SL PO","EU EB PL"],
+  ["logr","Débitmètre portable LOG'R","Doppler hauteur-vitesse autonome pour le diagnostic de réseau, Wi-Fi","SL PO","EU PL"],
+  ["bulr2","Débitmètre portable bulle à bulle BUL'R2","Débit sur canal de comptage, enregistreur intégré, asservissement préleveur","SL PO","EU EB PL"],
+  ["debulle","Débitmètre bulle à bulle DEBULLE","Poste fixe sur canal de comptage, enregistreur intégré","SL FI","EU EB PL"],
+  ["oc90","Débitmètre à ultrasons OC90","Canal de comptage, mesure de niveau à ultrasons, 2 voies","SL FI","EU EB PL"],
+  ["phoenix","Débitmètre radar hauteur-vitesse PHOENIX","Rivières et grands canaux, sans contact avec l'écoulement","SL FI","EB"],
+  ["flostick","Courantomètre électromagnétique FloStick","Lecture instantanée de la vitesse, enregistrement 2 000 valeurs","SL PO","EU EB PL"],
+  ["fluvia","Courantomètre électromagnétique FLUVIA","Vitesse et calcul du débit, rivière, irrigation, assainissement","SL PO","EU EB PL"],
+  ["easyflow","Débitmètre par traçage au sel EASYFLOW","Jaugeage en quelques minutes sur cours d'eau à fort brassage","SL PO","EB"],
+  ["torpee-mag","Débitmètre multipoint à insertion TORPEE-MAG","Électromagnétique, DN 100 à DN 2500, pose sans interruption du débit","EC FI","EP EB"],
+  ["kf100","Débitmètre à temps de transit KF100","Poste fixe, capteur non intrusif, DN 10 à 3 000 mm","EC FI","EP EB"],
+  ["kf200","Débitmètre portable à temps de transit KF200","Capteur non intrusif, DN 10 à 6 500 mm","EC PO","EP EB"],
+  ["kf210","Débitmètre portable à temps de transit KF210","Portable IP67, capteur non intrusif, DN 50 à 2 500 mm","EC PO","EP EB"]
+  ].map(([id,n,s,m,w])=>({id,n,s,m:m.split(" "),w:w.split(" "),f:`debitmetrie/${id}.pdf`}))}];
+const DOC_SIZE={"raven-eye":0.8,"beluga-av":0.5,"beluga":0.7,"raven-eye-beluga-solutions-autonomes":0.4,"logr":0.5,"bulr2":0.3,"debulle":0.9,"oc90":0.6,"phoenix":0.7,"flostick":0.5,"fluvia":2.3,"easyflow":0.4,"torpee-mag":0.4,"kf100":0.3,"kf200":0.6,"kf210":0.4};
+const PF_GROUPS=[{k:"m",l:"Mesure",o:[["SL","Surface libre"],["EC","En charge"]]},{k:"i",l:"Installation",o:[["PO","Portable"],["FI","Fixe"]]},{k:"w",l:"Type d'eau",o:[["EU","Eaux usées"],["EP","Eau potable"],["EB","Eau brute"],["PL","Eaux pluviales"]]}];
+const PF={cat:null,sel:{m:new Set(),i:new Set(),w:new Set()},q:""};
+function prodOn(){ return document.body.classList.contains("onprod") }
+function showProd(cat,push){
+  document.body.classList.remove("onhub","onsim"); $("hub").classList.remove("hub-anim"); document.body.classList.add("onprod");
+  if(push!==false) try{ history.pushState({prod:cat||1},"") }catch(e){}
+  PF.cat=cat||null; $("prodCats").hidden=!!cat; $("prodList").hidden=!cat;
+  const c=PROD_CATS.find(x=>x.id===cat); $("prodTitle").textContent=c?c.name:"Nos produits"; $("prodBackLab").textContent=c?"Nos produits":"Accueil";
+  if(c) renderProdList(); window.scrollTo({top:0}) }
+$("hubProd").onclick=()=>showProd(null);
+$("prodBack").onclick=()=>{ if(history.state&&history.state.prod) history.back(); else if(PF.cat) showProd(null,false); else showHub(false) };
+$("pcGrid").innerHTML=PROD_CATS.map(c=>`<button class="pc-card" type="button" data-cat="${c.id}"><span class="pc-ico">${c.ico}</span><b>${c.name}</b><small>${c.desc}</small><span class="pc-n">${c.items.length} documentations</span></button>`).join("");
+$("pcGrid").onclick=e=>{ const b=e.target.closest("[data-cat]"); if(b) showProd(b.dataset.cat) };
+$("pfGroups").innerHTML=PF_GROUPS.map(g=>`<div class="pf-g" role="group" aria-label="${g.l}"><span>${g.l}</span><div class="pf-chips">${g.o.map(([v,l])=>`<button class="pf-chip" type="button" aria-pressed="false" data-g="${g.k}" data-v="${v}">${g.k==="w"?wIcon(v):""}${l}</button>`).join("")}</div></div>`).join("");
+$("pfGroups").onclick=e=>{ const b=e.target.closest(".pf-chip"); if(!b) return; const set=PF.sel[b.dataset.g]; if(set.has(b.dataset.v)) set.delete(b.dataset.v); else set.add(b.dataset.v); b.setAttribute("aria-pressed",set.has(b.dataset.v)); renderProdList() };
+$("pfQ").addEventListener("input",()=>{ PF.q=$("pfQ").value; renderProdList() });
+$("pfReset").onclick=()=>{ for(const k in PF.sel) PF.sel[k].clear(); PF.q=""; $("pfQ").value=""; document.querySelectorAll(".pf-chip").forEach(b=>b.setAttribute("aria-pressed","false")); renderProdList() };
+const norm=t=>t.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
+const TAGL={SL:"Surface libre",EC:"En charge",PO:"Portable",FI:"Fixe"};
+function renderProdList(){
+  const c=PROD_CATS.find(x=>x.id===PF.cat); if(!c) return; const q=norm(PF.q.trim()), S=PF.sel;
+  const ok=it=>(!S.m.size||it.m.some(v=>S.m.has(v)))&&(!S.i.size||it.m.some(v=>S.i.has(v)))&&(!S.w.size||it.w.some(v=>S.w.has(v)))&&(!q||norm(it.n+" "+it.s).includes(q));
+  const list=c.items.filter(ok);
+  $("pl").innerHTML=list.map(it=>`<li><a href="${DOC_BASE+it.f}" target="_blank" rel="noopener" aria-label="${esc(it.n)} : documentation commerciale (PDF)">
+    <span class="pn">${esc(it.n)}</span>
+    <span class="ps">${esc(it.s)}</span>
+    <span class="pt">${it.m.filter(v=>v==="SL"||v==="EC").map(v=>`<span class="tag m">${TAGL[v]}</span>`).join("")}${it.m.filter(v=>v==="PO"||v==="FI").map(v=>`<span class="tag">${TAGL[v]}</span>`).join("")}<span class="pw">${it.w.map(k=>wIcon(k)).join("")}</span></span>
+    <span class="pdf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6"/><path d="M9 14h6M9 17.5h4"/></svg>PDF<small>${nf(DOC_SIZE[it.id]||0,1)} Mo</small></span></a></li>`).join("");
+  $("plEmpty").hidden=list.length>0;
+  const nf_=Object.values(S).reduce((n,x)=>n+x.size,0)+(q?1:0);
+  $("pfCount").textContent=`${list.length} appareil${list.length>1?"s":""}${nf_?` sur ${c.items.length}`:""}`; $("pfReset").hidden=!nf_;
+}
 
 /* ---------- Simulateur de débit : Q = S × V ou Manning-Strickler ---------- */
 const SIM={meth:"sv",shape:"circ",dims:{circ:"",rect:""},iu:"mm",ku:"ks",shown:false,vCalc:null};
@@ -1629,7 +1692,7 @@ function wetted(sh,D,H){ // D, H en mm → S (m²), P (m)
     const th=2*Math.acos((r-h)/r); return {S:r*r/2*(th-Math.sin(th)),P:r*th} }
   const L=D/1000, h=Math.max(0,H)/1000; return {S:L*h,P:L+2*h} }
 function strickler(w,Ks,I){ if(!(w.S>0)) return 0; return Ks*Math.pow(w.S/w.P,2/3)*Math.sqrt(I) } // V en m/s
-function showSim(push){ document.body.classList.remove("onhub"); $("hub").classList.remove("hub-anim"); document.body.classList.add("onsim"); if(push!==false) try{ history.pushState({sim:1},"") }catch(e){} window.scrollTo({top:0}); simDraw() }
+function showSim(push){ document.body.classList.remove("onhub","onprod"); $("hub").classList.remove("hub-anim"); document.body.classList.add("onsim"); if(push!==false) try{ history.pushState({sim:1},"") }catch(e){} window.scrollTo({top:0}); simDraw() }
 $("hubSim").onclick=()=>showSim();
 $("simBack").onclick=()=>{ if(history.state&&history.state.sim) history.back(); else showHub(false) };
 function radio(sel,attr,val){ document.querySelectorAll(sel).forEach(b=>b.setAttribute("aria-checked",b.dataset[attr]===val)) }
