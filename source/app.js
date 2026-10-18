@@ -1664,7 +1664,13 @@ const PROD_CATS=[{id:"debitmetrie",name:"Débitmétrie",desc:"Débitmètres pour
   ["maxx-p6","Préleveur portable MAXX P6","Léger et compact, mono ou multi-flacons","PO VI PE",2.2],
   ["maxx-tp5p","Préleveur portable MAXX TP5 P","Mono ou multi-flacons, isotherme ou réfrigéré","PO VI",1.3],
   ["maxx-tp5c","Préleveur portable MAXX TP5 C","Préleveur de terrain, mono ou multi-flacons, isotherme ou réfrigéré","PO PE",1.8]
-  ].map(([id,n,s,t,mo,x])=>({id,n,s,t:t.split(" "),mo,x,f:`preleveurs/${id}.pdf`}))}];
+  ].map(([id,n,s,t,mo,x])=>({id,n,s,t:t.split(" "),mo,x,f:`preleveurs/${id}.pdf`}))},
+ {id:"canaux",name:"Canaux de mesure",desc:"Canaux jaugeurs Venturi et Palmer-Bowlus : le niveau mesuré en amont donne directement le débit.",ico:'<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11h11l6 7h6l6-7h11"/><path d="M4 37h11l6-7h6l6 7h11"/><path d="M9 24h28" stroke="#E3000B"/><path d="M32 20l5 4-5 4" stroke="#E3000B"/></svg>',
+  groups:[],
+  items:[
+  ["venturi-amv","Canal Venturi AMV","Mesure de débit en canal ouvert à surface libre, liquides clairs ou chargés, de 5 à 3 300 m³/h","",0.4,"Canal ouvert · ISO 4359"],
+  ["palmer-bowlus","Canal jaugeur Palmer-Bowlus","Canal circulaire en fibre de verre, à poser dans un conduit gravitaire DN 100 à 800 depuis un regard, jusqu'à 1 800 m³/h","",0.3,"Conduite circulaire"]
+  ].map(([id,n,s,t,mo,x])=>({id,n,s,t:t?t.split(" "):[],mo,x,f:`canaux/${id}.pdf`}))}];
 const PF={cat:null,sel:{},q:""};
 function prodOn(){ return document.body.classList.contains("onprod") }
 function curCat(){ return PROD_CATS.find(x=>x.id===PF.cat) }
@@ -1674,6 +1680,7 @@ function showProd(cat,push){
   const changed=PF.cat!==(cat||null); PF.cat=cat||null; $("prodCats").hidden=!!cat; $("prodList").hidden=!cat;
   const c=curCat(); $("prodTitle").textContent=c?c.name:"Nos produits"; $("prodBackLab").textContent=c?"Nos produits":"Accueil";
   if(c&&changed){ PF.sel={}; c.groups.forEach(g=>PF.sel[g.k]=new Set()); PF.q=""; $("pfQ").value="";
+    $("pfGroups").hidden=!c.groups.length; $("pfQ").closest(".pf-search").hidden=c.items.length<5;  /* petite famille : ni filtres ni recherche */
     $("pfGroups").innerHTML=c.groups.map(g=>`<div class="pf-g" role="group" aria-label="${g.l}"><span>${g.l}</span><div class="pf-chips">${g.o.map(([v,l])=>`<button class="pf-chip" type="button" aria-pressed="false" data-g="${g.k}" data-v="${v}">${g.water?wIcon(v):""}${l}</button>`).join("")}</div></div>`).join("") }
   if(c) renderProdList(); window.scrollTo({top:0}) }
 $("hubProd").onclick=()=>showProd(null);
