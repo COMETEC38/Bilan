@@ -1616,6 +1616,8 @@ $("hubDemo").onclick=()=>{ enterApp(); startDemo() };
 document.querySelectorAll("header.top .logo, header.top .appicon").forEach(el=>{ el.classList.add("tohub"); el.title="Accueil COMETEC";
   el.addEventListener("click",()=>{ if(history.state&&history.state.app) history.back(); else showHub(false) }) });
 addEventListener("popstate",()=>{ const st=history.state;
+  if(st&&st.pdf){ if(!pdfOn()){ const it=findItem(st.pdf); if(it){ showProd(st.prod===1?null:st.prod,false); openPdf(it,false) } } return }
+  if(pdfOn()){ closePdf(); if(st&&st.prod&&prodOn()&&(st.prod===1?null:st.prod)===PF.cat) return }
   if(st&&st.prod){ showProd(st.prod===1?null:st.prod,false) }
   else if(st&&st.sim){ if(!simOn()) showSim(false) }
   else if(st&&(st.app||st.mview)){ if(hubOn()||simOn()||prodOn()) enterApp(false) }
@@ -1674,7 +1676,7 @@ function renderProdList(){
   const c=PROD_CATS.find(x=>x.id===PF.cat); if(!c) return; const q=norm(PF.q.trim()), S=PF.sel;
   const ok=it=>(!S.m.size||it.m.some(v=>S.m.has(v)))&&(!S.i.size||it.m.some(v=>S.i.has(v)))&&(!S.w.size||it.w.some(v=>S.w.has(v)))&&(!q||norm(it.n+" "+it.s).includes(q));
   const list=c.items.filter(ok);
-  $("pl").innerHTML=list.map(it=>`<li><a href="${DOC_BASE+it.f}" target="_blank" rel="noopener" aria-label="${esc(it.n)} : documentation commerciale (PDF)">
+  $("pl").innerHTML=list.map(it=>`<li><a href="${DOC_BASE+it.f}" target="_blank" rel="noopener" data-id="${it.id}" aria-label="${esc(it.n)} : documentation commerciale (PDF)">
     <span class="pn">${esc(it.n)}</span>
     <span class="ps">${esc(it.s)}</span>
     <span class="pt">${it.m.filter(v=>v==="SL"||v==="EC").map(v=>`<span class="tag m">${TAGL[v]}</span>`).join("")}${it.m.filter(v=>v==="PO"||v==="FI").map(v=>`<span class="tag">${TAGL[v]}</span>`).join("")}<span class="pw">${it.w.map(k=>wIcon(k)).join("")}</span></span>
@@ -1683,6 +1685,49 @@ function renderProdList(){
   const nf_=Object.values(S).reduce((n,x)=>n+x.size,0)+(q?1:0);
   $("pfCount").textContent=`${list.length} appareil${list.length>1?"s":""}${nf_?` sur ${c.items.length}`:""}`; $("pfReset").hidden=!nf_;
 }
+
+
+/* ---------- Lecteur de documentation intégré (téléphone) : PDF.js, avec retour et partage ---------- */
+const LIB_BASE=(location.hostname==="cometec38.github.io")?"/Bilan/lib/pdfjs/":(location.protocol.startsWith("http")&&/^(localhost|127\.0\.0\.1)$/.test(location.hostname))?"lib/pdfjs/":"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/";
+let pdfLibP=null;
+function loadPdfJs(){ if(window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
+  if(!pdfLibP) pdfLibP=new Promise((res,rej)=>{ const sc=document.createElement("script"); sc.src=LIB_BASE+"pdf.min.js";
+    sc.onload=()=>{ window.pdfjsLib.GlobalWorkerOptions.workerSrc=LIB_BASE+"pdf.worker.min.js"; res(window.pdfjsLib) }; sc.onerror=()=>{ pdfLibP=null; rej(new Error("lecteur indisponible")) }; document.head.appendChild(sc) });
+  return pdfLibP }
+const PV={doc:null,item:null,zoom:1,token:0};
+const ZOOMS=[1,1.5,2,3];
+function pdfOn(){ return document.body.classList.contains("onpdf") }
+function findItem(id){ for(const c of PROD_CATS){ const it=c.items.find(x=>x.id===id); if(it) return it } return null }
+async function openPdf(it,push){
+  if(!pdfOn()) PV.scroll=window.scrollY; document.body.classList.add("onpdf"); $("pdfv").hidden=false; $("pdfvTitle").textContent=it.n; PV.item=it; PV.zoom=1;
+  $("pdfvBody").innerHTML=`<p class="pdfv-msg">Chargement de la documentation…</p>`;
+  if(push!==false) try{ history.pushState({prod:PF.cat||1,pdf:it.id},"") }catch(e){}
+  const tok=++PV.token;
+  try{ const lib=await loadPdfJs(); const doc=await lib.getDocument({url:DOC_BASE+it.f}).promise; if(tok!==PV.token){ doc.destroy(); return } PV.doc=doc; await renderPdf() }
+  catch(e){ if(tok!==PV.token) return; $("pdfvBody").innerHTML=`<p class="pdfv-msg">Impossible d'afficher la documentation ici${navigator.onLine===false?" : pas de connexion Internet":""}.<br><br><a href="${DOC_BASE+it.f}" target="_blank" rel="noopener">Ouvrir le PDF</a></p>` } }
+async function renderPdf(){
+  const doc=PV.doc, tok=PV.token, body=$("pdfvBody"); if(!doc) return;
+  const avail=Math.max(200,body.clientWidth-16), dpr=Math.min(window.devicePixelRatio||1,3);
+  body.innerHTML=""; const pages=[];
+  for(let n=1;n<=doc.numPages;n++){ const d=document.createElement("div"); d.className="pdfv-page"; body.appendChild(d); pages.push(d) }
+  for(let n=1;n<=doc.numPages;n++){
+    const page=await doc.getPage(n); if(tok!==PV.token) return;
+    const v1=page.getViewport({scale:1}), cssW=avail*PV.zoom, scale=cssW/v1.width, vp=page.getViewport({scale:scale*dpr});
+    const c=document.createElement("canvas"); c.width=Math.floor(vp.width); c.height=Math.floor(vp.height);
+    pages[n-1].style.width=cssW+"px"; pages[n-1].style.aspectRatio=`${v1.width} / ${v1.height}`; pages[n-1].appendChild(c);
+    await page.render({canvasContext:c.getContext("2d"),viewport:vp}).promise; if(tok!==PV.token) return }
+}
+function closePdf(){ PV.token++; if(PV.doc){ try{ PV.doc.destroy() }catch(e){} } PV.doc=null; document.body.classList.remove("onpdf"); $("pdfv").hidden=true; $("pdfvBody").innerHTML=""; window.scrollTo({top:PV.scroll||0}) }
+function setZoom(d){ const i=Math.max(0,Math.min(ZOOMS.length-1,ZOOMS.indexOf(PV.zoom)+d)); if(ZOOMS[i]===PV.zoom) return;
+  const b=$("pdfvBody"), fy=b.scrollTop/Math.max(1,b.scrollHeight); PV.zoom=ZOOMS[i]; renderPdf().then(()=>{ b.scrollTop=fy*b.scrollHeight }) }
+$("pdfvIn").onclick=()=>setZoom(1); $("pdfvOut").onclick=()=>setZoom(-1);
+$("pdfvBack").onclick=()=>{ if(history.state&&history.state.pdf) history.back(); else closePdf() };
+$("pdfvShare").onclick=async()=>{ const it=PV.item; if(!it) return; const url=new URL(DOC_BASE+it.f,location.href).href, name=("COMETEC - "+it.n).replace(/[\\/:*?"<>|]/g,"")+".pdf";
+  try{ if(navigator.canShare){ const blob=await (await fetch(url)).blob(); const file=new File([blob],name,{type:"application/pdf"}); if(navigator.canShare({files:[file]})){ await navigator.share({files:[file],title:it.n}); return } }
+    if(navigator.share){ await navigator.share({title:it.n,url}); return } }catch(e){ if(e&&e.name==="AbortError") return }
+  const a=document.createElement("a"); a.href=url; a.download=name; a.target="_blank"; document.body.appendChild(a); a.click(); a.remove() };
+let pdfRz=null; addEventListener("resize",()=>{ if(!pdfOn()) return; clearTimeout(pdfRz); pdfRz=setTimeout(renderPdf,250) });
+$("pl").addEventListener("click",e=>{ const a=e.target.closest("a[data-id]"); if(!a||!isM()) return; e.preventDefault(); const it=findItem(a.dataset.id); if(it) openPdf(it) });
 
 /* ---------- Simulateur de débit : Q = S × V ou Manning-Strickler ---------- */
 const SIM={meth:"sv",shape:"circ",dims:{circ:"",rect:""},iu:"mm",ku:"ks",shown:false,vCalc:null};
