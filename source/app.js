@@ -1936,38 +1936,215 @@ new MutationObserver(rethem).observe(document.documentElement,{attributes:true,a
 })();
 
 
-/* ---------- Espace COMETEC : rubrique réservée, déverrouillée par un code d'accès ----------
-   Le module « constat RAVEN-EYE » (écrans + calculs + rapport) est chiffré à la construction (AES-GCM 256,
-   clé dérivée du code par PBKDF2-SHA256) : sans le code, son contenu est illisible, même en lisant le code de l'appli.
-   Le code est demandé une fois par appareil, puis mémorisé sur l'appareil (bouton « Verrouiller » pour l'oublier). */
-const CV_LOCK=%%CV_LOCK%%;
+/* ---------- Constat de vérification RAVEN-EYE au banc RAV-TRACK (Espace COMETEC) ----------
+   Assistant pas à pas → rapport PDF COMETEC. Brouillon (avec photos) gardé sur l'appareil (IndexedDB),
+   nom de l'intervenant, banc et signature mémorisés (localStorage). Rien n'est envoyé en ligne. */
+const CV_STEPS=["Dossier","Client","Instrument","Ouvrage","Configuration","Réglage 1","Réglage 2","Réglage 3","Intervenant","Rapport"];
+const CV_TOL=10; // écart maximum toléré, en %
+const CV_BANC={bancN:"001",bancSerie:"001",bancFab:"05/06/2023",bancCtrl:"07/01/2026"};
+const CV={d:null,step:1};
+const cvDB={p:null,
+  open(){ if(!this.p) this.p=new Promise(res=>{ try{ const r=indexedDB.open("cometec-constat",1); r.onupgradeneeded=()=>r.result.createObjectStore("kv"); r.onsuccess=()=>res(r.result); r.onerror=()=>res(null) }catch(e){ res(null) } }); return this.p },
+  async get(k){ const db=await this.open(); if(!db) return null; return new Promise(res=>{ try{ const q=db.transaction("kv").objectStore("kv").get(k); q.onsuccess=()=>res(q.result||null); q.onerror=()=>res(null) }catch(e){ res(null) } }) },
+  async set(k,v){ const db=await this.open(); if(!db) return; try{ db.transaction("kv","readwrite").objectStore("kv").put(v,k) }catch(e){} },
+  async del(k){ const db=await this.open(); if(!db) return; try{ db.transaction("kv","readwrite").objectStore("kv").delete(k) }catch(e){} } };
+const cvPrefs={ get(){ try{ return JSON.parse(localStorage.getItem("cvPrefs")||"{}") }catch(e){ return {} } }, set(o){ try{ localStorage.setItem("cvPrefs",JSON.stringify(Object.assign(this.get(),o))) }catch(e){} } };
+const cvNum=s=>{ s=String(s==null?"":s).trim().replace(/\s/g,"").replace(",","."); return s===""?NaN:Number(s) };
+const cvToday=()=>{ const t=new Date(); return `${t.getFullYear()}-${p2(t.getMonth()+1)}-${p2(t.getDate())}` };
+function cvDate(iso,plusYears){ const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(iso||""); if(!m) return null; const d=new Date(+m[1]+(plusYears||0),+m[2]-1,+m[3]); if(plusYears&&d.getMonth()!==+m[2]-1) d.setDate(0); return d }
+const cvLong=d=>d?d.toLocaleDateString("fr-FR",{day:"numeric",month:"long",year:"numeric"}):"–";
+function cvNo(f){ const d=cvDate(f.date); return /^\d{7}$/.test(f.devis||"")?String(d?d.getFullYear():new Date().getFullYear())+f.devis:"" }
+function cvReg(f,n){ const vt=cvNum(f["vt"+n]), rs=["a","b","c"].map(c=>cvNum(f["r"+n+c]));
+  if(!(vt>0)||rs.some(x=>!(x>=0))) return {vt,rs,done:false};
+  const vr=Math.round(rs.reduce((a,b)=>a+b,0)/3*1000+1e-9)/1000, m=(vt+vr)/2, e=(vr-m)/m*100;   // formule COMETEC, Vraw arrondi au millième
+  return {vt,rs,vr,e,ok:Math.abs(e)<=CV_TOL,done:true} }
+function cvAll(f){ const R=[1,2,3].map(n=>cvReg(f,n)), done=R.every(r=>r.done); const mean=done?R.reduce((a,r)=>a+r.e,0)/3:NaN; return {R,done,mean,ok:done&&R.every(r=>r.ok)} }
+const cvPct=(e,minus)=>!isFinite(e)?"–":(e>0.0049?"+":e<-0.0049?(minus||"−"):"")+nf(Math.abs(e),2)+" %";
+function cvNewDraft(){ const p=cvPrefs.get(); const d={f:Object.assign({date:cvToday(),type:"RAVEN-EYE 2"},CV_BANC),img:{},step:1,t:Date.now()};
+  ["bancN","bancSerie","bancFab","bancCtrl"].forEach(k=>{ if(p[k]) d.f[k]=p[k] }); if(p.interv) d.f.interv=p.interv; if(p.sig) d.img.sig=p.sig; return d }
+let cvT=null;
+function cvSave(){ clearTimeout(cvT); cvT=setTimeout(()=>{ if(CV.d){ CV.d.t=Date.now(); CV.d.step=CV.step; cvDB.set("draft",CV.d) } },300) }
 function ctrlOn(){ return document.body.classList.contains("onctrl") }
-const cvNorm=s=>String(s||"").toUpperCase().replace(/[^A-Z0-9]/g,"");
-async function cvUnlock(code){
-  if(window.CVM) return true;
-  if(!CV_LOCK||!window.crypto||!crypto.subtle) throw new Error("déverrouillage impossible sur ce navigateur");
-  const b64=x=>Uint8Array.from(atob(x),c=>c.charCodeAt(0));
-  const base=await crypto.subtle.importKey("raw",new TextEncoder().encode(cvNorm(code)),"PBKDF2",false,["deriveKey"]);
-  const key=await crypto.subtle.deriveKey({name:"PBKDF2",salt:b64(CV_LOCK.s),iterations:CV_LOCK.n,hash:"SHA-256"},base,{name:"AES-GCM",length:256},false,["decrypt"]);
-  let txt; try{ txt=new TextDecoder().decode(await crypto.subtle.decrypt({name:"AES-GCM",iv:b64(CV_LOCK.i)},key,b64(CV_LOCK.d))) }catch(e){ return false }
-  const m=JSON.parse(txt); $("ctrlGate").insertAdjacentHTML("afterend",m.html);
-  const lg=document.querySelector("#sim .sim-logo"); document.querySelectorAll("#ctrl [data-logo]").forEach(im=>im.src=lg.src);
-  (0,eval)(m.js);   // module exécuté dans la portée globale (accès aux outils communs de l'appli) ; il expose window.CVM
-  try{ localStorage.setItem("cvKey",cvNorm(code)) }catch(e){}
-  return !!window.CVM }
-async function showCtrl(push){ document.body.classList.remove("onhub","onprod","onsim"); $("hub").classList.remove("hub-anim"); document.body.classList.add("onctrl");
-  if(push!==false) try{ history.pushState({ctrl:1},"") }catch(e){} window.scrollTo({top:0});
-  if(!window.CVM){ let k=null; try{ k=localStorage.getItem("cvKey") }catch(e){} if(k){ $("ctrlGate").hidden=true; try{ await cvUnlock(k) }catch(e){} } }
-  if(window.CVM){ $("ctrlGate").hidden=true; window.CVM.start() }
-  else { $("ctrlGate").hidden=false; $("gateErr").hidden=true; $("gateCode").value=""; if(!matchMedia("(pointer:coarse)").matches) setTimeout(()=>$("gateCode").focus(),60) } }
+function showCtrl(push){ document.body.classList.remove("onhub","onprod","onsim"); $("hub").classList.remove("hub-anim"); document.body.classList.add("onctrl");
+  if(push!==false) try{ history.pushState({ctrl:1},"") }catch(e){} window.scrollTo({top:0}); cvStartScreen() }
+async function cvStartScreen(){ $("cvWiz").hidden=true; $("cvStart").hidden=false; $("ctrlTitle").textContent="Constat RAVEN-EYE";
+  const d=await cvDB.get("draft"); const has=d&&d.f&&(d.f.devis||d.f.societe||d.f.vt1);
+  $("cvResume").hidden=!has; if(has){ $("cvResumeT").textContent=(cvNo(d.f)?`Constat N° ${cvNo(d.f)}`:"Constat en cours")+(d.example?" (exemple)":"");
+    $("cvResumeS").textContent=[d.f.societe,d.f.lieu,`modifié le ${new Date(d.t).toLocaleDateString("fr-FR")} à ${new Date(d.t).toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"})}`].filter(Boolean).join(" · ");
+    $("cvResumeGo").onclick=()=>cvOpen(d,d.step||1) } }
+function cvOpen(d,step){ CV.d=d; $("cvStart").hidden=true; $("cvWiz").hidden=false;
+  document.querySelectorAll("#cvForm [data-k]").forEach(el=>{ const v=d.f[el.dataset.k]; el.value=v==null?(el.tagName==="SELECT"?el.options[0].value:""):v });
+  ["site","cap1","cap2","cap3"].forEach(cvShowImg); $("cvSigMem").checked=!!cvPrefs.get().sig; cvSigDraw(); cvGo(step||1) }
 $("hubCtrl").onclick=()=>showCtrl();
-$("gateBack").onclick=()=>{ if(history.state&&history.state.ctrl) history.back(); else showHub(false) };
-$("gateForm").addEventListener("submit",async e=>{ e.preventDefault(); const b=$("gateGo"), err=$("gateErr"); if(!cvNorm($("gateCode").value)) return;
-  b.disabled=true; b.textContent="Vérification…"; let ok=false;
-  try{ ok=await cvUnlock($("gateCode").value) }catch(x){ err.textContent="Déverrouillage impossible sur ce navigateur. Essayez avec Chrome, Edge ou Safari à jour."; err.hidden=false }
-  b.disabled=false; b.textContent="Déverrouiller";
-  if(ok){ $("ctrlGate").hidden=true; window.CVM.start(); toast("Espace COMETEC déverrouillé sur cet appareil") }
-  else if(err.hidden){ err.textContent="Code incorrect."; err.hidden=false; $("gateCode").select() } });
 try{ if(history.state&&(history.state.ctrl||history.state.sim||history.state.prod)&&hubOn()) history.replaceState(null,"") }catch(e){}  // après un rechargement, l'appli repart de l'accueil
-
-/* module Espace COMETEC chiffré : voir CV_LOCK */
+$("ctrlBack").onclick=()=>{ if(history.state&&history.state.ctrl) history.back(); else showHub(false) };
+$("cvNew").onclick=async()=>{ const d=await cvDB.get("draft"); if(d&&d.f&&(d.f.devis||d.f.societe||d.f.vt1)&&!d.example&&!confirmCv()) return; const n=cvNewDraft(); cvDB.set("draft",n); cvOpen(n,1) };
+function confirmCv(){ return window.confirm("Un constat est en cours sur cet appareil. Le remplacer par un nouveau constat vierge ?") }
+$("cvDemo").onclick=async()=>{ const cur=await cvDB.get("draft"); if(cur&&cur.f&&(cur.f.devis||cur.f.societe||cur.f.vt1)&&!cur.example&&!confirmCv()) return;
+  const d=cvNewDraft(); d.example=true; Object.assign(d.f,{devis:"1234567",lieu:"Déversoir d'orage DO-12, rue de l'Exemple, 00000 Ville-Test",societe:"Communauté de Communes X",adresse:"1 place de la Mairie",cp:"00000",ville:"Ville-Test",contact:"Monsieur X",tel:"",mail:"",type:"RAVEN-EYE 2",serie:"RE-000000",
+    ouvrage:"Il s'agit d'un profil rectangulaire. Point de mesure réglementaire de type A2 (déversoir en tête de station).",
+    config:"Le RAVEN-EYE est installé dans le sens amont et est raccordé sur un automate en Modbus RS485.\nLa communication entre le débitmètre et l'automate est fonctionnelle.\nLe contrôle des différents organes constituant le débitmètre (RAVEN-EYE, câble, support) montre qu'ils sont en bon état.",
+    vt1:"0,70",r1a:"0,72",r1b:"0,72",r1c:"0,70",vt2:"0,50",r2a:"0,48",r2b:"0,47",r2c:"0,47",vt3:"0,35",r3a:"0,36",r3b:"0,35",r3c:"0,35"});
+  if(!d.f.interv) d.f.interv="Prénom NOM"; cvDB.set("draft",d); cvOpen(d,1); toast("Exemple chargé : données fictives, modifiables") };
+// ---- navigation entre étapes
+$("cvDots").innerHTML=CV_STEPS.map((l,i)=>`<li><button type="button" data-go="${i+1}">${i+1}. ${l}</button></li>`).join("");
+$("cvDots").onclick=e=>{ const b=e.target.closest("[data-go]"); if(b) cvGo(+b.dataset.go) };
+$("cvPrev").onclick=()=>cvGo(CV.step-1);
+$("cvNext").onclick=()=>cvGo(CV.step+1);
+function cvGo(n){ n=Math.max(1,Math.min(CV_STEPS.length,n)); CV.step=n;
+  document.querySelectorAll("#cvForm .cv-step").forEach(fs=>fs.hidden=+fs.dataset.step!==n);
+  $("cvStepLab").textContent=CV_STEPS[n-1]; $("cvStepN").textContent=`Étape ${n} sur ${CV_STEPS.length}`; $("cvBarFill").style.width=(n/CV_STEPS.length*100)+"%";
+  document.querySelectorAll("#cvDots button").forEach((b,i)=>{ if(i+1===n) b.setAttribute("aria-current","step"); else b.removeAttribute("aria-current"); b.classList.toggle("done",cvStepDone(i+1)) });
+  $("cvPrev").hidden=n===1; $("cvNext").hidden=n===CV_STEPS.length; $("cvNext").textContent=n===CV_STEPS.length-1?"Récapitulatif":"Suivant";
+  cvLive(); if(n===9) requestAnimationFrame(cvSigDraw); if(n===10) cvSummary(); cvSave(); window.scrollTo({top:0}) }
+function cvStepDone(n){ const f=CV.d?CV.d.f:{}; return [()=>/^\d{7}$/.test(f.devis||"")&&f.date&&f.lieu,()=>!!f.societe,()=>!!f.serie,()=>!!(CV.d&&CV.d.img.site)&&!!f.ouvrage,()=>!!f.config,
+  ()=>cvReg(f,1).done,()=>cvReg(f,2).done,()=>cvReg(f,3).done,()=>!!f.interv&&!!(CV.d&&CV.d.img.sig),()=>false][n-1]() }
+// ---- saisie
+$("cvForm").addEventListener("input",e=>{ const el=e.target.closest("[data-k]"); if(!el||!CV.d) return;
+  if(el.dataset.k==="devis") el.value=el.value.replace(/\D/g,"").slice(0,7);
+  CV.d.f[el.dataset.k]=el.value; if(el.dataset.k==="interv"&&$("cvSigMem").checked) cvPrefs.set({interv:el.value});
+  if(/^banc/.test(el.dataset.k)) cvPrefs.set({[el.dataset.k]:el.value}); cvLive(); cvSave() });
+$("cvForm").addEventListener("change",e=>{ const el=e.target.closest("[data-k]"); if(el&&CV.d){ CV.d.f[el.dataset.k]=el.value; cvLive(); cvSave() } });
+$("cvForm").addEventListener("submit",e=>e.preventDefault());
+function cvLive(){ if(!CV.d) return; const f=CV.d.f; const no=cvNo(f);
+  $("cvNo").textContent=no||(f.devis?`${f.devis.length}/7 chiffres`:"–"); $("cvNext1").textContent=cvLong(cvDate(f.date,1));
+  [1,2,3].forEach(n=>{ const r=cvReg(f,n), box=$("cvRes"+n);
+    if(!r.done){ box.className="cv-res"; box.innerHTML=(r.vt>0||r.rs.some(x=>x>=0))?`<span>Renseignez Vtrack et les 3 mesures Vraw pour calculer l'écart.</span>`:""; return }
+    box.className="cv-res "+(r.ok?"ok":"ko");
+    box.innerHTML=`<span>Vraw retenu <b>${nf(r.vr,3)} m/s</b></span><span>Écart <b>${cvPct(r.e)}</b></span><span class="cv-v">${r.ok?"OK":"HORS TOLÉRANCE"}</span>` }) }
+// ---- images (photo du point de mesure, captures Fuzion)
+function cvLoadImg(file,max){ return new Promise((res,rej)=>{ const u=URL.createObjectURL(file), im=new Image();
+  im.onload=()=>{ let w=im.naturalWidth,h=im.naturalHeight; const k=Math.min(1,(max||1800)/Math.max(w,h)); w=Math.round(w*k); h=Math.round(h*k);
+    const c=document.createElement("canvas"); c.width=w; c.height=h; const g=c.getContext("2d"); g.fillStyle="#fff"; g.fillRect(0,0,w,h); g.drawImage(im,0,0,w,h); URL.revokeObjectURL(u);
+    res({data:c.toDataURL("image/jpeg",0.88),w,h}) };
+  im.onerror=()=>{ URL.revokeObjectURL(u); rej(new Error("image illisible")) }; im.src=u }) }
+function cvShowImg(k){ const box=document.querySelector(`.cv-photo[data-img="${k}"]`), im=CV.d&&CV.d.img[k];
+  box.querySelector(".cv-ph-empty").hidden=!!im; box.querySelector(".cv-ph-full").hidden=!im; if(im) box.querySelector("img").src=im.data }
+$("cvForm").addEventListener("change",async e=>{ const inp=e.target.closest("[data-pick]"); if(!inp||!inp.files||!inp.files[0]||!CV.d) return;
+  const k=inp.dataset.pick; try{ CV.d.img[k]=await cvLoadImg(inp.files[0],k==="site"?1600:1800); cvShowImg(k); cvSave() }catch(err){ toast("Image illisible : choisissez un fichier JPEG ou PNG.") } inp.value="" });
+$("cvForm").addEventListener("click",e=>{ const b=e.target.closest("[data-drop]"); if(!b||!CV.d) return; delete CV.d.img[b.dataset.drop]; cvShowImg(b.dataset.drop); cvSave() });
+// ---- signature
+const cvSc=$("cvSig"), cvSg=cvSc.getContext("2d"); let cvDraw=null;
+function cvSigDraw(){ cvSg.clearRect(0,0,cvSc.width,cvSc.height); const s=CV.d&&CV.d.img.sig; $("cvSigHint").hidden=!!s;
+  if(s){ const im=new Image(); im.onload=()=>cvSg.drawImage(im,0,0,cvSc.width,cvSc.height); im.src=s.data } }
+const cvPos=e=>{ const r=cvSc.getBoundingClientRect(); return [(e.clientX-r.left)*cvSc.width/r.width,(e.clientY-r.top)*cvSc.height/r.height] };
+cvSc.addEventListener("pointerdown",e=>{ cvDraw={p:cvPos(e),moved:false}; try{ cvSc.setPointerCapture(e.pointerId) }catch(_){} $("cvSigHint").hidden=true; e.preventDefault() });
+cvSc.addEventListener("pointermove",e=>{ if(!cvDraw) return; const p=cvPos(e); cvSg.lineWidth=4; cvSg.lineCap="round"; cvSg.lineJoin="round"; cvSg.strokeStyle="#10233F";
+  cvSg.beginPath(); cvSg.moveTo(...cvDraw.p); cvSg.lineTo(...p); cvSg.stroke(); cvDraw.p=p; cvDraw.moved=true });
+const cvSigEnd=()=>{ if(!cvDraw) return; const mv=cvDraw.moved; cvDraw=null; if(!mv||!CV.d) return;
+  CV.d.img.sig={data:cvSc.toDataURL("image/png"),w:cvSc.width,h:cvSc.height}; if($("cvSigMem").checked) cvPrefs.set({sig:CV.d.img.sig,interv:CV.d.f.interv||""}); cvSave() };
+cvSc.addEventListener("pointerup",cvSigEnd); cvSc.addEventListener("pointercancel",cvSigEnd);
+$("cvSigClear").onclick=()=>{ if(!CV.d) return; delete CV.d.img.sig; cvSigDraw(); if($("cvSigMem").checked) cvPrefs.set({sig:null}); cvSave() };
+$("cvSigMem").onchange=()=>{ if($("cvSigMem").checked) cvPrefs.set({sig:CV.d&&CV.d.img.sig||null,interv:CV.d&&CV.d.f.interv||""}); else cvPrefs.set({sig:null,interv:""}) };
+// ---- récapitulatif
+function cvMissing(f,img){ const block=[], warn=[];
+  if(!/^\d{7}$/.test(f.devis||"")) block.push("le numéro de devis (7 chiffres)"); if(!cvDate(f.date)) block.push("la date de l'intervention");
+  if(!f.societe) block.push("la société du client"); if(!f.lieu) block.push("le lieu du contrôle");
+  [1,2,3].forEach(n=>{ if(!cvReg(f,n).done) block.push(`les vitesses du réglage ${n}`) });
+  if(!f.serie) warn.push("Numéro de série de l'instrument non renseigné"); if(!img.site) warn.push("Photo du point de mesure absente");
+  [1,2,3].forEach(n=>{ if(!img["cap"+n]) warn.push(`Capture Fuzion du réglage ${n} absente`) });
+  if(!f.ouvrage) warn.push("Description de l'ouvrage vide"); if(!f.config) warn.push("Configuration de l'équipement vide");
+  if(!f.interv) warn.push("Nom de l'intervenant absent"); if(!img.sig) warn.push("Signature absente");
+  return {block,warn} }
+function cvSummary(){ const f=CV.d.f, A=cvAll(f), M=cvMissing(f,CV.d.img), no=cvNo(f);
+  $("cvSum").innerHTML=`<div class="cv-sum">
+    <div class="cv-sum-id"><span>Constat N°</span><b>${esc(no||"–")}</b><span>Client</span><b>${esc(f.societe||"–")}</b><span>Lieu</span><b>${esc(f.lieu||"–")}</b><span>Intervention</span><b>${cvLong(cvDate(f.date))}</b><span>Prochaine inspection</span><b>${cvLong(cvDate(f.date,1))}</b></div>
+    <div class="cv-tabw"><table class="cv-tab"><thead><tr><th>Réglage</th><th>Vtrack (m/s)</th><th>Vraw (m/s)</th><th>Écart</th><th>Résultat</th></tr></thead><tbody>
+    ${A.R.map((r,i)=>`<tr><td>${i+1}</td><td>${r.vt>0?nf(r.vt,2):"–"}</td><td>${r.done?nf(r.vr,3):"–"}</td><td class="${r.done?(r.ok?"ok":"ko"):""}">${r.done?cvPct(r.e):"–"}</td><td class="${r.done?(r.ok?"ok":"ko"):""}">${r.done?(r.ok?"OK":"Hors tolérance"):"à compléter"}</td></tr>`).join("")}
+    </tbody></table></div>
+    ${A.done?`<p class="cv-mean">Écart moyen sur le contrôle de vitesse : <b class="${Math.abs(A.mean)<=CV_TOL?"ok":"ko"}">${cvPct(A.mean)}</b> (tolérance ± ${CV_TOL} %)</p>
+    <div class="cv-verdict ${A.ok?"":"ko"}"><span>Instrument</span><span><b>${A.ok?"CONFORME":"NON CONFORME"}</b><br><small>aux spécifications requises</small></span></div>`:""}
+    ${M.block.length?`<p class="cv-err">Pour générer le rapport, il manque : ${M.block.join(", ")}.</p>`:""}
+    ${M.warn.length?`<ul class="cv-warn">${M.warn.map(w=>`<li>${w}</li>`).join("")}</ul>`:""}
+    <div class="cv-end"><button type="button" class="cv-btn big" id="cvPdf" ${M.block.length?"disabled":""}>Générer le rapport PDF</button>
+    <button type="button" class="cv-btn ghost" id="cvDone">Terminer et revenir à l'accueil</button></div></div>`;
+  $("cvPdf").onclick=cvExport; $("cvDone").onclick=()=>{ if(history.state&&history.state.ctrl) history.back(); else showHub(false) } }
+async function cvExport(){ const b=$("cvPdf"); b.disabled=true; b.textContent="Création du rapport…";
+  try{ const f=CV.d.f; const blob=await cvBuildPdf(CV.d); const name=`Constat de vérification RAVEN-EYE ${cvNo(f)}${f.societe?" - "+f.societe.replace(/[\\/:*?"<>|]/g,"").trim():""}.pdf`;
+    const file=new File([blob],name,{type:"application/pdf"});
+    if(matchMedia("(pointer:coarse)").matches&&navigator.canShare&&navigator.canShare({files:[file]})){ try{ await navigator.share({files:[file],title:name}) }catch(e){ if(!e||e.name!=="AbortError") await saveFile(name,blob) } }
+    else await saveFile(name,blob) }
+  catch(e){ console.error(e); toast("Rapport impossible : "+e.message) }
+  b.disabled=false; b.textContent="Générer le rapport PDF" }
+// ---- rapport PDF (mise en page COMETEC)
+function cvImgSize(src){ return new Promise(res=>{ const im=new Image(); im.onload=()=>res({w:im.naturalWidth,h:im.naturalHeight}); im.onerror=()=>res({w:3,h:1}); im.src=src }) }
+async function cvBuildPdf(D){
+  const {jsPDF}=window.jspdf; const f=D.f, img=D.img, A=cvAll(f), no=cvNo(f);
+  const doc=new jsPDF({unit:"mm",format:"a4",orientation:"portrait",compress:true}); const W=210,H=297,M=18,CW=W-2*M, TOP=34, BOT=262;
+  const ARD=[26,77,77], RED=[227,0,11], INK=[25,25,25], MUT=[95,108,108], OKC=[24,135,66], KOC=[200,16,46];
+  const T=(s,x,y,o)=>doc.text(pdfTxt(s),x,y,o);
+  const set=(sz,st,col)=>{ doc.setFont("helvetica",st||"normal"); doc.setFontSize(sz); doc.setTextColor(...(col||INK)) };
+  const pct=e=>cvPct(e,"-");
+  const logoSrc=document.querySelector("#ctrl .sim-logo").src, ls=await cvImgSize(logoSrc);
+  let y=TOP;
+  const newPage=()=>{ doc.addPage(); y=TOP };
+  const need=h=>{ if(y+h>BOT) newPage() };
+  const section=(t,x,w)=>{ x=x||M; w=w||CW; need(14); set(12,"bold",ARD); T(t,x,y); doc.setDrawColor(...RED); doc.setLineWidth(0.5); doc.line(x,y+2,x+w,y+2); y+=8.5 };
+  const para=(t,x,w,o)=>{ x=x||M; w=w||CW; o=o||{}; set(o.sz||10,o.st||"normal",o.col||INK); const L=doc.splitTextToSize(pdfTxt(t),w); for(const l of L){ need(5.2); doc.text(l,x,y); y+=5 } y+=o.gap==null?2:o.gap };
+  const rows=(R,lw)=>{ lw=lw||52; for(const [a,b,col] of R){ const L=doc.splitTextToSize(pdfTxt(b||""),CW-lw); need(L.length*5+1.5); set(10,"normal",MUT); T(a,M,y); set(10,"bold",col||INK); doc.text(L,M+lw,y); y+=Math.max(6,L.length*5+1) } y+=3 };
+  const image=(im,x,w,maxH)=>{ let h=w*im.h/im.w; if(h>maxH){ h=maxH; w=h*im.w/im.h } doc.addImage(im.data,"JPEG",x,y,w,h); return {w,h} };
+  // ---------- page 1
+  section("Délivré à");
+  rows([["Société :",f.societe],["Adresse :",f.adresse],["CP / Ville :",[f.cp,f.ville].filter(Boolean).join(" ")],["Contact :",f.contact],["Téléphone :",f.tel],["Mail :",f.mail]].filter((r,i)=>i===0||r[1]));
+  section("Dossier");
+  rows([["Constat de vérification N° :",no],["N° de devis :",f.devis],["Date d'intervention :",cvLong(cvDate(f.date))],["Lieu du contrôle :",f.lieu],["Prochaine inspection suggérée :",cvLong(cvDate(f.date,1)),RED]],58);
+  section("Instrument vérifié");
+  rows([["Désignation :","Débitmètre RAVEN-EYE"],["Constructeur :","Flow-Tronic"],["Type :",f.type||"RAVEN-EYE"],["Numéro de série :",f.serie||"Non communiqué"],["Référence interne :",f.refint]].filter((r,i)=>i<4||r[1]));
+  section("Référence de la procédure");
+  para("Ce document ne peut pas être utilisé en lieu et place d'un certificat d'étalonnage. Ce document est réalisé suivant les recommandations du fascicule de documentation X 07-011 définissant le constat de vérification.");
+  para(`La procédure de vérification est effectuée au moyen d'un système de contrôle par bande roulante RAV-TRACK N° ${f.bancN||"001"}${f.bancCtrl?`, contrôlé le ${f.bancCtrl}`:""}.`);
+  // ---------- page 2 : ouvrage, configuration, méthode
+  newPage();
+  const y0=y; let yImg=y0;
+  if(img.site){ const s=image(img.site,M,66,92); yImg=y0+s.h; }
+  const tx=img.site?M+72:M, tw=img.site?CW-72:CW;
+  section("Ouvrage et conditions hydrauliques",tx,tw); para(f.ouvrage||"Non renseigné.",tx,tw,{gap:4});
+  section("Configuration de l'équipement mis en place",tx,tw); for(const l of String(f.config||"Non renseignée.").split(/\n+/)) para(l,tx,tw,{gap:2.5});
+  y=Math.max(y,yImg)+8;
+  section(`Outil de contrôle : banc d'étalonnage RAV-TRACK N° ${f.bancN||"001"}`);
+  rows([["N° de série :",f.bancSerie],["Date de fabrication :",f.bancFab],["Dernier contrôle du banc :",f.bancCtrl]].filter(r=>r[1]),56);
+  section("Mesures comparatives");
+  para("Nous effectuons une comparaison sur la vitesse brute de surface.");
+  para("La vitesse du RAVEN-EYE relevée sur le logiciel Fuzion « Vraw » (moyenne de 3 mesures successives) est comparée à la vitesse affichée sur la console de la bande roulante RAV-TRACK « Vtrack ».");
+  para("Le calcul de l'écart est : (Vraw - ((Vtrack + Vraw) / 2)) / ((Vtrack + Vraw) / 2) × 100.");
+  para(`L'écart maximum toléré est de ± ${CV_TOL} %.`,M,CW,{st:"bold"});
+  // ---------- réglages
+  newPage(); section("Contrôle du capteur de vitesse");
+  A.R.forEach((r,i)=>{ const cap=img["cap"+(i+1)]; const ih=cap?Math.min(CW*cap.h/cap.w,70):0; need(34+ih);
+    set(10.5,"bold",INK); T(`Réglage ${i+1} :`,M,y); y+=5.6;
+    const line=(a,b,col,bold)=>{ set(10,"normal",INK); T(a,M,y); const w=doc.getTextWidth(pdfTxt(a)); set(10,bold?"bold":"normal",col||INK); T(b,M+w+2.2,y); y+=5.2 };
+    line("Vitesse indiquée par le banc RAV-TRACK, Vtrack :",`${nf(r.vt,2)} m/s`);
+    line("Vitesses brutes relevées sur Fuzion, Vraw :",r.rs.map(v=>nf(v,2)).join(" / ")+" m/s");
+    line("Vitesse moyenne indiquée par le RAVEN-EYE, Vraw :",`${nf(r.vr,3)} m/s`);
+    line("Écart constaté :",pct(r.e),r.ok?INK:KOC,true);
+    line("Conclusion :",r.ok?"OK":"HORS TOLÉRANCE",r.ok?OKC:KOC,true);
+    y+=1.5; if(cap){ const s=image(cap,M,CW,70); y+=s.h } y+=9 });
+  // ---------- résultats et conclusion
+  need(62); section("Résultats obtenus");
+  { const cols=[["Réglage",18],["Vtrack",24],["Vraw (3 mesures)",42],["Vraw retenu",26],["Écart",22],["Conclusion",CW-132]]; let x=M;
+    doc.setFillColor(...ARD); doc.rect(M,y-4.6,CW,7,"F"); set(9,"bold",[255,255,255]); for(const [l,w] of cols){ T(l,x+2,y); x+=w } y+=7;
+    A.R.forEach((r,i)=>{ x=M; const v=[String(i+1),nf(r.vt,2)+" m/s",r.rs.map(v=>nf(v,2)).join(" / "),nf(r.vr,3)+" m/s",pct(r.e),r.ok?"OK":"Hors tolérance"];
+      v.forEach((t,j)=>{ const c=(j>=4)?(r.ok?(j===5?OKC:INK):KOC):INK; set(9.5,j>=4?"bold":"normal",c); T(t,x+2,y); x+=cols[j][1] });
+      doc.setDrawColor(200,212,212); doc.setLineWidth(0.25); doc.line(M,y+2.6,M+CW,y+2.6); y+=7.2 }); y+=4 }
+  { set(10.5,"normal",INK); const a="Nous constatons que l'écart moyen sur le contrôle de vitesse est de : "; T(a,M,y); set(10.5,"bold",Math.abs(A.mean)<=CV_TOL?OKC:KOC); T(pct(A.mean),M+doc.getTextWidth(pdfTxt(a.trim()))+2.4,y); y+=8 }
+  para(A.ok?"Le RAVEN-EYE fonctionne correctement.":`Au moins un réglage présente un écart supérieur à la tolérance de ± ${CV_TOL} %.`,M,CW,{gap:6});
+  need(70); section("Conclusion");
+  set(10.5,"normal",INK); T("État de l'instrument :",M,y); y+=6;
+  doc.setFillColor(...(A.ok?ARD:KOC)); doc.roundedRect(M+20,y,CW-40,16,2,2,"F");
+  set(11,"normal",[255,255,255]); T("INSTRUMENT :",M+30,y+9.6); set(13,"bold",[255,255,255]); T(A.ok?"CONFORME":"NON CONFORME",M+20+(CW-40)*0.66,y+7.6,{align:"center"});
+  set(9.5,"bold",[255,255,255]); T("aux spécifications requises",M+20+(CW-40)*0.66,y+12.6,{align:"center"}); y+=26;
+  set(10.5,"normal",INK); T("Intervenant :",M,y); set(10.5,"bold",INK); T(f.interv||"",M+26,y); y+=8;
+  set(10.5,"normal",INK); T("Signature :",M,y);
+  if(img.sig){ doc.addImage(img.sig.data,"PNG",M+26,y-4,60,20,"cvsig","FAST") }
+  // ---------- en-têtes et pieds sur toutes les pages
+  const N=doc.getNumberOfPages(), lh=15, lw=lh*ls.w/ls.h;
+  for(let p=1;p<=N;p++){ doc.setPage(p);
+    doc.addImage(logoSrc,"PNG",M-2,9,lw,lh,"cvlogo","FAST");
+    set(10.5,"normal",RED); T(`Constat de vérification N° ${no}`,W-M,15,{align:"right"}); T(`Date de l'intervention : ${cvLong(cvDate(f.date))}`,W-M,20.5,{align:"right"});
+    if(D.example){ set(8.5,"bold",RED); T("EXEMPLE - DONNÉES FICTIVES",W-M,26,{align:"right"}) }
+    set(8.5,"italic",MUT); T(`Page ${p} sur ${N}`,W-M,H-23,{align:"right"});
+    doc.setFillColor(...ARD); doc.rect(0,H-18,W,18,"F"); set(8.5,"normal",[255,255,255]);
+    T("COMETEC • Service technique • 9 bis, rue du Général Leclerc • 94520 MANDRES-LES-ROSES",W/2,H-11,{align:"center"});
+    T("Tél : 01 48 90 40 79 • Fax : 01 48 90 41 02 • Mail : contact@cometec.fr • Web : www.cometec.fr",W/2,H-6,{align:"center"}) }
+  doc.setProperties({title:`Constat de vérification RAVEN-EYE N° ${no}`,author:"COMETEC",subject:f.lieu||"",creator:"Application COMETEC"});
+  return doc.output("blob") }

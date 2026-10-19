@@ -1,21 +1,6 @@
 import base64, json, sys
-VERSION='2.8.1'
-import re, os, json, secrets, hashlib
-from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-# ---- Espace COMETEC : le module « constat RAVEN-EYE » est chiffré avec le code d'accès (jamais publié en clair)
-_APP=open('app.js').read(); _SRC=open('src.html').read()
-_mj=re.search(r'/\*CV-BEGIN\*/(.*?)/\*CV-END\*/',_APP,re.S); _mh=re.search(r'<!--CV-BEGIN-->(.*?)<!--CV-END-->',_SRC,re.S)
-_code=os.environ.get('CV_CODE') or open('.cv_code').read().strip()
-_norm=re.sub('[^A-Z0-9]','',_code.upper()); assert len(_norm)>=8, "code d'accès trop court"
-_salt=secrets.token_bytes(16); _iv=secrets.token_bytes(12); _N=250000
-_key=hashlib.pbkdf2_hmac('sha256',_norm.encode(),_salt,_N,32)
-_ct=AESGCM(_key).encrypt(_iv,json.dumps({"html":_mh.group(1),"js":_mj.group(1)},ensure_ascii=False).encode(),None)
-_b=lambda x: base64.b64encode(x).decode()
-CV_LOCK=json.dumps({"s":_b(_salt),"i":_b(_iv),"n":_N,"d":_b(_ct)})
-APP_PUB=_APP.replace(_mj.group(0),'/* module Espace COMETEC chiffré : voir CV_LOCK */'); SRC_PUB=_SRC.replace(_mh.group(0),'')
-assert 'cvBuildPdf' not in APP_PUB and 'cvStartScreen' not in APP_PUB and 'id="cvWiz"' not in SRC_PUB
-open('dist/app_public.js','w').write(APP_PUB); open('dist/src_public.html','w').write(SRC_PUB)   # sources publiées dans le dépôt (sans le module en clair)
-s=SRC_PUB.replace('%%VERSION%%',VERSION).replace('%%APP%%',APP_PUB.replace('%%CV_LOCK%%',CV_LOCK)).replace('%%DEMO%%',open('demo.json').read())
+VERSION='2.8.2'
+s=open('src.html').read().replace('%%VERSION%%',VERSION).replace('%%APP%%',open('app.js').read()).replace('%%DEMO%%',open('demo.json').read())
 logo='data:image/png;base64,'+base64.b64encode(open('logo_new.png','rb').read()).decode()
 for _k in ['base','wave','o']: s=s.replace('%%HUB_'+_k.upper()+'%%','data:image/png;base64,'+base64.b64encode(open('hub/l_'+_k+'.png','rb').read()).decode())  # logo d'accueil en 3 calques animés
 import os

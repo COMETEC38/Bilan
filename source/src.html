@@ -729,14 +729,6 @@ body.onsim{padding-bottom:0!important}
   .sr-det div:last-child{grid-column:1/-1}
 }
 /* ================= Constat de vérification RAVEN-EYE ================= */
-.gate{max-width:520px;width:100%;margin:12px auto 0;align-items:stretch;text-align:left}
-.gate h2{margin:0;font-family:var(--f-display);font-weight:600;font-size:22px;color:var(--brand)}
-.gate p{margin:0;color:var(--ink-2);font-size:14.5px;line-height:1.5}
-.gate-ico{display:flex;align-items:center;justify-content:center;width:64px;height:64px;border-radius:16px;background:var(--brand-soft);color:var(--brand)}
-.gate-ico svg{width:38px;height:38px}
-.gate .sim-in input{letter-spacing:.12em;text-transform:uppercase}
-.cv-lock{align-self:flex-start;font-size:13px;color:var(--muted)}
-
 body.onctrl .ctrl{display:flex}
 body.onctrl>.wrap,body.onctrl .mnav,body.onctrl .hub,body.onctrl #sim,body.onctrl #prod{display:none!important}
 body.onsim #ctrl,body.onprod #ctrl{display:none!important}
@@ -880,7 +872,7 @@ body.onctrl{padding-bottom:0!important}
     <div class="hub-tools">
     <button class="hub-tool" id="hubCtrl" type="button">
       <span class="ht-ico"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 7h30"/><path d="M24 7v5"/><path d="M17 17a10 10 0 0 0 14 0"/><path d="M12 22a17 17 0 0 0 24 0"/><path d="M15 36l6 6 12-12" stroke="#E3000B"/></svg></span>
-      <span class="ht-txt"><b>Constat de vérification RAVEN-EYE</b><small>Réservé aux équipes COMETEC (code d'accès) : contrôle au banc RAV-TRACK guidé pas à pas, avec rapport PDF prêt à envoyer.</small></span>
+      <span class="ht-txt"><b>Constat de vérification RAVEN-EYE</b><small>Contrôle métrologique au banc RAV-TRACK, guidé pas à pas, avec rapport PDF COMETEC prêt à envoyer.</small></span>
       <svg class="ht-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
     </button>
     </div>
@@ -892,25 +884,97 @@ body.onctrl{padding-bottom:0!important}
     <p class="hub-foot">COMETEC · Instrumentation des eaux · Chapareillan (38) · version %%VERSION%%</p>
   </div>
 </section>
-<section class="sim ctrl" id="ctrlGate" aria-labelledby="gateTitle">
+<section class="sim ctrl" id="ctrl" aria-labelledby="ctrlTitle">
   <header class="sim-bar">
-    <button class="sim-back" id="gateBack" type="button" aria-label="Retour à l'accueil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg><span>Accueil</span></button>
-    <h1 id="gateTitle">Espace COMETEC</h1>
+    <button class="sim-back" id="ctrlBack" type="button" aria-label="Retour à l'accueil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg><span>Accueil</span></button>
+    <h1 id="ctrlTitle">Constat RAVEN-EYE</h1>
     <img class="sim-logo" src="%%LOGO%%" alt="COMETEC">
   </header>
   <div class="sim-body">
-    <form class="sim-form gate" id="gateForm" novalidate autocomplete="off">
-      <span class="gate-ico"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="10" y="21" width="28" height="21" rx="4"/><path d="M16 21v-6a8 8 0 0 1 16 0v6"/><path d="M24 29v5" stroke="#E3000B"/></svg></span>
-      <h2>Accès réservé aux équipes COMETEC</h2>
-      <p>Cette rubrique (constat de vérification RAVEN-EYE au banc RAV-TRACK) est protégée par un code d'accès. Il n'est demandé qu'une fois sur cet appareil.</p>
-      <label class="sim-field"><span>Code d'accès</span><span class="sim-in"><input id="gateCode" type="text" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="XXXX-XXXX"></span></label>
-      <p class="cv-err" id="gateErr" hidden></p>
-      <button type="submit" class="cv-btn big" id="gateGo">Déverrouiller</button>
-      <p class="sim-foot">Vous n'avez pas le code ? Demandez-le à votre responsable COMETEC.</p>
-    </form>
+    <div class="cv-start" id="cvStart">
+      <p class="sim-intro">Constat de vérification d'un débitmètre <b>RAVEN-EYE</b> au banc <b>RAV-TRACK</b> : l'assistant vous demande les informations une à une, calcule les écarts et produit le rapport PDF COMETEC. Tout reste enregistré sur cet appareil, vous pouvez reprendre plus tard.</p>
+      <div class="cv-resume" id="cvResume" hidden><div><b id="cvResumeT"></b><small id="cvResumeS"></small></div><button type="button" class="cv-btn" id="cvResumeGo">Reprendre</button></div>
+      <div class="cv-start-act"><button type="button" class="cv-btn" id="cvNew">Nouveau constat</button><button type="button" class="cv-btn ghost" id="cvDemo">Voir un exemple (données fictives)</button></div>
+    </div>
+    <div class="cv-wiz" id="cvWiz" hidden>
+      <div class="cv-prog"><div class="cv-prog-top"><b id="cvStepLab"></b><span id="cvStepN"></span></div><div class="cv-bar"><i id="cvBarFill"></i></div><ol class="cv-dots" id="cvDots"></ol></div>
+      <form class="sim-form cv-card" id="cvForm" novalidate autocomplete="off">
+      <fieldset class="cv-step" data-step="1"><legend>Dossier</legend>
+        <label class="sim-field"><span>Numéro du devis</span><span class="sim-in"><input data-k="devis" type="text" placeholder="7 chiffres" autocomplete="off" inputmode="numeric"></span></label>
+        <div class="cv-info" id="cvNoBox">Constat de vérification N° <b id="cvNo">–</b></div>
+        <label class="sim-field"><span>Date de l'intervention</span><span class="sim-in"><input data-k="date" type="date"></span></label>
+        <div class="cv-info">Prochaine inspection suggérée : <b id="cvNext1">–</b></div>
+        <label class="sim-field"><span>Lieu du contrôle</span><span class="sim-in"><input data-k="lieu" type="text" placeholder="Nom du site et adresse du point de mesure" autocomplete="off" ></span></label>
+      </fieldset>
+      <fieldset class="cv-step" data-step="2" hidden><legend>Client (délivré à)</legend>
+        <label class="sim-field"><span>Société</span><span class="sim-in"><input data-k="societe" type="text" placeholder="ex. Communauté de Communes…" autocomplete="off" ></span></label>
+        <label class="sim-field"><span>Adresse</span><span class="sim-in"><input data-k="adresse" type="text" placeholder="" autocomplete="off" ></span></label>
+        <div class="cv-2"><label class="sim-field"><span>Code postal</span><span class="sim-in"><input data-k="cp" type="text" placeholder="" autocomplete="off" inputmode="numeric" maxlength="5"></span></label><label class="sim-field"><span>Ville</span><span class="sim-in"><input data-k="ville" type="text" placeholder="" autocomplete="off" ></span></label></div>
+        <label class="sim-field"><span>Contact</span><span class="sim-in"><input data-k="contact" type="text" placeholder="Nom du contact" autocomplete="off" ></span></label>
+        <div class="cv-2"><label class="sim-field"><span>Téléphone</span><span class="sim-in"><input data-k="tel" type="tel" placeholder="" autocomplete="off" ></span></label><label class="sim-field"><span>Mail</span><span class="sim-in"><input data-k="mail" type="email" placeholder="" autocomplete="off" ></span></label></div>
+      </fieldset>
+      <fieldset class="cv-step" data-step="3" hidden><legend>Instrument vérifié</legend>
+        <div class="cv-fixed"><span>Désignation</span><b>Débitmètre RAVEN-EYE</b><span>Constructeur</span><b>Flow-Tronic</b></div>
+        <label class="sim-field"><span>Type</span><span class="sim-in"><select data-k="type"><option>RAVEN-EYE 2</option><option>RAVEN-EYE 2+</option><option>RAVEN-EYE</option></select></span></label>
+        <label class="sim-field"><span>Numéro de série</span><span class="sim-in"><input data-k="serie" type="text" placeholder="Relevé sur la plaque signalétique" autocomplete="off" ></span></label>
+        <label class="sim-field"><span>Référence interne</span><span class="sim-in"><input data-k="refint" type="text" placeholder="Facultatif" autocomplete="off" ></span></label>
+      </fieldset>
+      <fieldset class="cv-step" data-step="4" hidden><legend>Ouvrage et conditions hydrauliques</legend>
+        <div class="cv-photo" data-img="site"><div class="cv-ph-head"><b>Photo du point de mesure</b><small>Vue de l'ouvrage avec le RAVEN-EYE installé</small></div>
+          <div class="cv-ph-empty"><label class="cv-pick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span>Ajouter une image</span><input type="file" accept="image/*" data-pick="site"></label></div>
+          <div class="cv-ph-full" hidden><img alt="Photo du point de mesure"><div class="cv-ph-act"><label class="cv-mini">Remplacer<input type="file" accept="image/*" data-pick="site"></label><button type="button" class="cv-mini" data-drop="site">Retirer</button></div></div></div>
+        <label class="sim-field"><span>Description de l'ouvrage</span><textarea data-k="ouvrage" rows="4" placeholder="Type de profil (rectangulaire, circulaire, ovoïde…), type de point de mesure (A2, A3, DO…), nature de l'ouvrage, conditions d'écoulement…"></textarea></label>
+      </fieldset>
+      <fieldset class="cv-step" data-step="5" hidden><legend>Configuration de l'équipement</legend>
+        <label class="sim-field"><span>Configuration mise en place</span><textarea data-k="config" rows="6" placeholder="Sens d'installation (amont / aval), raccordement (automate, protocole), état de la communication, état du capteur, du câble et du support…"></textarea></label>
+      </fieldset>
+      <fieldset class="cv-step" data-step="6" hidden><legend>Réglage 1 sur 3</legend>
+        <p class="cv-help">Réglez le banc RAV-TRACK, puis relevez sur Fuzion <b>3 mesures successives</b> dans la colonne <b>Vraw [m/s]</b>. Leur moyenne est la vitesse retenue pour ce réglage.</p>
+        <label class="sim-field"><span>Vitesse du banc RAV-TRACK, Vtrack</span><span class="sim-in"><input data-k="vt1" type="text" placeholder="ex. 0,70" autocomplete="off" inputmode="decimal"><em>m/s</em></span></label>
+        <div class="cv-3"><span class="cv-3lab">Vitesses brutes Vraw relevées sur Fuzion</span>
+          <div class="cv-3in"><span class="sim-in"><input data-k="r1a" type="text" inputmode="decimal" autocomplete="off" placeholder="mesure 1" aria-label="Vraw mesure 1"><em>m/s</em></span><span class="sim-in"><input data-k="r1b" type="text" inputmode="decimal" autocomplete="off" placeholder="mesure 2" aria-label="Vraw mesure 2"><em>m/s</em></span><span class="sim-in"><input data-k="r1c" type="text" inputmode="decimal" autocomplete="off" placeholder="mesure 3" aria-label="Vraw mesure 3"><em>m/s</em></span></div></div>
+        <div class="cv-res" id="cvRes1"></div>
+        <div class="cv-photo" data-img="cap1"><div class="cv-ph-head"><b>Capture Fuzion du réglage 1</b><small>Copie d'écran montrant les 3 lignes relevées</small></div>
+          <div class="cv-ph-empty"><label class="cv-pick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span>Ajouter une image</span><input type="file" accept="image/*" data-pick="cap1"></label></div>
+          <div class="cv-ph-full" hidden><img alt="Capture Fuzion du réglage 1"><div class="cv-ph-act"><label class="cv-mini">Remplacer<input type="file" accept="image/*" data-pick="cap1"></label><button type="button" class="cv-mini" data-drop="cap1">Retirer</button></div></div></div>
+      </fieldset>
+      <fieldset class="cv-step" data-step="7" hidden><legend>Réglage 2 sur 3</legend>
+        <p class="cv-help">Réglez le banc RAV-TRACK, puis relevez sur Fuzion <b>3 mesures successives</b> dans la colonne <b>Vraw [m/s]</b>. Leur moyenne est la vitesse retenue pour ce réglage.</p>
+        <label class="sim-field"><span>Vitesse du banc RAV-TRACK, Vtrack</span><span class="sim-in"><input data-k="vt2" type="text" placeholder="ex. 0,50" autocomplete="off" inputmode="decimal"><em>m/s</em></span></label>
+        <div class="cv-3"><span class="cv-3lab">Vitesses brutes Vraw relevées sur Fuzion</span>
+          <div class="cv-3in"><span class="sim-in"><input data-k="r2a" type="text" inputmode="decimal" autocomplete="off" placeholder="mesure 1" aria-label="Vraw mesure 1"><em>m/s</em></span><span class="sim-in"><input data-k="r2b" type="text" inputmode="decimal" autocomplete="off" placeholder="mesure 2" aria-label="Vraw mesure 2"><em>m/s</em></span><span class="sim-in"><input data-k="r2c" type="text" inputmode="decimal" autocomplete="off" placeholder="mesure 3" aria-label="Vraw mesure 3"><em>m/s</em></span></div></div>
+        <div class="cv-res" id="cvRes2"></div>
+        <div class="cv-photo" data-img="cap2"><div class="cv-ph-head"><b>Capture Fuzion du réglage 2</b><small>Copie d'écran montrant les 3 lignes relevées</small></div>
+          <div class="cv-ph-empty"><label class="cv-pick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span>Ajouter une image</span><input type="file" accept="image/*" data-pick="cap2"></label></div>
+          <div class="cv-ph-full" hidden><img alt="Capture Fuzion du réglage 2"><div class="cv-ph-act"><label class="cv-mini">Remplacer<input type="file" accept="image/*" data-pick="cap2"></label><button type="button" class="cv-mini" data-drop="cap2">Retirer</button></div></div></div>
+      </fieldset>
+      <fieldset class="cv-step" data-step="8" hidden><legend>Réglage 3 sur 3</legend>
+        <p class="cv-help">Réglez le banc RAV-TRACK, puis relevez sur Fuzion <b>3 mesures successives</b> dans la colonne <b>Vraw [m/s]</b>. Leur moyenne est la vitesse retenue pour ce réglage.</p>
+        <label class="sim-field"><span>Vitesse du banc RAV-TRACK, Vtrack</span><span class="sim-in"><input data-k="vt3" type="text" placeholder="ex. 0,35" autocomplete="off" inputmode="decimal"><em>m/s</em></span></label>
+        <div class="cv-3"><span class="cv-3lab">Vitesses brutes Vraw relevées sur Fuzion</span>
+          <div class="cv-3in"><span class="sim-in"><input data-k="r3a" type="text" inputmode="decimal" autocomplete="off" placeholder="mesure 1" aria-label="Vraw mesure 1"><em>m/s</em></span><span class="sim-in"><input data-k="r3b" type="text" inputmode="decimal" autocomplete="off" placeholder="mesure 2" aria-label="Vraw mesure 2"><em>m/s</em></span><span class="sim-in"><input data-k="r3c" type="text" inputmode="decimal" autocomplete="off" placeholder="mesure 3" aria-label="Vraw mesure 3"><em>m/s</em></span></div></div>
+        <div class="cv-res" id="cvRes3"></div>
+        <div class="cv-photo" data-img="cap3"><div class="cv-ph-head"><b>Capture Fuzion du réglage 3</b><small>Copie d'écran montrant les 3 lignes relevées</small></div>
+          <div class="cv-ph-empty"><label class="cv-pick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span>Ajouter une image</span><input type="file" accept="image/*" data-pick="cap3"></label></div>
+          <div class="cv-ph-full" hidden><img alt="Capture Fuzion du réglage 3"><div class="cv-ph-act"><label class="cv-mini">Remplacer<input type="file" accept="image/*" data-pick="cap3"></label><button type="button" class="cv-mini" data-drop="cap3">Retirer</button></div></div></div>
+      </fieldset>
+      <fieldset class="cv-step" data-step="9" hidden><legend>Banc de contrôle et intervenant</legend>
+        <div class="cv-2"><label class="sim-field"><span>Banc RAV-TRACK N°</span><span class="sim-in"><input data-k="bancN" type="text" placeholder="001" autocomplete="off" ></span></label><label class="sim-field"><span>N° de série du banc</span><span class="sim-in"><input data-k="bancSerie" type="text" placeholder="001" autocomplete="off" ></span></label></div>
+        <div class="cv-2"><label class="sim-field"><span>Date de fabrication du banc</span><span class="sim-in"><input data-k="bancFab" type="text" placeholder="jj/mm/aaaa" autocomplete="off" ></span></label><label class="sim-field"><span>Dernier contrôle du banc</span><span class="sim-in"><input data-k="bancCtrl" type="text" placeholder="jj/mm/aaaa" autocomplete="off" ></span></label></div>
+        <label class="sim-field"><span>Intervenant</span><span class="sim-in"><input data-k="interv" type="text" placeholder="Prénom NOM" autocomplete="off" ></span></label>
+        <div class="sim-field"><span>Signature</span>
+          <div class="cv-sigbox"><canvas id="cvSig" width="900" height="300" aria-label="Zone de signature"></canvas><span class="cv-sig-hint" id="cvSigHint">Signez ici avec le doigt ou la souris</span></div>
+          <div class="cv-sig-act"><button type="button" class="cv-mini" id="cvSigClear">Effacer</button><label class="cv-chk"><input type="checkbox" id="cvSigMem"> Mémoriser ma signature et mon nom sur cet appareil</label></div>
+        </div>
+      </fieldset>
+      <fieldset class="cv-step" data-step="10" hidden><legend>Récapitulatif et rapport</legend>
+        <div id="cvSum"></div>
+      </fieldset>
+      </form>
+      <div class="cv-nav"><button type="button" class="cv-btn ghost" id="cvPrev">Précédent</button><button type="button" class="cv-btn" id="cvNext">Suivant</button></div>
+    </div>
   </div>
 </section>
-
 <section class="sim prod" id="prod" aria-labelledby="prodTitle">
   <header class="sim-bar">
     <button class="sim-back" id="prodBack" type="button" aria-label="Retour"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg><span id="prodBackLab">Accueil</span></button>
