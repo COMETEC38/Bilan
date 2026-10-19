@@ -890,7 +890,7 @@ body.onctrl{padding-bottom:0!important}
       <li><span class="hs-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.2 5.8L20 11l-5.8 2.2L12 19l-2.2-5.8L4 11l5.8-2.2z"/></svg></span><b>Nouveautés</b><small>Nouveaux produits et actualités</small><em>Bientôt</em></li>
       <li><span class="hs-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></span><b>Aide au paramétrage</b><small>Réglage pas à pas de vos appareils</small><em>Bientôt</em></li>
     </ul>
-    <p class="hub-foot">COMETEC · Instrumentation des eaux · Chapareillan (38) · version 2.8.4</p>
+    <p class="hub-foot">COMETEC · Instrumentation des eaux · Chapareillan (38) · version 2.8.5</p>
   </div>
 </section>
 <section class="sim ctrl" id="ctrl" aria-labelledby="ctrlTitle">
@@ -1325,7 +1325,7 @@ body.onctrl{padding-bottom:0!important}
     <button type="button" data-mtab="volumes"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 20V11M12 20V5M18 20v-7"/></svg></span>Volumes</button>
     <button type="button" data-mtab="export"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 20h16"/></svg></span>Exporter</button>
   </nav>
-  <footer>COMETEC · Instrumentation des eaux · ZA de Longifan, 38530 Chapareillan · application COMETEC version 2.8.4</footer>
+  <footer>COMETEC · Instrumentation des eaux · ZA de Longifan, 38530 Chapareillan · application COMETEC version 2.8.5</footer>
 </div>
 <div class="modal" id="reportModal" hidden role="dialog" aria-modal="true" aria-labelledby="t-report">
   <form class="modal-box" id="reportForm">
@@ -3228,7 +3228,7 @@ async function buildReport(){
   const {jsPDF}=window.jspdf; const d=S.ds, n=d.t.length, st=stats();
   const INK=[38,50,56], MUT=[110,124,130], ACC=[0,145,155], LINE=[214,222,224], SOFT=[242,246,247];
   const f={title:$("rpTitle").value.trim()||"Fiche de bilan de mesure de débit",point:$("rpPoint").value.trim(),owner:$("rpOwner").value.trim(),ref:$("rpRef").value.trim(),company:$("rpCompany").value.trim(),operator:$("rpOperator").value.trim(),notes:$("rpNotes").value.trim()};
-  const doc=new jsPDF({unit:"mm",format:"a4",orientation:"portrait"}); const W=210,H=297,M=15, CW=W-2*M;
+  const doc=new jsPDF({unit:"mm",format:"a4",orientation:"portrait",compress:true}); const W=210,H=297,M=15, CW=W-2*M;
   const T=(s,x,y,o)=>doc.text(pdfTxt(s),x,y,o);
   const set=(sz,style,col)=>{ doc.setFont("helvetica",style||"normal"); doc.setFontSize(sz); doc.setTextColor(...(col||INK)) };
   // ---- données (version corrigée uniquement)
@@ -3240,7 +3240,7 @@ async function buildReport(){
   // ---- en-tête et pied de page
   const header=()=>{
     let x=M;
-    if(rpLogo){ const h=14, w=Math.min(48,rpLogo.w/rpLogo.h*h); doc.addImage(rpLogo.data,"JPEG",M,10,w,w/(rpLogo.w/rpLogo.h)); x=M+w+6 }
+    if(rpLogo){ const h=14, w=Math.min(48,rpLogo.w/rpLogo.h*h); doc.addImage(rpLogo.data,"JPEG",M,10,w,w/(rpLogo.w/rpLogo.h),"rpLogo"); x=M+w+6 }
     else if(f.company){ set(11,"bold",INK); T(f.company,M,17) }
     set(14,"bold",INK); T(f.title,W-M,15,{align:"right"});
     set(9,"normal",MUT); T([f.point&&`Point de mesure : ${f.point}`,`du ${fmtDT(d.t[0])} au ${fmtDT(d.t[n-1])}`].filter(Boolean).join("  ·  "),W-M,21,{align:"right"});
@@ -3285,7 +3285,7 @@ async function buildReport(){
             {type:"line",xAxisIndex:1,yAxisIndex:1,data:pts(S.hc),showSymbol:false,sampling:"lttb",lineStyle:{width:2.2,color:"#1A4D4D"}}]
   },1600,720);
   set(10,"bold",INK); T("Débit et hauteur d'eau",M,y); y+=2;
-  const ih=CW*720/1600; doc.addImage(img1,"PNG",M,y,CW,ih); y+=ih+6;
+  const ih=CW*720/1600; doc.addImage(img1,"PNG",M,y,CW,ih,"rpChart1","FAST");   // graphiques compressés (sinon ~30 Mo) y+=ih+6;
   // observations : texte libre saisi par l'utilisateur, en bas de la page 1 si la place suffit
   const obs=[];
   if(f.notes) obs.push(f.notes);
@@ -3344,7 +3344,7 @@ async function buildReport(){
     yAxis:{type:"value",name:"Volume (m³)",nameTextStyle:{color:"#55676d",fontSize:20,align:"left"},...gridC,axisLabel:{color:"#55676d",fontSize:20,formatter:v=>v.toLocaleString("fr-FR")}},
     series:[{type:"bar",data:iv.map(r=>+r.vn.toFixed(3)),itemStyle:{color:"#00919B",borderRadius:[4,4,0,0]},barCategoryGap:"25%"}]
   },1600,500);
-  const ih2=CW*500/1600; doc.addImage(img2,"PNG",M,y,CW,ih2); y+=ih2+5;
+  const ih2=CW*500/1600; doc.addImage(img2,"PNG",M,y,CW,ih2,"rpChart2","FAST"); y+=ih2+5;
   // tableau des volumes (au pas choisi si 48 intervalles au plus, sinon à l'heure)
   const tStep=iv.length<=48?S.step:3600, tRows=tStep===S.step?iv:intervals(d.t,S.vo,S.vn,3600);
   const tLab=tStep>=86400?"24 heures":(tStep===S.step?stepLabel:"1 heure");

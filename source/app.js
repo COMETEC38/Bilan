@@ -1360,7 +1360,7 @@ async function buildReport(){
   const {jsPDF}=window.jspdf; const d=S.ds, n=d.t.length, st=stats();
   const INK=[38,50,56], MUT=[110,124,130], ACC=[0,145,155], LINE=[214,222,224], SOFT=[242,246,247];
   const f={title:$("rpTitle").value.trim()||"Fiche de bilan de mesure de débit",point:$("rpPoint").value.trim(),owner:$("rpOwner").value.trim(),ref:$("rpRef").value.trim(),company:$("rpCompany").value.trim(),operator:$("rpOperator").value.trim(),notes:$("rpNotes").value.trim()};
-  const doc=new jsPDF({unit:"mm",format:"a4",orientation:"portrait"}); const W=210,H=297,M=15, CW=W-2*M;
+  const doc=new jsPDF({unit:"mm",format:"a4",orientation:"portrait",compress:true}); const W=210,H=297,M=15, CW=W-2*M;
   const T=(s,x,y,o)=>doc.text(pdfTxt(s),x,y,o);
   const set=(sz,style,col)=>{ doc.setFont("helvetica",style||"normal"); doc.setFontSize(sz); doc.setTextColor(...(col||INK)) };
   // ---- données (version corrigée uniquement)
@@ -1372,7 +1372,7 @@ async function buildReport(){
   // ---- en-tête et pied de page
   const header=()=>{
     let x=M;
-    if(rpLogo){ const h=14, w=Math.min(48,rpLogo.w/rpLogo.h*h); doc.addImage(rpLogo.data,"JPEG",M,10,w,w/(rpLogo.w/rpLogo.h)); x=M+w+6 }
+    if(rpLogo){ const h=14, w=Math.min(48,rpLogo.w/rpLogo.h*h); doc.addImage(rpLogo.data,"JPEG",M,10,w,w/(rpLogo.w/rpLogo.h),"rpLogo"); x=M+w+6 }
     else if(f.company){ set(11,"bold",INK); T(f.company,M,17) }
     set(14,"bold",INK); T(f.title,W-M,15,{align:"right"});
     set(9,"normal",MUT); T([f.point&&`Point de mesure : ${f.point}`,`du ${fmtDT(d.t[0])} au ${fmtDT(d.t[n-1])}`].filter(Boolean).join("  ·  "),W-M,21,{align:"right"});
@@ -1417,7 +1417,7 @@ async function buildReport(){
             {type:"line",xAxisIndex:1,yAxisIndex:1,data:pts(S.hc),showSymbol:false,sampling:"lttb",lineStyle:{width:2.2,color:"#1A4D4D"}}]
   },1600,720);
   set(10,"bold",INK); T("Débit et hauteur d'eau",M,y); y+=2;
-  const ih=CW*720/1600; doc.addImage(img1,"PNG",M,y,CW,ih); y+=ih+6;
+  const ih=CW*720/1600; doc.addImage(img1,"PNG",M,y,CW,ih,"rpChart1","FAST");   // graphiques compressés (sinon ~30 Mo) y+=ih+6;
   // observations : texte libre saisi par l'utilisateur, en bas de la page 1 si la place suffit
   const obs=[];
   if(f.notes) obs.push(f.notes);
@@ -1476,7 +1476,7 @@ async function buildReport(){
     yAxis:{type:"value",name:"Volume (m³)",nameTextStyle:{color:"#55676d",fontSize:20,align:"left"},...gridC,axisLabel:{color:"#55676d",fontSize:20,formatter:v=>v.toLocaleString("fr-FR")}},
     series:[{type:"bar",data:iv.map(r=>+r.vn.toFixed(3)),itemStyle:{color:"#00919B",borderRadius:[4,4,0,0]},barCategoryGap:"25%"}]
   },1600,500);
-  const ih2=CW*500/1600; doc.addImage(img2,"PNG",M,y,CW,ih2); y+=ih2+5;
+  const ih2=CW*500/1600; doc.addImage(img2,"PNG",M,y,CW,ih2,"rpChart2","FAST"); y+=ih2+5;
   // tableau des volumes (au pas choisi si 48 intervalles au plus, sinon à l'heure)
   const tStep=iv.length<=48?S.step:3600, tRows=tStep===S.step?iv:intervals(d.t,S.vo,S.vn,3600);
   const tLab=tStep>=86400?"24 heures":(tStep===S.step?stepLabel:"1 heure");
