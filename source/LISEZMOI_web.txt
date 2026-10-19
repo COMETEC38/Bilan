@@ -1,4 +1,4 @@
-COMETEC Bilan – version web installable
+COMETEC – application web installable (bilans BUL'R2, documentations, simulateur, constats RAVEN-EYE)
 =======================================
 
 À l'attention de la personne qui gère le site cometec.fr.

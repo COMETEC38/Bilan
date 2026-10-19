@@ -1,5 +1,5 @@
 import base64, json, sys
-VERSION='2.8.3'
+VERSION='2.8.4'
 s=open('src.html').read().replace('%%VERSION%%',VERSION).replace('%%APP%%',open('app.js').read()).replace('%%DEMO%%',open('demo.json').read())
 logo='data:image/png;base64,'+base64.b64encode(open('logo_new.png','rb').read()).decode()
 for _k in ['base','wave','o']: s=s.replace('%%HUB_'+_k.upper()+'%%','data:image/png;base64,'+base64.b64encode(open('hub/l_'+_k+'.png','rb').read()).decode())  # logo d'accueil en 3 calques animés
@@ -29,17 +29,17 @@ web='dist/web'; shutil.rmtree(web,ignore_errors=True); os.makedirs(web+'/icons')
 for f in ['icon-192.png','icon-512.png','icon-maskable-512.png','apple-touch-icon.png','favicon-64.png']: shutil.copy(f,web+'/icons/'+f)
 whead=('<!doctype html><html lang="fr"><head><meta charset="utf-8">'
  '<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">'
- '<meta name="theme-color" content="#1A4D4D"><meta name="description" content="COMETEC Bilan : traitement des bilans des débitmètres portables BUL\'R2">'
+ '<meta name="theme-color" content="#1A4D4D"><meta name="description" content="COMETEC : les outils COMETEC pour l\'instrumentation des eaux (bilans BUL\'R2, documentations, simulateur de débit, constats RAVEN-EYE)">'
  '<link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" href="icons/favicon-64.png">'
  '<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">'
  '<style>:root{color-scheme:light dark}body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style></head><body>')
 open(web+'/index.html','w').write(whead+s0.replace('%%LIBS%%',libs)+'</body></html>')
-manifest={"name":"COMETEC Bilan","short_name":"COMETEC Bilan","description":"Traitement des bilans pour débitmètres portables BUL'R2","lang":"fr","start_url":"./","scope":"./","display":"standalone","background_color":"#F2F5F5","theme_color":"#1A4D4D",
+manifest={"name":"COMETEC","short_name":"COMETEC","description":"Les outils COMETEC pour l'instrumentation des eaux : bilans BUL'R2, documentations, simulateur de débit, constats RAVEN-EYE","lang":"fr","start_url":"./","scope":"./","display":"standalone","background_color":"#F2F5F5","theme_color":"#1A4D4D",
  "icons":[{"src":"icons/icon-192.png","sizes":"192x192","type":"image/png"},{"src":"icons/icon-512.png","sizes":"512x512","type":"image/png"},{"src":"icons/icon-maskable-512.png","sizes":"512x512","type":"image/png","purpose":"maskable"}],
  "file_handlers":[{"action":"./","accept":{"text/csv":[".csv"],"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":[".xlsx"]}}]}
 open(web+'/manifest.webmanifest','w').write(json.dumps(manifest,ensure_ascii=False,indent=2))
 h=hashlib.sha1(open(web+'/index.html','rb').read()).hexdigest()[:8]
-sw=f"""// COMETEC Bilan {VERSION} – fonctionnement hors ligne
+sw=f"""// Application COMETEC {VERSION} – fonctionnement hors ligne
 const CACHE='cometec-bilan-{VERSION}-{h}';
 const FILES=['./','index.html','manifest.webmanifest','icons/icon-192.png','icons/icon-512.png','icons/icon-maskable-512.png','icons/apple-touch-icon.png','icons/favicon-64.png'];
 self.addEventListener('install',e=>{{ e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting())) }});

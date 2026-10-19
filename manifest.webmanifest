@@ -1,7 +1,7 @@
 {
-  "name": "COMETEC Bilan",
-  "short_name": "COMETEC Bilan",
-  "description": "Traitement des bilans pour débitmètres portables BUL'R2",
+  "name": "COMETEC",
+  "short_name": "COMETEC",
+  "description": "Les outils COMETEC pour l'instrumentation des eaux : bilans BUL'R2, documentations, simulateur de débit, constats RAVEN-EYE",
   "lang": "fr",
   "start_url": "./",
   "scope": "./",
