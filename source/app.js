@@ -1915,9 +1915,14 @@ showHub(true);
 
 /* ---------- Application installable (version publiée sur un site web) ---------- */
 let installEvt=null;
-addEventListener("beforeinstallprompt",e=>{ e.preventDefault(); installEvt=e; $("btnInstall").hidden=false });
-addEventListener("appinstalled",()=>{ installEvt=null; $("btnInstall").hidden=true; toast("COMETEC Bilan est installé sur cet ordinateur") });
-$("btnInstall").onclick=async()=>{ if(!installEvt) return; installEvt.prompt(); try{ await installEvt.userChoice }catch(e){} installEvt=null; $("btnInstall").hidden=true };
+addEventListener("beforeinstallprompt",e=>{ e.preventDefault(); installEvt=e; $("btnInstall").hidden=false; if(matchMedia("(pointer:coarse)").matches) $("hubInstallTxt").innerHTML="<b>Installez l'application COMETEC</b> sur ce téléphone : ouverture directe depuis l'écran d'accueil, fonctionne même sans connexion."; $("hubInstall").hidden=false; $("hubInstallGo").hidden=false });
+addEventListener("appinstalled",()=>{ installEvt=null; $("btnInstall").hidden=true; $("hubInstall").hidden=true; toast("L'application COMETEC est installée sur cet appareil") });
+$("btnInstall").onclick=async()=>{ if(!installEvt) return; installEvt.prompt(); let ok=false; try{ ok=(await installEvt.userChoice).outcome==="accepted" }catch(e){} if(ok){ installEvt=null; $("btnInstall").hidden=true; $("hubInstall").hidden=true } };
+$("hubInstallGo").onclick=()=>$("btnInstall").onclick();
+{ // iPhone / iPad : pas d'installation automatique possible, on explique le geste (Safari › Partager › Sur l'écran d'accueil)
+  const iOS=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+  const standalone=matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+  if(iOS&&!standalone){ $("hubInstallTxt").innerHTML="<b>Installez l'application COMETEC</b> : dans Safari, touchez le bouton Partager puis « Sur l'écran d'accueil »."; $("hubInstallGo").hidden=true; $("hubInstall").hidden=false } }
 // ouverture d'un fichier par double-clic quand l'application installée est associée aux .csv / .xlsx
 if("launchQueue" in window) window.launchQueue.setConsumer(async p=>{ if(p.files&&p.files.length){ const f=await p.files[0].getFile(); openFile(f) } });
 if("serviceWorker" in navigator&&location.protocol.startsWith("http")&&document.querySelector('link[rel="manifest"]')) navigator.serviceWorker.register("sw.js").catch(e=>console.warn("Mode hors ligne indisponible",e));
