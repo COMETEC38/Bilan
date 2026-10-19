@@ -3285,7 +3285,7 @@ async function buildReport(){
             {type:"line",xAxisIndex:1,yAxisIndex:1,data:pts(S.hc),showSymbol:false,sampling:"lttb",lineStyle:{width:2.2,color:"#1A4D4D"}}]
   },1600,720);
   set(10,"bold",INK); T("Débit et hauteur d'eau",M,y); y+=2;
-  const ih=CW*720/1600; doc.addImage(img1,"PNG",M,y,CW,ih,"rpChart1","FAST");   // graphiques compressés (sinon ~30 Mo) y+=ih+6;
+  const ih=CW*720/1600; doc.addImage(img1,"PNG",M,y,CW,ih,"rpChart1","FAST"); /* graphiques compressés (sinon ~30 Mo) */ y+=ih+6;
   // observations : texte libre saisi par l'utilisateur, en bas de la page 1 si la place suffit
   const obs=[];
   if(f.notes) obs.push(f.notes);
