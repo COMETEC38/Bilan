@@ -1628,7 +1628,7 @@ addEventListener("popstate",()=>{ const st=history.state;
 
 /* ---------- Nos produits : documentations par famille ---------- */
 // Adresse des PDF : dossier docs/ à côté de l'application publiée ; ailleurs (fichier local, aperçu) → site en ligne
-const DOC_BASE=(location.hostname==="cometec38.github.io")?"/Bilan/docs/":(location.protocol.startsWith("http")&&/^(localhost|127\.0\.0\.1)$/.test(location.hostname))?"docs/":"https://cometec38.github.io/Bilan/docs/";
+const DOC_BASE=window.CMT_LOCAL?"docs/":(location.hostname==="cometec38.github.io")?"/Bilan/docs/":(location.protocol.startsWith("http")&&/^(localhost|127\.0\.0\.1)$/.test(location.hostname))?"docs/":"https://cometec38.github.io/Bilan/docs/";
 const WATER={EU:{l:"Eaux usées",c:"#8A5A2B",b:"#F3E6D8",p:'<circle cx="12" cy="12" r="6.5"/><path d="M7.2 9.5h9.6M6.2 12h11.6M7.2 14.5h9.6"/>'},
   EP:{l:"Eau potable",c:"#1769C2",b:"#E2EEFA",p:'<path d="M12 5.2c2.8 3.4 4.4 5.6 4.4 7.8a4.4 4.4 0 0 1-8.8 0c0-2.2 1.6-4.4 4.4-7.8z"/><path d="M10.2 13.6a1.9 1.9 0 0 0 1.8 1.6"/>'},
   EB:{l:"Eau brute",c:"#1E7A5A",b:"#DFF2E9",p:'<path d="M4 10c1.3-1.2 2.7-1.2 4 0s2.7 1.2 4 0 2.7-1.2 4 0 2.7 1.2 4 0M4 15c1.3-1.2 2.7-1.2 4 0s2.7 1.2 4 0 2.7-1.2 4 0 2.7 1.2 4 0"/>'},
@@ -1736,7 +1736,7 @@ function renderProdList(){
 
 
 /* ---------- Lecteur de documentation intégré (téléphone) : PDF.js, avec retour et partage ---------- */
-const LIB_BASE=(location.hostname==="cometec38.github.io")?"/Bilan/lib/pdfjs/":(location.protocol.startsWith("http")&&/^(localhost|127\.0\.0\.1)$/.test(location.hostname))?"lib/pdfjs/":"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/";
+const LIB_BASE=window.CMT_LOCAL?"lib/pdfjs/":(location.hostname==="cometec38.github.io")?"/Bilan/lib/pdfjs/":(location.protocol.startsWith("http")&&/^(localhost|127\.0\.0\.1)$/.test(location.hostname))?"lib/pdfjs/":"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/";
 let pdfLibP=null;
 function loadPdfJs(){ if(window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
   if(!pdfLibP) pdfLibP=new Promise((res,rej)=>{ const sc=document.createElement("script"); sc.src=LIB_BASE+"pdf.min.js";

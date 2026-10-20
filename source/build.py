@@ -1,5 +1,5 @@
 import base64, json, sys
-VERSION='2.8.5'
+VERSION='2.8.6'
 s=open('src.html').read().replace('%%VERSION%%',VERSION).replace('%%APP%%',open('app.js').read()).replace('%%DEMO%%',open('demo.json').read())
 logo='data:image/png;base64,'+base64.b64encode(open('logo_new.png','rb').read()).decode()
 for _k in ['base','wave','o']: s=s.replace('%%HUB_'+_k.upper()+'%%','data:image/png;base64,'+base64.b64encode(open('hub/l_'+_k+'.png','rb').read()).decode())  # logo d'accueil en 3 calques animés
@@ -57,3 +57,21 @@ shutil.copytree('docs',web+'/docs')
 os.makedirs(web+'/lib/pdfjs',exist_ok=True)  # lecteur PDF (chargé seulement à l'ouverture d'une documentation sur téléphone)
 for _f in ['pdf.min.js','pdf.worker.min.js']: shutil.copy('node_modules/pdfjs-dist/legacy/build/'+_f,web+'/lib/pdfjs/'+_f)  # documentations PDF (rubrique « Nos produits »), servies à côté de l'application
 print('web ok',VERSION,h)
+
+# ---------- Version client hors ligne (exécutable Windows) : sans constat RAV-TRACK, sans installation web ----------
+cli='dist/client'; shutil.rmtree(cli,ignore_errors=True); os.makedirs(cli)
+chead=('<!doctype html><html lang="fr"><head><meta charset="utf-8">'
+ '<meta name="viewport" content="width=device-width,initial-scale=1"><title>COMETEC</title>'
+ '<link rel="icon" type="image/png" href="'+fav+'">'
+ '<style>:root{color-scheme:light dark}body{margin:0}[hidden]{display:none!important}img{max-width:100%}'
+ '#hubCtrl,#ctrl,#hubInstall,#btnInstall,.hub-sub.cmt-esp,.hub-tools.cmt-esp{display:none!important}</style>'
+ '<script>window.CMT_LOCAL=1;window.CMT_CLIENT=1</script></head><body>')
+cs=s0.replace('%%LIBS%%',libs)
+_e='<h3 class="hub-sub">Espace COMETEC</h3>\n    <div class="hub-tools">'
+assert _e in cs, 'bloc Espace COMETEC introuvable'
+cs=cs.replace(_e,'<h3 class="hub-sub cmt-esp">Espace COMETEC</h3>\n    <div class="hub-tools cmt-esp">')
+open(cli+'/index.html','w').write(chead+cs+'</body></html>')
+shutil.copytree('docs',cli+'/docs')
+os.makedirs(cli+'/lib/pdfjs',exist_ok=True)
+for _f in ['pdf.min.js','pdf.worker.min.js']: shutil.copy('node_modules/pdfjs-dist/legacy/build/'+_f,cli+'/lib/pdfjs/'+_f)
+print('client ok',VERSION)
