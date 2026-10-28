@@ -2170,7 +2170,6 @@ const CT_ORDER=["benoit","hugo","alexis","olivier"];
 const CT_DEP={}; for(const k in CT_COM) CT_COM[k].d.split(" ").forEach(c=>CT_DEP[c]=k);
 const CT_DOM={"971":"Guadeloupe","972":"Martinique","973":"Guyane","974":"La Réunion","975":"Saint-Pierre-et-Miquelon","976":"Mayotte","977":"Saint-Barthélemy","978":"Saint-Martin","984":"Terres australes","986":"Wallis-et-Futuna","987":"Polynésie française","988":"Nouvelle-Calédonie"};
 let ctBuilt=false, ctPushed=false;
-function ctNorm(v){ v=String(v||"").trim().toUpperCase().replace(/\s/g,""); if(/^\d$/.test(v)) v="0"+v; if(v==="20") return v; return v }
 function ctName(c){ return (FRDEP.n&&FRDEP.n[c])||CT_DOM[c]||"" }
 function ctBuild(){ if(ctBuilt) return; ctBuilt=true;
   const W=FRDEP.w, H=FRDEP.h, dom=[["971","Guadeloupe"],["972","Martinique"],["973","Guyane"],["974","Réunion"],["976","Mayotte"]];
@@ -2179,7 +2178,7 @@ function ctBuild(){ if(ctBuilt) return; ctBuilt=true;
   svg+=`<g class="dom" transform="translate(4 ${H-150})">`+dom.map(([c,n],i)=>`<g data-d="${c}" transform="translate(0 ${i*30})"><rect width="22" height="22" rx="5" fill="${CT_COM.alexis.col}" data-d="${c}"><title>${c} · ${n}</title></rect><text x="28" y="15">${n}</text></g>`).join("")+`</g></svg>`;
   $("ctMap").innerHTML=svg;
   $("ctLeg").innerHTML=CT_ORDER.map(k=>`<li><button type="button" data-k="${k}"><i style="background:${CT_COM[k].col}"></i><span><b>${CT_COM[k].n}</b><br>${CT_COM[k].reg}</span></button></li>`).join("");
-  $("ctMap").addEventListener("click",e=>{ const el=e.target.closest("[data-d]"); if(!el) return; $("ctDep").value=el.dataset.d; ctShow(el.dataset.d,true) });
+  $("ctMap").addEventListener("click",e=>{ const el=e.target.closest("[data-d]"); if(!el) return; const d=el.dataset.d; if(CT_DEP[d]) ctShowCom(CT_DEP[d],d) });
   $("ctLeg").addEventListener("click",e=>{ const b=e.target.closest("[data-k]"); if(b) ctShowCom(b.dataset.k,null) });
 }
 function ctHighlight(k,dep){ const m=$("ctMap"); m.classList.toggle("sel",!!k); if(dep){ const sel=m.querySelector(`path[data-d="${dep}"]`); if(sel) sel.parentNode.insertBefore(sel,m.querySelector("g.dom")) }
@@ -2190,25 +2189,18 @@ function ctShowCom(k,dep){ const c=CT_COM[k]; if(!c) return;
   const tel="+33"+c.tel.replace(/\s/g,"").slice(1);
   $("ctCall").href="tel:"+tel; $("ctTel").textContent=c.tel;
   $("ctMail").href=`mailto:${c.mail}?subject=${encodeURIComponent("Demande depuis l'application COMETEC")}`; $("ctMailT").textContent=c.mail;
-  const card=$("ctCard"); card.hidden=false; card.style.animation="none"; void card.offsetWidth; card.style.animation="";
-  $("ctMsg").textContent=""; $("ctMsg").className="ct-msg"; ctHighlight(k,dep) }
-function ctShow(v,save){ const dep=ctNorm(v);
-  if(!dep){ $("ctCard").hidden=true; $("ctMsg").textContent=""; ctHighlight(null,null); return }
-  if(dep==="20"){ $("ctMsg").textContent="Corse : tapez 2A (Corse-du-Sud) ou 2B (Haute-Corse)."; $("ctMsg").className="ct-msg"; return }
-  const k=CT_DEP[dep];
-  if(!k){ $("ctCard").hidden=true; ctHighlight(null,null); if(dep.length>=2&&!(dep.length===2&&/^9[78]$/.test(dep))){ $("ctMsg").textContent="Département inconnu : vérifiez le numéro (ex. 38, 2A, 974)."; $("ctMsg").className="ct-msg ko" } else { $("ctMsg").textContent="" } return }
-  ctShowCom(k,dep); if(save) try{ localStorage.setItem("cometecDep",dep) }catch(e){} }
+  $("ctHint").hidden=true; const card=$("ctCard"); card.hidden=false; card.style.animation="none"; void card.offsetWidth; card.style.animation="";
+  ctHighlight(k,dep); $("contact").querySelector(".ct-in").scrollTo({top:0,behavior:"smooth"}) }
+function ctReset(){ $("ctCard").hidden=true; $("ctHint").hidden=false; ctHighlight(null,null) }
 function openContact(){ ctBuild(); const dl=$("contact"); if(dl.open) return;
-  let dep=""; try{ dep=localStorage.getItem("cometecDep")||"" }catch(e){}
-  $("ctDep").value=dep; ctShow(dep,false);
+  ctReset(); dl.querySelector(".ct-in").scrollTo(0,0);  /* rien n'est mémorisé : on retrouve son secteur à chaque fois */
   try{ dl.showModal() }catch(e){ dl.setAttribute("open","") }
   try{ history.pushState(Object.assign({},history.state||{},{contact:1}),""); ctPushed=true }catch(e){}
-  if(!matchMedia("(pointer:coarse)").matches||!dep) setTimeout(()=>{ if(!dep) $("ctDep").focus() },60) }
+  $("ctClose").focus() }
 function closeContact(fromPop){ const dl=$("contact"); if(dl.open) dl.close(); if(!fromPop&&ctPushed&&history.state&&history.state.contact){ ctPushed=false; history.back() } else ctPushed=false }
 document.addEventListener("click",e=>{ if(e.target.closest("[data-contact]")) openContact() });
 $("ctClose").onclick=()=>closeContact(false);
 $("contact").addEventListener("cancel",e=>{ e.preventDefault(); closeContact(false) });
 $("contact").addEventListener("click",e=>{ if(e.target===$("contact")) closeContact(false) });
-$("ctDep").addEventListener("input",e=>{ const v=e.target.value.toUpperCase().replace(/[^0-9AB]/g,""); if(v!==e.target.value) e.target.value=v; ctShow(v,true) });
-$("ctExport").onclick=()=>{ $("ctDep").value=""; ctShowCom("olivier",null); $("ctReg").textContent="Sud-Est & Export · clients hors de France" };
+$("ctExport").onclick=()=>{ ctShowCom("olivier",null); $("ctReg").textContent="Sud-Est & Export · clients hors de France" };
 addEventListener("popstate",()=>{ if($("contact").open&&!(history.state&&history.state.contact)) closeContact(true) });
