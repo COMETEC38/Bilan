@@ -2153,3 +2153,62 @@ async function cvBuildPdf(D){
     T("Tél : 01 48 90 40 79 • Fax : 01 48 90 41 02 • Mail : contact@cometec.fr • Web : www.cometec.fr",W/2,H-6,{align:"center"}) }
   doc.setProperties({title:`Constat de vérification RAVEN-EYE N° ${no}`,author:"COMETEC",subject:f.lieu||"",creator:"Application COMETEC"});
   return doc.output("blob") }
+
+/* ---------- Contacter votre commercial : département → commercial, carte des secteurs ---------- */
+const FRDEP=%%FRDEP%%;
+const CT_COM={
+  hugo:{n:"Hugo SACCANI",ini:"HS",reg:"Rhône-Alpes & Grand Est",tel:"06 02 53 93 16",mail:"hugo.saccani@cometec.fr",col:"#047876",
+    d:"01 03 08 10 21 25 38 39 42 51 52 54 55 57 58 63 67 68 69 70 71 73 74 88 89 90"},
+  olivier:{n:"Olivier PAILLARD",ini:"OP",reg:"Sud-Est & Export",tel:"06 49 90 51 38",mail:"olivier.paillard@cometec.fr",col:"#6B778D",
+    d:"04 05 06 07 11 12 13 15 26 30 34 43 48 66 83 84 2A 2B"},
+  alexis:{n:"Alexis CROZATIER",ini:"AC",reg:"Sud-Ouest & Outre-mer",tel:"07 56 01 20 67",mail:"alexis.crozatier@cometec.fr",col:"#5AA9A6",
+    d:"09 16 17 19 23 24 31 32 33 40 46 47 64 65 79 81 82 85 86 87 971 972 973 974 975 976 977 978 984 986 987 988"},
+  benoit:{n:"Benoît PARIS",ini:"BP",reg:"Nord-Ouest & Île-de-France",tel:"06 43 30 29 60",mail:"benoit.paris@cometec.fr",col:"#487CA7",
+    d:"02 14 18 22 27 28 29 35 36 37 41 44 45 49 50 53 56 59 60 61 62 72 75 76 77 78 80 91 92 93 94 95"}};
+const CT_ROLE="Ingénieur technico-commercial";
+const CT_ORDER=["benoit","hugo","alexis","olivier"];
+const CT_DEP={}; for(const k in CT_COM) CT_COM[k].d.split(" ").forEach(c=>CT_DEP[c]=k);
+const CT_DOM={"971":"Guadeloupe","972":"Martinique","973":"Guyane","974":"La Réunion","975":"Saint-Pierre-et-Miquelon","976":"Mayotte","977":"Saint-Barthélemy","978":"Saint-Martin","984":"Terres australes","986":"Wallis-et-Futuna","987":"Polynésie française","988":"Nouvelle-Calédonie"};
+let ctBuilt=false, ctPushed=false;
+function ctNorm(v){ v=String(v||"").trim().toUpperCase().replace(/\s/g,""); if(/^\d$/.test(v)) v="0"+v; if(v==="20") return v; return v }
+function ctName(c){ return (FRDEP.n&&FRDEP.n[c])||CT_DOM[c]||"" }
+function ctBuild(){ if(ctBuilt) return; ctBuilt=true;
+  const W=FRDEP.w, H=FRDEP.h, dom=[["971","Guadeloupe"],["972","Martinique"],["973","Guyane"],["974","Réunion"],["976","Mayotte"]];
+  let svg=`<svg viewBox="-4 -4 ${W+8} ${H+8}" xmlns="http://www.w3.org/2000/svg">`;
+  for(const c in FRDEP.d){ const k=CT_DEP[c]; svg+=`<path d="${FRDEP.d[c]}" data-d="${c}" fill="${k?CT_COM[k].col:"#B8C4C4"}"><title>${c} · ${esc(ctName(c))}</title></path>` }
+  svg+=`<g class="dom" transform="translate(4 ${H-150})">`+dom.map(([c,n],i)=>`<g data-d="${c}" transform="translate(0 ${i*30})"><rect width="22" height="22" rx="5" fill="${CT_COM.alexis.col}" data-d="${c}"><title>${c} · ${n}</title></rect><text x="28" y="15">${n}</text></g>`).join("")+`</g></svg>`;
+  $("ctMap").innerHTML=svg;
+  $("ctLeg").innerHTML=CT_ORDER.map(k=>`<li><button type="button" data-k="${k}"><i style="background:${CT_COM[k].col}"></i><span><b>${CT_COM[k].n}</b><br>${CT_COM[k].reg}</span></button></li>`).join("");
+  $("ctMap").addEventListener("click",e=>{ const el=e.target.closest("[data-d]"); if(!el) return; $("ctDep").value=el.dataset.d; ctShow(el.dataset.d,true) });
+  $("ctLeg").addEventListener("click",e=>{ const b=e.target.closest("[data-k]"); if(b) ctShowCom(b.dataset.k,null) });
+}
+function ctHighlight(k,dep){ const m=$("ctMap"); m.classList.toggle("sel",!!k); if(dep){ const sel=m.querySelector(`path[data-d="${dep}"]`); if(sel) sel.parentNode.insertBefore(sel,m.querySelector("g.dom")) }
+  m.querySelectorAll("path,rect").forEach(p=>{ const kk=CT_DEP[p.dataset.d]; p.classList.toggle("on",!!k&&kk===k); p.classList.toggle("me",!!dep&&p.dataset.d===dep) }) }
+function ctShowCom(k,dep){ const c=CT_COM[k]; if(!c) return;
+  $("ctAv").textContent=c.ini; $("ctAv").style.background=c.col; $("ctName").textContent=c.n; $("ctRole").textContent=CT_ROLE;
+  $("ctReg").textContent=c.reg+(dep?` · votre département : ${dep}${ctName(dep)?" "+ctName(dep):""}`:"");
+  const tel="+33"+c.tel.replace(/\s/g,"").slice(1);
+  $("ctCall").href="tel:"+tel; $("ctTel").textContent=c.tel;
+  $("ctMail").href=`mailto:${c.mail}?subject=${encodeURIComponent("Demande depuis l'application COMETEC")}`; $("ctMailT").textContent=c.mail;
+  const card=$("ctCard"); card.hidden=false; card.style.animation="none"; void card.offsetWidth; card.style.animation="";
+  $("ctMsg").textContent=""; $("ctMsg").className="ct-msg"; ctHighlight(k,dep) }
+function ctShow(v,save){ const dep=ctNorm(v);
+  if(!dep){ $("ctCard").hidden=true; $("ctMsg").textContent=""; ctHighlight(null,null); return }
+  if(dep==="20"){ $("ctMsg").textContent="Corse : tapez 2A (Corse-du-Sud) ou 2B (Haute-Corse)."; $("ctMsg").className="ct-msg"; return }
+  const k=CT_DEP[dep];
+  if(!k){ $("ctCard").hidden=true; ctHighlight(null,null); if(dep.length>=2&&!(dep.length===2&&/^9[78]$/.test(dep))){ $("ctMsg").textContent="Département inconnu : vérifiez le numéro (ex. 38, 2A, 974)."; $("ctMsg").className="ct-msg ko" } else { $("ctMsg").textContent="" } return }
+  ctShowCom(k,dep); if(save) try{ localStorage.setItem("cometecDep",dep) }catch(e){} }
+function openContact(){ ctBuild(); const dl=$("contact"); if(dl.open) return;
+  let dep=""; try{ dep=localStorage.getItem("cometecDep")||"" }catch(e){}
+  $("ctDep").value=dep; ctShow(dep,false);
+  try{ dl.showModal() }catch(e){ dl.setAttribute("open","") }
+  try{ history.pushState(Object.assign({},history.state||{},{contact:1}),""); ctPushed=true }catch(e){}
+  if(!matchMedia("(pointer:coarse)").matches||!dep) setTimeout(()=>{ if(!dep) $("ctDep").focus() },60) }
+function closeContact(fromPop){ const dl=$("contact"); if(dl.open) dl.close(); if(!fromPop&&ctPushed&&history.state&&history.state.contact){ ctPushed=false; history.back() } else ctPushed=false }
+document.addEventListener("click",e=>{ if(e.target.closest("[data-contact]")) openContact() });
+$("ctClose").onclick=()=>closeContact(false);
+$("contact").addEventListener("cancel",e=>{ e.preventDefault(); closeContact(false) });
+$("contact").addEventListener("click",e=>{ if(e.target===$("contact")) closeContact(false) });
+$("ctDep").addEventListener("input",e=>{ const v=e.target.value.toUpperCase().replace(/[^0-9AB]/g,""); if(v!==e.target.value) e.target.value=v; ctShow(v,true) });
+$("ctExport").onclick=()=>{ $("ctDep").value=""; ctShowCom("olivier",null); $("ctReg").textContent="Sud-Est & Export · clients hors de France" };
+addEventListener("popstate",()=>{ if($("contact").open&&!(history.state&&history.state.contact)) closeContact(true) });
