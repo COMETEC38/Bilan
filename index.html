@@ -460,14 +460,14 @@ body.onhub{padding-bottom:0!important}
 .hl img{position:absolute;inset:0;width:100%;height:100%;max-width:none;display:block}
 .hub-body{width:100%;display:flex;flex-direction:column;gap:18px}
 .hub-tag{margin:0;text-align:center;color:var(--ink-2);font-size:15px;letter-spacing:.01em}
-.hub-li{align-self:center;display:inline-flex;align-items:center;gap:8px;margin-top:-8px;padding:5px 13px 5px 6px;border-radius:999px;border:1px solid rgba(10,102,194,.22);background:rgba(10,102,194,.06);color:var(--ink-2);font-size:13px;font-weight:600;text-decoration:none;transition:background .15s,border-color .15s,color .15s}
+.hub-li{align-self:center;display:inline-flex;align-items:center;gap:8px;margin-top:-8px;padding:5px 13px 5px 6px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);font-size:13px;font-weight:600;text-decoration:none;box-shadow:0 2px 8px rgba(18,56,56,.06);transition:background .15s,border-color .15s,color .15s}
 .hub-li svg{width:20px;height:20px;flex:none;display:block}
 .hub-links{align-self:center;display:flex;flex-wrap:wrap;justify-content:center;gap:8px 10px;margin-top:-8px}
 .hub-links .hub-li{margin-top:0;align-self:auto}
-.hub-ct{display:inline-flex;align-items:center;gap:8px;padding:5px 14px 5px 5px;border-radius:999px;border:1px solid #1A4D4D;background:#1A4D4D;color:#fff;font:inherit;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(26,77,77,.18);transition:transform .15s,box-shadow .15s,background .15s}
-.hub-ct:hover{transform:translateY(-1px);box-shadow:0 8px 18px rgba(26,77,77,.26)}
+.hub-ct{display:inline-flex;align-items:center;gap:8px;padding:5px 14px 5px 5px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);font:inherit;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(18,56,56,.06);transition:background .15s,border-color .15s,color .15s}
+.hub-ct:hover{border-color:rgba(227,0,11,.45);color:var(--brand)}
 .hub-ct:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
-.hub-ct-i{display:inline-flex;width:22px;height:22px;border-radius:50%;background:#E3000B;align-items:center;justify-content:center}
+.hub-ct-i{display:inline-flex;width:22px;height:22px;border-radius:50%;background:#E3000B;color:#fff;align-items:center;justify-content:center}
 .hub-ct-i svg{width:13px;height:13px}
 .sim-right{display:flex;align-items:center;gap:10px}
 .ct-mini{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--brand);cursor:pointer;flex:none}
@@ -537,7 +537,7 @@ dialog.ct[open]{display:flex;animation:ctIn .22s cubic-bezier(.2,.7,.2,1)}
   header.sim-bar{grid-template-columns:auto 1fr auto}
   .ct-mini{width:38px;height:38px}
 }
-.hub-li:hover,.hub-li:focus-visible{background:rgba(10,102,194,.12);border-color:rgba(10,102,194,.45);color:#0A66C2}
+.hub-li:hover,.hub-li:focus-visible{border-color:rgba(10,102,194,.45);color:#0A66C2}
 .hub-li:focus-visible{outline:2px solid #0A66C2;outline-offset:2px}
 .hub-hero{position:relative;overflow:hidden;border-radius:20px;background:linear-gradient(135deg,#1A4D4D 0%,#133A3A 60%,#0F3030 100%);color:#fff;padding:30px 32px 30px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px;align-items:center;box-shadow:0 20px 44px rgba(18,56,56,.22)}
 .hub-wave{position:absolute;left:0;right:0;bottom:0;width:100%;height:46%;pointer-events:none}
@@ -973,7 +973,7 @@ body.onctrl{padding-bottom:0!important}
       <li><span class="hs-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.2 5.8L20 11l-5.8 2.2L12 19l-2.2-5.8L4 11l5.8-2.2z"/></svg></span><b>Nouveautés</b><small>Nouveaux produits et actualités</small><em>Bientôt</em></li>
       <li><span class="hs-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></span><b>Aide au paramétrage</b><small>Réglage pas à pas de vos appareils</small><em>Bientôt</em></li>
     </ul>
-    <p class="hub-foot">COMETEC · Instrumentation des eaux · Chapareillan (38) · version 2.8.8</p>
+    <p class="hub-foot">COMETEC · Instrumentation des eaux · Chapareillan (38) · version 2.8.9</p>
   </div>
 </section>
 <section class="sim ctrl" id="ctrl" aria-labelledby="ctrlTitle">
@@ -1408,7 +1408,7 @@ body.onctrl{padding-bottom:0!important}
     <button type="button" data-mtab="volumes"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 20V11M12 20V5M18 20v-7"/></svg></span>Volumes</button>
     <button type="button" data-mtab="export"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 20h16"/></svg></span>Exporter</button>
   </nav>
-  <footer>COMETEC · Instrumentation des eaux · ZA de Longifan, 38530 Chapareillan · application COMETEC version 2.8.8</footer>
+  <footer>COMETEC · Instrumentation des eaux · ZA de Longifan, 38530 Chapareillan · application COMETEC version 2.8.9</footer>
 </div>
 <div class="modal" id="reportModal" hidden role="dialog" aria-modal="true" aria-labelledby="t-report">
   <form class="modal-box" id="reportForm">
