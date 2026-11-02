@@ -1556,6 +1556,8 @@ function endTour(done){
   if(isM()&&S.ds&&document.body.dataset.mtab!=="bilan") setMTab("bilan");
 }
 $("tourNext").onclick=nextTour; $("tourSkip").onclick=()=>endTour(true);
+/* la visite guidée appartient à COMETEC Bilan : elle se ferme dès qu'on quitte la rubrique (accueil, Hydro, simulateur…) */
+new MutationObserver(()=>{ if(!$("tour").hidden&&/\bon(hub|sim|prod|ctrl|hydro)\b/.test(document.body.className)) endTour(false) }).observe(document.body,{attributes:true,attributeFilter:["class"]});
 addEventListener("resize",placeTour); addEventListener("scroll",placeTour,{passive:true});
 addEventListener("keydown",e=>{ if(e.key==="Escape"&&!$("tour").hidden) endTour(true) });
 
