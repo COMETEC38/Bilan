@@ -2293,18 +2293,19 @@ const hyCss=t=>`rgb(${hyCol(t).map(Math.round).join(",")})`;
 $("hyGrad").style.background=`linear-gradient(90deg,${HY_ST.map(s=>`rgb(${s[1]},${s[2]},${s[3]}) ${s[0]*100}%`).join(",")})`;
 const hyTok=k=>getComputedStyle(document.documentElement).getPropertyValue(k).trim();
 const hnf=(v,d=2)=>Number(v).toLocaleString("fr-FR",{minimumFractionDigits:d,maximumFractionDigits:d});
-function hyDrawSection(){
-  const M=HY.M, cv=$("hyCv"), cw=cv.parentElement.clientWidth; if(!cw) return; const dpr=Math.min(window.devicePixelRatio||1,2);
+function hyDrawSection(cv,cw,P,pdf){
+  const M=HY.M; if(!cw) return; P=P||hyTok; const dpr=pdf?2:Math.min(window.devicePixelRatio||1,2), hov=pdf?null:HY.hover;
   const ml=cw<520?34:52, mr=cw<520?28:38, mt=46, mb=34, pw=cw-ml-mr, sx=pw/M.W;
   const target=Math.max(150,Math.min(pw*0.36,380)), exRaw=target/(M.Dmax*sx), ex=[1,2,3,4,5,6,8,10,12,15,20,30,40,50].reduce((a,b)=>Math.abs(b-exRaw)<Math.abs(a-exRaw)?b:a);
   const ph=M.Dmax*sx*ex, gpad=Math.max(22,ph*0.12), ch=mt+ph+gpad+mb;
   cv.width=Math.round(cw*dpr); cv.height=Math.round(ch*dpr); cv.style.height=ch+"px";
   const g=cv.getContext("2d"); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,cw,ch);
-  const X=x=>ml+x*sx, Y=d=>mt+d*sx*ex; HY.geo={ml,mt,sx,ex,ph,ch};
-  const ink2=hyTok("--ink-2"), muted=hyTok("--muted"), line=hyTok("--line");
-  g.fillStyle=hyTok("--hy-air"); g.fillRect(ml,mt-26,pw,26);
-  g.beginPath(); g.moveTo(X(0),Y(0)); for(let k=0;k<=300;k++){const x=M.W*k/300; g.lineTo(X(x),Y(M.bed(x)))} g.lineTo(X(M.W),Y(0)); g.lineTo(X(M.W),mt+ph+gpad); g.lineTo(X(0),mt+ph+gpad); g.closePath(); g.fillStyle=hyTok("--hy-ground"); g.fill();
-  g.save(); g.clip(); g.strokeStyle=hyTok("--hy-ground2"); g.lineWidth=1; for(let x=-ph;x<pw+ph;x+=9){ g.beginPath(); g.moveTo(ml+x,mt+ph+gpad); g.lineTo(ml+x+gpad+ph,mt-6); g.stroke() } g.restore();
+  const X=x=>ml+x*sx, Y=d=>mt+d*sx*ex; if(!pdf) HY.geo={ml,mt,sx,ex,ph,ch};
+  const ink2=P("--ink-2"), muted=P("--muted"), line=P("--line");
+  if(pdf){ g.fillStyle="#FFFFFF"; g.fillRect(0,0,cw,ch) }
+  g.fillStyle=P("--hy-air"); g.fillRect(ml,mt-26,pw,26);
+  g.beginPath(); g.moveTo(X(0),Y(0)); for(let k=0;k<=300;k++){const x=M.W*k/300; g.lineTo(X(x),Y(M.bed(x)))} g.lineTo(X(M.W),Y(0)); g.lineTo(X(M.W),mt+ph+gpad); g.lineTo(X(0),mt+ph+gpad); g.closePath(); g.fillStyle=P("--hy-ground"); g.fill();
+  g.save(); g.clip(); g.strokeStyle=P("--hy-ground2"); g.lineWidth=1; for(let x=-ph;x<pw+ph;x+=9){ g.beginPath(); g.moveTo(ml+x,mt+ph+gpad); g.lineTo(ml+x+gpad+ph,mt-6); g.stroke() } g.restore();
   const w=Math.ceil(pw*dpr), h=Math.ceil(ph*dpr)+1, img=g.createImageData(w,h), px=img.data;
   for(let i=0;i<w;i++){ const xm=(i/dpr)/sx, B=M.bed(xm); if(B<=0) continue;
     for(let j=0;j<h;j++){ const dm=(j/dpr)/(sx*ex); if(dm>B) break; const c=hyCol(M.vel(xm,1-dm/B)/M.vScale), o=(j*w+i)*4; px[o]=c[0];px[o+1]=c[1];px[o+2]=c[2];px[o+3]=255 } }
@@ -2319,37 +2320,39 @@ function hyDrawSection(){
         ed(a,b,i,j,i+1,j); ed(b,c,i+1,j,i+1,j+1); ed(d,c,i,j+1,i+1,j+1); ed(a,d,i,j,i,j+1);
         if(p.length>=2){ g.moveTo(p[0][0],p[0][1]); g.lineTo(p[1][0],p[1][1]) } if(p.length===4){ g.moveTo(p[2][0],p[2][1]); g.lineTo(p[3][0],p[3][1]) } }
       g.stroke() } }
-  g.beginPath(); for(let k=0;k<=300;k++){const x=M.W*k/300; k?g.lineTo(X(x),Y(M.bed(x))):g.moveTo(X(x),Y(M.bed(x)))} g.strokeStyle=hyTok("--hy-bed"); g.lineWidth=2.2; g.stroke();
-  g.beginPath(); g.moveTo(X(0)-6,Y(0)); g.lineTo(X(M.W)+6,Y(0)); g.strokeStyle=hyTok("--brand"); g.lineWidth=2; g.stroke();
-  const tx=X(M.W)+(cw<520?16:24); g.beginPath(); g.moveTo(tx-6,Y(0)-11); g.lineTo(tx+6,Y(0)-11); g.lineTo(tx,Y(0)-2); g.closePath(); g.fillStyle=hyTok("--brand"); g.fill(); g.beginPath(); g.moveTo(tx-9,Y(0)-14); g.lineTo(tx+9,Y(0)-14); g.lineWidth=1.5; g.stroke();
-  M.V.forEach((v,i)=>{ const on=HY.hover===i, xx=X(v.x);
+  g.beginPath(); for(let k=0;k<=300;k++){const x=M.W*k/300; k?g.lineTo(X(x),Y(M.bed(x))):g.moveTo(X(x),Y(M.bed(x)))} g.strokeStyle=P("--hy-bed"); g.lineWidth=2.2; g.stroke();
+  g.beginPath(); g.moveTo(X(0)-6,Y(0)); g.lineTo(X(M.W)+6,Y(0)); g.strokeStyle=P("--brand"); g.lineWidth=2; g.stroke();
+  const tx=X(M.W)+(cw<520?16:24); g.beginPath(); g.moveTo(tx-6,Y(0)-11); g.lineTo(tx+6,Y(0)-11); g.lineTo(tx,Y(0)-2); g.closePath(); g.fillStyle=P("--brand"); g.fill(); g.beginPath(); g.moveTo(tx-9,Y(0)-14); g.lineTo(tx+9,Y(0)-14); g.lineWidth=1.5; g.stroke();
+  M.V.forEach((v,i)=>{ const on=hov===i, xx=X(v.x);
     if(HY.show.V||on){ g.save(); g.setLineDash([4,4]); g.strokeStyle=on?"#FFFFFF":"rgba(255,255,255,.75)"; g.lineWidth=on?2:1.2; g.beginPath(); g.moveTo(xx,Y(0)); g.lineTo(xx,Y(v.d)); g.stroke(); g.restore() }
     if(HY.show.P||on) v.pts.forEach(p=>{ g.beginPath(); g.arc(xx,Y(Math.max(0,v.d-p.h)),on?5.5:4.2,0,7); g.fillStyle=hyCss(p.v/M.vScale); g.fill(); g.lineWidth=1.6; g.strokeStyle="#FFFFFF"; g.stroke() });
-    const r=cw<520?8:10; g.beginPath(); g.arc(xx,mt-15,r,0,7); g.fillStyle=on?hyTok("--rule"):hyTok("--surface"); g.fill(); g.lineWidth=1.2; g.strokeStyle=on?hyTok("--rule"):line; g.stroke();
+    const r=cw<520?8:10; g.beginPath(); g.arc(xx,mt-15,r,0,7); g.fillStyle=on?P("--rule"):P("--surface"); g.fill(); g.lineWidth=1.2; g.strokeStyle=on?P("--rule"):line; g.stroke();
     g.fillStyle=on?"#FFFFFF":ink2; g.font=`700 ${cw<520?9:11}px Arial, sans-serif`; g.textAlign="center"; g.textBaseline="middle"; g.fillText(v.n,xx,mt-14.5) });
   g.fillStyle=muted; g.strokeStyle=line; g.font="12px Arial, sans-serif"; g.textBaseline="top"; g.textAlign="center"; g.lineWidth=1;
   const step=M.W>12?2:M.W>6?1:0.5; for(let x=0;x<=M.W+1e-9;x+=step){ g.beginPath(); g.moveTo(X(x),mt+ph+gpad); g.lineTo(X(x),mt+ph+gpad+5); g.stroke(); g.fillText(hnf(x,x%1?1:0),X(x),mt+ph+gpad+8) }
-  g.textAlign="right"; g.fillText(`${hnf(M.W)} m`,X(M.W),mt+ph+gpad+20); g.textAlign="left"; g.fillText("distance à la rive (m)",X(0),mt+ph+gpad+20);
+  g.textAlign="right"; g.fillText(`${hnf(M.W)} m`,X(M.W),mt+ph+gpad+20); g.textAlign="left"; g.fillText(HY.rive==="RG"?"distance depuis la rive gauche (m)":HY.rive==="RD"?"distance depuis la rive droite (m)":"distance à la rive (m)",X(0),mt+ph+gpad+20);
   g.textAlign="right"; g.textBaseline="middle"; const dstep=M.Dmax>1.6?0.5:M.Dmax>0.8?0.2:0.1;
   for(let d=0;d<=M.Dmax+1e-9;d+=dstep){ g.beginPath(); g.moveTo(ml-5,Y(d)); g.lineTo(ml,Y(d)); g.stroke(); g.fillText(hnf(d,1),ml-8,Y(d)) }
   if(cw>=520){ g.save(); g.translate(12,mt+ph/2); g.rotate(-Math.PI/2); g.textAlign="center"; g.fillText("profondeur (m)",0,0); g.restore() }
+  HY.exag=ex; if(pdf) return ch;
   const isoT=`isovitesses tous les ${hnf(M.iso,M.iso<0.1?2:1)} m/s`; $("hyExag").textContent=ex>1?`Échelle verticale exagérée × ${ex} · ${isoT}`:isoT.charAt(0).toUpperCase()+isoT.slice(1);
   $("hyVmax").textContent=`${hnf(M.vScale,2)} m/s`;
 }
-function hyDrawQ(){
-  const M=HY.M, cv=$("hyCq"), cw=cv.parentElement.clientWidth; if(!cw) return; const dpr=Math.min(window.devicePixelRatio||1,2);
-  const ml=44, mr=8, mt=22, mb=32, ch=230, pw=cw-ml-mr, ph=ch-mt-mb;
+function hyDrawQ(cv,cw,P,pdf){
+  const M=HY.M; if(!cw) return; P=P||hyTok; const dpr=pdf?2:Math.min(window.devicePixelRatio||1,2), hov=pdf?null:HY.hover;
+  const ml=44, mr=8, mt=22, mb=32, ch=pdf?210:230, pw=cw-ml-mr, ph=ch-mt-mb;
   cv.width=Math.round(cw*dpr); cv.height=Math.round(ch*dpr); cv.style.height=ch+"px";
   const g=cv.getContext("2d"); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,cw,ch);
+  if(pdf){ g.fillStyle="#FFFFFF"; g.fillRect(0,0,cw,ch) }
   const qm=M.qmax*1000, qst=[1,2,5,10,20,25,50,100,200,500,1000].find(t=>qm/t<=5)||2000, top=Math.max(qst,Math.ceil(qm/qst)*qst), X=x=>ml+x/M.W*pw, Y=q=>mt+ph-(q*1000)/top*ph;
-  g.font="11px Arial, sans-serif"; g.fillStyle=hyTok("--muted"); g.strokeStyle=hyTok("--line"); g.textAlign="right"; g.textBaseline="middle"; g.lineWidth=1;
+  g.font="11px Arial, sans-serif"; g.fillStyle=P("--muted"); g.strokeStyle=P("--line"); g.textAlign="right"; g.textBaseline="middle"; g.lineWidth=1;
   for(let q=0;q<=top+1e-9;q+=qst){ g.beginPath(); g.moveTo(ml,Y(q/1000)); g.lineTo(ml+pw,Y(q/1000)); g.stroke(); g.fillText(q,ml-6,Y(q/1000)) }
   g.save(); g.translate(10,mt+ph/2); g.rotate(-Math.PI/2); g.textAlign="center"; g.fillText("L/s/m",0,0); g.restore();
-  M.seg.forEach((s,i)=>{ const x1=X(s.a)+1, x2=X(s.b)-1; g.fillStyle=hyCss(M.V[i].vm/M.vScale); g.globalAlpha=HY.hover===null||HY.hover===i?1:.45; g.fillRect(x1,Y(s.q),Math.max(1,x2-x1),Y(0)-Y(s.q)); g.globalAlpha=1;
-    if(x2-x1>22){ g.fillStyle=hyTok("--ink-2"); g.textAlign="center"; g.textBaseline="bottom"; g.font="600 10.5px Arial, sans-serif"; g.fillText(Math.round(s.part*100)+" %",(x1+x2)/2,Y(s.q)-3) } });
-  g.fillStyle=hyTok("--muted"); g.textAlign="center"; g.textBaseline="top"; g.font="11px Arial, sans-serif";
+  M.seg.forEach((s,i)=>{ const x1=X(s.a)+1, x2=X(s.b)-1; g.fillStyle=hyCss(M.V[i].vm/M.vScale); g.globalAlpha=hov===null||hov===i?1:.45; g.fillRect(x1,Y(s.q),Math.max(1,x2-x1),Y(0)-Y(s.q)); g.globalAlpha=1;
+    if(x2-x1>22){ g.fillStyle=P("--ink-2"); g.textAlign="center"; g.textBaseline="bottom"; g.font="600 10.5px Arial, sans-serif"; g.fillText(Math.round(s.part*100)+" %",(x1+x2)/2,Y(s.q)-3) } });
+  g.fillStyle=P("--muted"); g.textAlign="center"; g.textBaseline="top"; g.font="11px Arial, sans-serif";
   const step=M.W>12?2:M.W>6?1:0.5; for(let x=0;x<=M.W+1e-9;x+=step) g.fillText(hnf(x,x%1?1:0),X(x),mt+ph+6);
-  g.textAlign="right"; g.fillText("m",ml+pw,mt+ph+18);
+  g.textAlign="right"; g.fillText("m",ml+pw,mt+ph+18); return ch;
 }
 function hyFill(){
   const H=HY.J.head, M=HY.M, dd=H.debit<100?1:0, qd=M.qmax*1000<100?1:0, dQ=H.debit>0?(M.Q*1000-H.debit)/H.debit*100:0;
@@ -2369,9 +2372,10 @@ function hyFill(){
     M.V.map((v,i)=>`<tr data-i="${i}"><td><span class="hy-dot" style="background:${hyCss(v.vm/M.vScale)}"></span>${v.n}</td><td>${hnf(v.x)} m</td><td>${hnf(v.d)} m</td><td>${hnf(v.vm)} m/s</td><td>${hnf(M.seg[i].q*1000,qd)} L/s/m</td><td>${hnf(M.seg[i].part*100,1)} %</td></tr>`).join("")+`</tbody>`;
   const w=$("hyWarn"); if(M.vmax<0.1){ w.textContent="Vitesses très faibles : l'export arrondit les vitesses au centième de m/s, ce qui peut expliquer quelques pour cent d'écart entre le débit affiché par l'appareil et le débit recalculé."; w.hidden=false } else w.hidden=true;
   $("hyDemoBar").hidden=!HY.demo;
+  hyQualityUi();
 }
-function hyRender(){ if(!HY.M||!hydroOn()) return; hyDrawSection(); hyDrawQ(); document.querySelectorAll("#hyVt tbody tr").forEach(tr=>tr.classList.toggle("on",+tr.dataset.i===HY.hover)) }
-function hyShow(j,demo){ HY.J=j; HY.M=hyBuild(j); HY.demo=demo; HY.hover=null; $("hyTip").hidden=true; $("hyEmpty").hidden=true; $("hyView").hidden=false; hyFill(); window.scrollTo({top:0}); requestAnimationFrame(hyRender) }
+function hyRender(){ if(!HY.M||!hydroOn()) return; hyDrawSection($("hyCv"),$("hyCv").parentElement.clientWidth); hyDrawQ($("hyCq"),$("hyCq").parentElement.clientWidth); document.querySelectorAll("#hyVt tbody tr").forEach(tr=>tr.classList.toggle("on",+tr.dataset.i===HY.hover)) }
+function hyShow(j,demo){ HY.J=j; HY.M=hyBuild(j); HY.demo=demo; HY.hover=null; HY.info=null; HY.photo=null; HY.rive=""; $("hyTip").hidden=true; $("hyEmpty").hidden=true; $("hyView").hidden=false; hyFill(); window.scrollTo({top:0}); requestAnimationFrame(hyRender) }
 function hyPick(ev){ const r=$("hyCv").getBoundingClientRect(), x=ev.clientX-r.left, y=ev.clientY-r.top, G=HY.geo, M=HY.M; if(!G) return;
   const xm=(x-G.ml)/G.sx; if(xm<-0.05||xm>M.W+0.05||y<G.mt-30||y>G.mt+G.ph+10){ HY.hover=null; $("hyTip").hidden=true; hyRender(); return }
   let best=0; M.V.forEach((v,i)=>{ if(Math.abs(v.x-xm)<Math.abs(M.V[best].x-xm)) best=i }); HY.hover=best; hyRender();
@@ -2386,3 +2390,141 @@ $("hyVt").addEventListener("pointerover",e=>{ const tr=e.target.closest("tr[data
 { let t=null; addEventListener("resize",()=>{ clearTimeout(t); t=setTimeout(hyRender,120) }) }
 try{ matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>hyRender()) }catch(e){}
 new MutationObserver(()=>hyRender()).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+
+/* ---------- COMETEC Hydro : contrôle qualité (repères ISO 748) et incertitude estimée ---------- */
+// Incertitudes types en % (ordres de grandeur ISO 748, à valider) : nombre de verticales, points par verticale, durée d'exposition supposée, largeur, profondeur, étalonnage, systématique
+const HY_UM=[[5,7.5],[10,4.5],[15,3],[20,2.5],[25,2],[30,1.5],[35,1]], HY_UP={1:7.5,2:3.5,3:3}, HY_UE=3, HY_UB=0.5, HY_UD=0.5, HY_UC=1, HY_US=1;
+function hyUm(m){ if(m<=5) return 7.5; for(let k=0;k<HY_UM.length-1;k++){ const [a,ua]=HY_UM[k],[b,ub]=HY_UM[k+1]; if(m<=b) return ua+(m-a)/(b-a)*(ub-ua) } return 1 }
+function hyUncert(M){ const Q=M.Q; if(!(Q>0)) return null; let s2=0;
+  M.V.forEach((v,i)=>{ const qi=M.seg[i].q*(M.seg[i].b-M.seg[i].a), up=HY_UP[v.pts.length]||(v.pts.length>3?2.5:7.5);
+    s2+=qi*qi*(HY_UB**2+HY_UD**2+HY_UE**2+up**2+HY_UC**2) });
+  const u=Math.sqrt(HY_US**2+hyUm(M.V.length)**2+s2/(Q*Q)); return {u,U:2*u} }
+function hyNumIn(v){ const x=parseFloat(String(v||"").replace(",",".")); return isFinite(x)?x:null }
+function hyQuality(){ const M=HY.M, H=HY.J.head, it=[], info=HY.info||{};
+  const dQ=H.debit>0?(M.Q*1000-H.debit)/H.debit*100:0, ad=Math.abs(dQ);
+  it.push({st:ad<=2?"ok":ad<=5?"info":"warn",t:"Débit recalculé / débit de l'appareil",v:`${dQ>=0?"+":""}${hnf(dQ,1)} %`,n:ad<=2?"Les deux calculs concordent.":ad<=5?"Écart modéré : vérifiez les verticales de rive et les vitesses faibles.":"Écart important : vérifiez la largeur saisie et les verticales."});
+  const im=M.seg.reduce((a,s,i)=>s.part>M.seg[a].part?i:a,0), pm=M.seg[im].part*100;
+  it.push({st:pm<=5?"ok":pm<=10?"info":"warn",t:"Part maximale du débit dans une verticale",v:`${hnf(pm,1)} % (verticale ${M.V[im].n})`,n:pm<=5?"Conforme à la recommandation (5 % au plus).":pm<=10?"Acceptable : l'ISO 748 demande 10 % au plus, idéalement 5 %.":"Dépasse 10 % : ajoutez des verticales autour de la verticale "+M.V[im].n+" lors du prochain jaugeage."});
+  const m=M.V.length;
+  it.push({st:m>=20?"ok":"info",t:"Nombre de verticales",v:`${m}`,n:m>=20?"Conforme à la recommandation (20 au moins).":"L'ISO 748 recommande au moins 20 verticales lorsque la largeur le permet ; sur un petit cours d'eau, un pas régulier de quelques dizaines de centimètres reste acceptable."});
+  const np=M.V.map(v=>v.pts.length), one=np.filter(x=>x<=1).length;
+  it.push({st:one===0?"ok":"info",t:"Points de vitesse par verticale",v:[...new Set(np)].sort((a,b)=>a-b).join(" à "),n:one===0?"Profil de vitesse décrit sur plusieurs points.":`${one} verticale${one>1?"s":""} mesurée${one>1?"s":""} sur un seul point (faible profondeur) : incertitude plus forte sur ${one>1?"ces verticales":"cette verticale"}.`});
+  if(M.V.some(v=>v.pts.some(p=>p.v<0)||v.vm<0)) it.push({st:"warn",t:"Vitesses négatives",v:"présentes",n:"Contre-courant ou remous : vérifiez la section de mesure."});
+  if(M.vmax<0.1) it.push({st:"info",t:"Vitesses très faibles",v:`${hnf(M.vmax)} m/s au plus`,n:"L'export arrondit les vitesses au centième : l'écart relatif sur le débit peut atteindre quelques pour cent."});
+  const h0=hyNumIn(info.h0), h1=hyNumIn(info.h1);
+  if(h0!=null&&h1!=null){ const dh=Math.abs(h1-h0)*100; it.push({st:dh<=1?"ok":dh<=3?"info":"warn",t:"Variation de la cote pendant la mesure",v:`${hnf(dh,1)} cm`,n:dh<=1?"Écoulement stable pendant le jaugeage.":"Le niveau a varié pendant la mesure : écoulement non permanent, à signaler."}) }
+  return {it,unc:hyUncert(M)};
+}
+const HY_STL={ok:"Conforme",info:"À noter",warn:"À vérifier"};
+function hyQualityUi(){ if(!HY.M) return; const q=hyQuality();
+  $("hyQ").innerHTML=q.it.map(x=>`<li><span class="st ${x.st}">${HY_STL[x.st]}</span><b>${esc(x.t)} : ${esc(x.v)}</b><span class="n">${esc(x.n)}</span></li>`).join("");
+  $("hyUnc").innerHTML=q.unc?`Incertitude élargie estimée sur le débit : <b>± ${hnf(q.unc.U,0)} %</b> (environ 95 %). Estimation indicative selon la méthode de l'ISO 748, avec une durée de mesure par point supposée suffisante (l'export ne la fournit pas).`:"" }
+
+/* ---------- COMETEC Hydro : rapport PDF ---------- */
+const HY_RP_KEEP=["hyRpCompany","hyRpOperator","hyRpSerial"], HY_RP_ALL=["hyRpTitle","hyRpPoint","hyRpRiver","hyRpPlace","hyRpOwner","hyRpCompany","hyRpOperator","hyRpSerial","hyRpRive","hyRpRegime","hyRpH0","hyRpH1","hyRpNotes"];
+let hyLogo=null;
+function hyRpPrefs(){ let o={}; try{ o=JSON.parse(localStorage.getItem("cometecHydroReport")||"{}") }catch(e){}
+  if(!o.hyRpCompany||!o.hyRpOperator||!o.logo){ try{ const b=JSON.parse(localStorage.getItem("cometecBilanReport")||"{}"); o.hyRpCompany=o.hyRpCompany||b.rpCompany; o.hyRpOperator=o.hyRpOperator||b.rpOperator; o.logo=o.logo||b.logo }catch(e){} } return o }
+function hyRpSave(){ if(HY.demo) return; try{ const o={}; HY_RP_KEEP.forEach(k=>o[k]=$(k).value); if(hyLogo) o.logo=hyLogo; localStorage.setItem("cometecHydroReport",JSON.stringify(o)) }catch(e){} }
+function hyRpUi(){ $("hyRpLogoName").textContent=hyLogo?(hyLogo.demo?"Logo COMETEC (démonstration)":"Logo ajouté"):""; $("hyRpLogoDel").hidden=!hyLogo; $("hyRpLogoBtn").textContent=hyLogo?"Changer le logo":"Ajouter votre logo (facultatif)";
+  $("hyRpPhotoName").textContent=HY.photo?"Photo ajoutée":""; $("hyRpPhotoDel").hidden=!HY.photo; $("hyRpPhotoBtn").textContent=HY.photo?"Changer la photo":"Ajouter une photo du site (facultatif)" }
+async function hyRpOpen(){ if(!HY.M) return;
+  if(!HY.info){ HY_RP_ALL.forEach(k=>$(k).value=""); $("hyRpTitle").value="Rapport de jaugeage";
+    if(HY.demo){ $("hyRpPoint").value="Station de démonstration"; $("hyRpRiver").value="Rivière X"; $("hyRpPlace").value="Commune X"; $("hyRpOwner").value="Syndicat de rivière X"; $("hyRpCompany").value="COMETEC"; $("hyRpOperator").value="Monsieur X"; $("hyRpSerial").value="FLUVIA-DEMO"; $("hyRpRive").value="RG"; $("hyRpRegime").value="Stable"; $("hyRpH0").value="0,62"; $("hyRpH1").value="0,62"; $("hyRpNotes").value="Ceci est un TEST : jaugeage fictif de démonstration."; hyLogo=await demoLogo() }
+    else { const o=hyRpPrefs(); HY_RP_KEEP.forEach(k=>{ if(o[k]) $(k).value=o[k] }); hyLogo=o.logo||null } }
+  else HY_RP_ALL.forEach(k=>$(k).value=HY.info[k]??"");
+  $("hyRpHelp").textContent=HY.demo?"Jaugeage de démonstration : ces informations sont pré-remplies pour l'exemple et ne sont pas mémorisées.":"Ces informations apparaissent sur le rapport. Toutes sont facultatives ; la société, l'opérateur, l'appareil et le logo restent mémorisés sur cet appareil.";
+  hyRpUi(); $("hyReport").hidden=false }
+function hyRpCollect(){ const o={}; HY_RP_ALL.forEach(k=>o[k]=$(k).value.trim()); o.h0=o.hyRpH0; o.h1=o.hyRpH1; HY.info=o; HY.rive=o.hyRpRive; return o }
+$("hyReportBtn").onclick=hyRpOpen;
+$("hyRpClose").onclick=()=>{ hyRpCollect(); $("hyReport").hidden=true; hyQualityUi(); hyRender() };
+$("hyReport").addEventListener("click",e=>{ if(e.target.id==="hyReport") $("hyRpClose").onclick() });
+addEventListener("keydown",e=>{ if(e.key==="Escape"&&!$("hyReport").hidden) $("hyRpClose").onclick() });
+function hyImg(f,maxPx,cb){ const r=new FileReader(); r.onload=()=>{ const img=new Image(); img.onload=()=>{ const sc=Math.min(1,maxPx/Math.max(img.width,img.height)), c=document.createElement("canvas"); c.width=Math.round(img.width*sc); c.height=Math.round(img.height*sc);
+  const g=c.getContext("2d"); g.fillStyle="#fff"; g.fillRect(0,0,c.width,c.height); g.drawImage(img,0,0,c.width,c.height); cb({data:c.toDataURL("image/jpeg",0.88),w:c.width,h:c.height}) }; img.src=r.result }; r.readAsDataURL(f) }
+$("hyRpLogoBtn").onclick=()=>$("hyRpLogoIn").click();
+$("hyRpLogoDel").onclick=()=>{ hyLogo=null; hyRpUi(); hyRpSave() };
+$("hyRpLogoIn").onchange=e=>{ const f=e.target.files[0]; e.target.value=""; if(f) hyImg(f,300,o=>{ hyLogo=o; hyRpUi(); hyRpSave() }) };
+$("hyRpPhotoBtn").onclick=()=>$("hyRpPhotoIn").click();
+$("hyRpPhotoDel").onclick=()=>{ HY.photo=null; hyRpUi() };
+$("hyRpPhotoIn").onchange=e=>{ const f=e.target.files[0]; e.target.value=""; if(f) hyImg(f,1400,o=>{ HY.photo=o; hyRpUi() }) };
+const HY_LIGHT={"--ink":"#122B2B","--ink-2":"#456161","--muted":"#6F8787","--line":"#D2DDDD","--surface":"#FFFFFF","--rule":"#E3000B","--brand":"#1A4D4D","--hy-air":"#EAF1F3","--hy-ground":"#CDBFA6","--hy-ground2":"#B7A688","--hy-bed":"#5B4A33"};
+function hyCanvasImg(draw,w){ const c=document.createElement("canvas"); const h=draw(c,w,k=>HY_LIGHT[k]||"#000",true); return {data:c.toDataURL("image/jpeg",0.92),w:c.width,h:c.height} }
+$("hyRpForm").onsubmit=async e=>{ e.preventDefault(); const f=hyRpCollect(); hyRpSave(); hyQualityUi(); $("hyRpGo").disabled=true; $("hyRpGo").textContent="Génération…";
+  try{ const blob=await hyBuildPdf(f); const H=HY.J.head;
+    const name=(`Jaugeage ${f.hyRpPoint||("profil "+(H.profil||""))} ${String(H.date||"").replace(/\//g,"-")}`).replace(/[\\/:*?"<>|]/g,"").replace(/\s+/g," ").trim()+".pdf";
+    $("hyReport").hidden=true; hyRender();
+    const file=new File([blob],name,{type:"application/pdf"});
+    if(matchMedia("(pointer:coarse)").matches&&navigator.canShare&&navigator.canShare({files:[file]})){ try{ await navigator.share({files:[file],title:name}) }catch(err){ if(!err||err.name!=="AbortError") await saveFile(name,blob) } }
+    else await saveFile(name,blob) }
+  catch(err){ console.error(err); toast("Rapport impossible : "+err.message) }
+  finally{ $("hyRpGo").disabled=false; $("hyRpGo").textContent="Générer le rapport PDF" } };
+async function hyBuildPdf(f){
+  const {jsPDF}=window.jspdf, M=HY.M, H=HY.J.head, q=hyQuality();
+  const INK=[38,50,56], MUT=[110,124,130], ACC=[26,77,77], LINE=[214,222,224], SOFT=[242,246,247], RED=[227,0,11];
+  const doc=new jsPDF({unit:"mm",format:"a4",orientation:"portrait",compress:true}); const W=210,PH=297,Mg=15,CW=W-2*Mg;
+  const T=(s,x,y,o)=>doc.text(pdfTxt(s),x,y,o), set=(sz,st,col)=>{ doc.setFont("helvetica",st||"normal"); doc.setFontSize(sz); doc.setTextColor(...(col||INK)) };
+  const today=new Date(), todayS=`${p2(today.getDate())}/${p2(today.getMonth()+1)}/${today.getFullYear()}`;
+  const dd=H.debit<100?1:0, qd=M.qmax*1000<100?1:0, n2=(v,d=2)=>hnf(v,d);
+  const when=[H.date,H.heure&&`à ${H.heure}`].filter(Boolean).join(" ");
+  const header=()=>{ if(hyLogo){ const h=14, w=Math.min(48,hyLogo.w/hyLogo.h*h); doc.addImage(hyLogo.data,"JPEG",Mg,10,w,w/(hyLogo.w/hyLogo.h),"hyLogo") } else if(f.hyRpCompany){ set(11,"bold",INK); T(f.hyRpCompany,Mg,17) }
+    set(14,"bold",INK); T(f.hyRpTitle||"Rapport de jaugeage",W-Mg,15,{align:"right"});
+    set(9,"normal",MUT); T([f.hyRpPoint&&`Point : ${f.hyRpPoint}`,f.hyRpRiver,when].filter(Boolean).join("  ·  "),W-Mg,21,{align:"right"});
+    doc.setDrawColor(...ACC); doc.setLineWidth(0.6); doc.line(Mg,27,W-Mg,27) };
+  const footer=(p,tot)=>{ doc.setDrawColor(...LINE); doc.setLineWidth(0.2); doc.line(Mg,PH-14,W-Mg,PH-14); set(8,"normal",MUT);
+    T([HY.demo&&"Données de démonstration (fictives)",f.hyRpCompany&&`Établi par ${f.hyRpCompany}`,f.hyRpOperator&&`Opérateur : ${f.hyRpOperator}`,`Édité le ${todayS}`].filter(Boolean).join("  ·  "),Mg,PH-9); T(`Page ${p} / ${tot}`,W-Mg,PH-9,{align:"right"}) };
+  const section=(t,y)=>{ set(11,"bold",INK); T(t,Mg,y); doc.setDrawColor(...LINE); doc.setLineWidth(0.3); doc.line(Mg,y+2,W-Mg,y+2); return y+8 };
+  const kv=(rows,y,lw)=>{ const half=CW/2; let yy=y; lw=lw||36;
+    for(let i=0;i<rows.length;i+=2){ let h=0; for(let k=0;k<2&&i+k<rows.length;k++){ const [a,b]=rows[i+k], x=Mg+k*half; set(8.5,"normal",MUT); T(a,x,yy); set(9.5,"bold",INK); const l=doc.splitTextToSize(pdfTxt(b||"-"),half-lw-4); doc.text(l,x+lw,yy); h=Math.max(h,l.length*4.4) }
+      yy+=Math.max(6.2,h+1.8) } return yy };
+  const ensure=(y,need)=>{ if(y+need>PH-20){ doc.addPage(); header(); return 36 } return y };
+  // ===== page 1 : identification, conditions, résultats, coupe
+  header(); let y=36;
+  y=section("Identification",y);
+  y=kv([["Point de mesure",f.hyRpPoint],["Cours d'eau",f.hyRpRiver],["Commune / lieu",f.hyRpPlace],["Maître d'ouvrage",f.hyRpOwner],["Établi par",f.hyRpCompany],["Opérateur",f.hyRpOperator],["Date du jaugeage",when],["Date d'édition",todayS]],y);
+  y+=2; y=section("Conditions de mesure",y);
+  const rive={RG:"Rive gauche",RD:"Rive droite"}[f.hyRpRive]||"Non précisée";
+  const cote=(f.h0||f.h1)?[f.h0&&`${f.h0} m au début`,f.h1&&`${f.h1} m à la fin`].filter(Boolean).join(", "):"Non relevée";
+  const np=[...new Set(M.V.map(v=>v.pts.length))].sort((a,b)=>a-b).join(" à ");
+  y=kv([["Appareil",`Courantomètre électromagnétique FLUVIA${f.hyRpSerial?` n° ${f.hyRpSerial}`:""}`],["Profil",`n° ${H.profil||"-"} (mode ${String(H.type||"").toLowerCase().replace("riviere","rivière")})`],
+        ["Méthode","Exploration du champ des vitesses, section médiane (ISO 748)"],["Verticales",`${M.V.length}, ${np} point(s) de vitesse chacune`],
+        ["Rive de départ",rive],["Largeur",`${n2(M.W)} m`],["Cote à l'échelle",cote],["Régime",f.hyRpRegime||"Non précisé"]],y);
+  y+=2; y=section("Résultats",y);
+  const dQ=H.debit>0?(M.Q*1000-H.debit)/H.debit*100:0;
+  const tiles=[["Débit (appareil)",`${n2(H.debit,dd)} L/s`,`recalculé ${n2(M.Q*1000,dd)} L/s (${dQ>=0?"+":""}${n2(dQ,1)} %)`],["Section mouillée",`${n2(M.A)} m²`,`largeur ${n2(M.W)} m`],
+    ["Vitesse moyenne",`${n2(M.A>0?M.Q/M.A:0)} m/s`,"débit / section"],["Vitesse maximale",`${n2(M.vmax)} m/s`,`ponctuelle ${n2(M.vmaxPts)} m/s`],["Profondeur maximale",`${n2(M.Dmax)} m`,`moyenne ${n2(M.A/M.W)} m`]];
+  const tw=(CW-12)/5; tiles.forEach((t,i)=>{ const x=Mg+i*(tw+3); doc.setFillColor(...SOFT); doc.roundedRect(x,y,tw,20,1.5,1.5,"F"); set(7.5,"normal",MUT); T(t[0],x+3,y+5); set(11,"bold",i===0?ACC:INK); T(t[1],x+3,y+11.5); set(6.6,"normal",MUT); T(t[2],x+3,y+16.5) });
+  y+=26;
+  const sec=hyCanvasImg(hyDrawSection,900); const sh=CW*sec.h/sec.w;
+  y=ensure(y,sh+18); set(10,"bold",INK); T("Coupe du cours d'eau et champ des vitesses",Mg,y); y+=2;
+  doc.addImage(sec.data,"JPEG",Mg,y,CW,sh,"hySec","FAST"); y+=sh+3;
+  // légende des couleurs
+  const gx=Mg, gw=60; for(let k=0;k<60;k++){ const c=hyCol(k/59); doc.setFillColor(Math.round(c[0]),Math.round(c[1]),Math.round(c[2])); doc.rect(gx+k*gw/60,y,gw/60+0.05,3,"F") }
+  set(7.5,"normal",MUT); T("0",gx-1,y+2.5,{align:"right"}); T(`${n2(M.vScale)} m/s`,gx+gw+2,y+2.5);
+  T(`Rouge : zone la plus rapide de ce profil`,gx+gw+22,y+2.5); T(`Échelle verticale exagérée x ${HY.exag||1}  ·  isovitesses tous les ${n2(M.iso,M.iso<0.1?2:1)} m/s`,gx,y+7.5); y+=13;
+  // ===== répartition du débit + tableau des verticales
+  const qi=hyCanvasImg(hyDrawQ,900), qh=CW*qi.h/qi.w;
+  y=ensure(y,qh+12); set(10,"bold",INK); T("Répartition du débit par verticale (débit unitaire, part du débit total)",Mg,y); y+=2; doc.addImage(qi.data,"JPEG",Mg,y,CW,qh,"hyQ","FAST"); y+=qh+6;
+  y=ensure(y,30); y=section("Détail des verticales",y);
+  const cols=[["N°",9,"l"],["Dist. (m)",18,"r"],["Prof. (m)",18,"r"],["Points : hauteur / fond (m) > vitesse (m/s)",73,"l"],["V moy. (m/s)",21,"r"],["q (L/s/m)",21,"r"],["Part",20,"r"]];
+  const head=yy=>{ doc.setFillColor(...ACC); doc.rect(Mg,yy-4,CW,6.5,"F"); set(7.3,"bold",[255,255,255]); let x=Mg; cols.forEach(c=>{ T(c[0],c[2]==="r"?x+c[1]-1.5:x+1.5,yy,{align:c[2]==="r"?"right":"left"}); x+=c[1] }); return yy+6 };
+  y=head(y);
+  M.V.forEach((v,i)=>{ const pts=v.pts.slice().reverse().map(p=>`${n2(p.h)} > ${n2(p.v)}`).join("   ");
+    const cells=[String(v.n),n2(v.x),n2(v.d),pts||"-",n2(v.vm),n2(M.seg[i].q*1000,qd),`${n2(M.seg[i].part*100,1)} %`];
+    if(y>PH-22){ doc.addPage(); header(); y=head(40) }
+    if(i%2){ doc.setFillColor(...SOFT); doc.rect(Mg,y-4,CW,6,"F") }
+    set(8,"normal",INK); let x=Mg; cells.forEach((c,k)=>{ const col=cols[k]; if(k===6&&M.seg[i].part>0.1) set(8,"bold",RED); T(c,col[2]==="r"?x+col[1]-1.5:x+1.5,y,{align:col[2]==="r"?"right":"left"}); set(8,"normal",INK); x+=col[1] }); y+=6 });
+  set(7.5,"normal",MUT); T(`Débit recalculé par la section médiane : ${n2(M.Q*1000,dd)} L/s  ·  section mouillée ${n2(M.A)} m²  ·  vitesse moyenne ${n2(M.A>0?M.Q/M.A:0)} m/s`,Mg,y+1); y+=7;
+  // ===== contrôle qualité
+  y=ensure(y,20+q.it.length*11); y=section("Contrôle qualité (repères ISO 748)",y);
+  const stc={ok:[23,100,58],info:[122,86,0],warn:[155,44,16]}, stb={ok:[221,241,228],info:[255,241,199],warn:[253,224,214]};
+  q.it.forEach(x=>{ y=ensure(y,12); doc.setFillColor(...stb[x.st]); doc.roundedRect(Mg,y-3.6,22,5.2,2.6,2.6,"F"); set(7,"bold",stc[x.st]); T(HY_STL[x.st].toUpperCase(),Mg+11,y,{align:"center"});
+    set(9,"bold",INK); T(`${x.t} : ${x.v}`,Mg+26,y); set(8,"normal",MUT); const l=doc.splitTextToSize(pdfTxt(x.n),CW-26); doc.text(l,Mg+26,y+4.2); y+=5+l.length*3.8+2.5 });
+  if(q.unc){ y=ensure(y,16); set(9.5,"bold",INK); T(`Incertitude élargie estimée sur le débit : +/- ${n2(q.unc.U,0)} % (environ 95 %)`,Mg,y+2); set(7.8,"normal",MUT);
+    const l=doc.splitTextToSize(pdfTxt(`Estimation indicative selon la méthode de l'ISO 748 (incertitudes types : nombre de verticales, nombre de points par verticale, durée de mesure par point supposée suffisante car non fournie par l'export, largeur, profondeur, étalonnage de l'appareil).`),CW); doc.text(l,Mg,y+7); y+=9+l.length*3.6 }
+  // ===== observations et photo
+  if(f.hyRpNotes){ set(9.5,"normal",INK); const l=doc.splitTextToSize(pdfTxt(f.hyRpNotes),CW); y=ensure(y,14+l.length*4.6); y=section("Observations",y+3); set(9.5,"normal",INK); doc.text(l,Mg,y); y+=l.length*4.6+3 }
+  if(HY.photo){ const pw=Math.min(CW,120), phh=pw*HY.photo.h/HY.photo.w, hh=Math.min(phh,110), ww=hh*HY.photo.w/HY.photo.h; y=ensure(y,hh+14); y=section("Photo du site",y+3); doc.addImage(HY.photo.data,"JPEG",Mg,y,ww,hh,"hyPhoto","FAST"); y+=hh+4 }
+  const tot=doc.getNumberOfPages(); for(let p=1;p<=tot;p++){ doc.setPage(p); footer(p,tot) }
+  return doc.output("blob");
+}

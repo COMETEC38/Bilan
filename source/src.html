@@ -760,6 +760,18 @@ body.onhydro{padding-bottom:0!important}
 .hy-scale{display:flex;align-items:center;gap:8px}
 .hy-scale i{display:block;width:220px;max-width:46vw;height:12px;border-radius:6px}
 .hy-warn{margin:0;font-size:13px;color:var(--ink-2);background:var(--surface-2);border-radius:10px;padding:8px 12px}
+.hy-head-act{display:flex;flex-wrap:wrap;gap:8px}
+.hy-head-act .btn svg{width:17px;height:17px}
+.hy-q{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.hy-q li{display:grid;grid-template-columns:96px minmax(0,1fr);gap:2px 12px;align-items:start;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
+.hy-q .st{grid-row:span 2;align-self:center;font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:4px 9px;border-radius:999px;white-space:nowrap;text-align:center;min-width:82px}
+.hy-q .st.ok{background:#DDF1E4;color:#17643A}
+.hy-q .st.info{background:#FFF1C7;color:#7A5600}
+.hy-q .st.warn{background:#FDE0D6;color:#9B2C10}
+.hy-q b{font-size:14px;color:var(--ink)}
+.hy-q span.n{font-size:13px;color:var(--ink-2)}
+.hy-unc{margin:0;font-size:13.5px;color:var(--ink-2)}
+.hy-unc b{color:var(--ink);font-size:15px}
 .hy-cols{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:18px}
 .hy-tw{overflow-x:auto}
 .hy-vt{width:100%;border-collapse:collapse;font-size:13.5px;font-variant-numeric:tabular-nums}
@@ -1598,7 +1610,7 @@ body.onctrl{padding-bottom:0!important}
   <div class="sim-body" id="hyView" hidden>
     <div class="hy-head">
       <div><div class="hy-eyebrow" id="hyEyebrow">Jaugeage en rivière</div><h2 id="hyProfil">Profil</h2><div class="hy-meta" id="hyMeta"></div></div>
-      <button class="btn" id="hyOpen2" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3m0 0-5 5m5-5 5 5M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>Ouvrir un autre jaugeage</button>
+      <div class="hy-head-act"><button class="btn primary" id="hyReportBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6M9 13h8M9 17h8"/></svg>Rapport PDF</button><button class="btn" id="hyOpen2" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3m0 0-5 5m5-5 5 5M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>Ouvrir un autre jaugeage</button></div>
     </div>
     <div class="hy-demo" id="hyDemoBar" hidden><b>Démonstration</b> · jaugeage fictif fourni par COMETEC pour découvrir COMETEC Hydro. <button class="link" id="hyQuitDemo" type="button">Ouvrir mon jaugeage</button></div>
     <div class="dz-err" id="hyErr2" role="alert" hidden></div>
@@ -1610,6 +1622,8 @@ body.onctrl{padding-bottom:0!important}
       <div class="hy-leg"><div class="hy-scale"><span>0</span><i id="hyGrad"></i><span id="hyVmax"></span></div><span id="hyExag"></span></div>
       <p class="hy-warn" id="hyWarn" hidden></p>
     </section>
+    <section class="hy-card" aria-labelledby="hyHQ"><div class="hy-card-h"><div><h3 id="hyHQ">Contrôle qualité</h3><p>Repères issus de la norme ISO 748 (mesure du débit par exploration du champ des vitesses).</p></div></div>
+      <ul class="hy-q" id="hyQ"></ul><p class="hy-unc" id="hyUnc"></p></section>
     <div class="hy-cols">
       <section class="hy-card" aria-labelledby="hyH2"><div class="hy-card-h"><div><h3 id="hyH2">Répartition du débit</h3><p>Débit par mètre de largeur à chaque verticale (profondeur × vitesse moyenne) et part du débit total.</p></div></div>
         <div class="hy-fig"><canvas id="hyCq" role="img" aria-label="Débit unitaire par verticale"></canvas></div></section>
@@ -1619,6 +1633,38 @@ body.onctrl{padding-bottom:0!important}
     <p class="hy-note">Les vitesses entre les points de mesure sont interpolées (le long de chaque verticale, puis d'une verticale à l'autre) ; près du fond et des rives, la vitesse décroît jusqu'à zéro. Le rouge correspond à la zone la plus rapide de ce profil. Le débit recalculé utilise la méthode de la section médiane (ISO 748) avec les vitesses moyennes fournies par l'appareil.</p>
   </div>
 </section>
+<div class="modal" id="hyReport" hidden role="dialog" aria-modal="true" aria-labelledby="hyRpT">
+  <form class="modal-box" id="hyRpForm">
+    <div class="rubrique"><h2 id="hyRpT">Rapport PDF du jaugeage</h2><button class="link" type="button" id="hyRpClose">Fermer</button></div>
+    <p class="help" id="hyRpHelp">Ces informations apparaissent sur le rapport. Toutes sont facultatives ; la société, l'opérateur, l'appareil et le logo restent mémorisés sur cet appareil.</p>
+    <div class="formgrid">
+      <label class="field">Titre du rapport<input id="hyRpTitle" value="Rapport de jaugeage"></label>
+      <label class="field">Point de mesure / station<input id="hyRpPoint" placeholder="ex. Pont de la D12, station amont"></label>
+      <label class="field">Cours d'eau<input id="hyRpRiver" placeholder="ex. Le Furon"></label>
+      <label class="field">Commune / lieu<input id="hyRpPlace"></label>
+      <label class="field">Maître d'ouvrage / client<input id="hyRpOwner"></label>
+      <label class="field">Établi par (société)<input id="hyRpCompany"></label>
+      <label class="field">Opérateur<input id="hyRpOperator"></label>
+      <label class="field">N° de série du FLUVIA<input id="hyRpSerial"></label>
+      <label class="field">Rive de départ (vue vers l'aval)<select id="hyRpRive"><option value="">Non précisée</option><option value="RG">Rive gauche</option><option value="RD">Rive droite</option></select></label>
+      <label class="field">Régime pendant la mesure<select id="hyRpRegime"><option value="">Non précisé</option><option>Stable</option><option>En montée</option><option>En baisse</option></select></label>
+      <label class="field">Cote à l'échelle au début (m)<input id="hyRpH0" inputmode="decimal" placeholder="ex. 0,42"></label>
+      <label class="field">Cote à l'échelle à la fin (m)<input id="hyRpH1" inputmode="decimal" placeholder="ex. 0,42"></label>
+    </div>
+    <label class="field">Observations<textarea id="hyRpNotes" rows="3" placeholder="Météo, état du lit (végétation, dépôts), conditions d'accès, remarques…"></textarea></label>
+    <div class="inline">
+      <input type="file" id="hyRpPhotoIn" accept="image/*" hidden>
+      <button class="btn small" type="button" id="hyRpPhotoBtn">Ajouter une photo du site (facultatif)</button>
+      <span class="help" id="hyRpPhotoName"></span><button class="link" type="button" id="hyRpPhotoDel" hidden>Retirer</button>
+    </div>
+    <div class="inline">
+      <input type="file" id="hyRpLogoIn" accept="image/png,image/jpeg" hidden>
+      <button class="btn small" type="button" id="hyRpLogoBtn">Ajouter votre logo (facultatif)</button>
+      <span class="help" id="hyRpLogoName"></span><button class="link" type="button" id="hyRpLogoDel" hidden>Retirer</button>
+    </div>
+    <div class="inline modal-actions"><span class="help">Les valeurs mesurées par l'appareil ne sont pas modifiées.</span><button class="btn primary" type="submit" id="hyRpGo">Générer le rapport PDF</button></div>
+  </form>
+</div>
 <dialog class="ct" id="contact" aria-labelledby="ctTitle">
   <div class="ct-in">
     <header class="ct-head"><div><h2 id="ctTitle">Vos contacts technico-commerciaux</h2><p>Le spécialiste COMETEC de votre secteur, un rendez-vous en visio, et le standard / SAV.</p></div>
