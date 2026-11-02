@@ -2259,7 +2259,7 @@ async function hyOpenFile(f){ $("hyErr").hidden=true; $("hyErr2").hidden=true;
 function hyLoadDemo(){ $("hyErr").hidden=true; $("hyErr2").hidden=true; const j=hyParse(hyRowsFromText(HY_DEMO)); j.name="Démonstration"; hyShow(j,true) }
 $("hyOpen").onclick=e=>{ e.stopPropagation(); $("hyInput").click() };
 $("hyOpen2").onclick=()=>$("hyInput").click();
-$("hyQuitDemo").onclick=()=>$("hyInput").click();
+$("hyQuitDemo").onclick=()=>{ hyReset(); window.scrollTo({top:0}) };
 $("hyDemo").onclick=e=>{ e.stopPropagation(); hyLoadDemo() };
 $("hyDrop").onclick=e=>{ if(!e.target.closest("button,a,.dz-err")) $("hyInput").click() };
 $("hyDrop").onkeydown=e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); $("hyInput").click() } };
@@ -2356,7 +2356,6 @@ function hyDrawQ(cv,cw,P,pdf){
 }
 function hyFill(){
   const H=HY.J.head, M=HY.M, dd=H.debit<100?1:0, qd=M.qmax*1000<100?1:0, dQ=H.debit>0?(M.Q*1000-H.debit)/H.debit*100:0;
-  $("hyEyebrow").textContent=`Courantomètre FLUVIA · jaugeage ${/rivi/i.test(H.type||"")?"en rivière":String(H.type||"").toLowerCase()}`;
   $("hyProfil").textContent=`Profil n° ${H.profil||"?"}`;
   $("hyMeta").innerHTML=`<b>${esc(H.date||"")}</b>${H.heure?` à <b>${esc(H.heure)}</b>`:""} · ${M.V.length} verticales · ${HY.demo?"jaugeage de démonstration":`fichier <b>${esc(HY.J.name)}</b>`}`;
   const K=[["main","Débit",`${hnf(H.debit,dd)}<small>${esc(H.uQ)}</small>`,`recalculé : ${hnf(M.Q*1000,dd)} L/s (${dQ>=0?"+":""}${hnf(dQ,1)} %)`],
