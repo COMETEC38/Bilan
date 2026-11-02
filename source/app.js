@@ -166,7 +166,8 @@ async function readFile(file){
   if(!/\.(xlsx|csv)$/i.test(file.name)) throw new NativeError(["seuls les fichiers Excel (.xlsx) et CSV (.csv) exportés par le BUL'R2 sont acceptés"]);
   const buf=await file.arrayBuffer();
   let sheets;
-  if(/\.xlsx$/i.test(file.name)){
+  const zip=(()=>{ const b=new Uint8Array(buf.slice(0,2)); return b[0]===0x50&&b[1]===0x4B })();
+  if(/\.xlsx$/i.test(file.name)||zip){
     const wb=new ExcelJS.Workbook(); await wb.xlsx.load(buf);
     const names=wb.worksheets.map(w=>w.name);
     if(wb.creator==="COMETEC Bilan"||(names.includes("Journal")&&names.includes("Bilan"))) throw new NativeError([ALREADY],true);
@@ -174,6 +175,7 @@ async function readFile(file){
   } else sheets=[{name:"",rows:parseCSVText(await readText(buf))}];
   let best=null;
   for(const sh of sheets){
+    if(isFluviaRows(sh.rows)) throw Object.assign(new Error("fluvia"),{fluvia:true});
     if(sh.rows.slice(0,40).some(r=>(r||[]).some(c=>/corrig[ée]|du fichier \(/i.test(txt(c))))) throw new NativeError([ALREADY],true);
     try{ const ds=parseNative(sh.rows,file.name); ds.sheet=sh.name; return ds }
     catch(e){ if(!(e instanceof NativeError)) throw e; if(!best||e.reasons.length<best.reasons.length) best=e }
@@ -1083,6 +1085,7 @@ async function openFile(f){
   $("emptyErr").hidden=true; $("fileErr").hidden=true;
   try{ const ds=await readFile(f); loadDataset(ds,false); toast(`${f.name} ouvert : ${ds.t.length} mesures`) }
   catch(err){ console.warn(err);
+    if(err&&err.fluvia){ showHydro(); hyOpenFile(f); toast("Jaugeage FLUVIA reconnu : ouvert dans COMETEC Hydro"); return }
     const html = err instanceof NativeError
       ? (err.already?`<b>« ${esc(f.name)} » n'est pas accepté.</b> ${esc(ALREADY)}`
         :`<b>« ${esc(f.name)} » n'est pas reconnu comme un enregistrement du BUL'R2.</b> Ouvrez le fichier Excel ou CSV exporté par l'appareil.<ul>${err.reasons.slice(0,3).map(r=>`<li>${esc(r.charAt(0).toUpperCase()+r.slice(1))}.</li>`).join("")}</ul>`)
@@ -1092,10 +1095,10 @@ async function openFile(f){
 $("btnOpen").onclick=()=>$("fileInput").click();
 $("fileInput").onchange=e=>{const f=e.target.files[0]; e.target.value=""; if(f) openFile(f)};
 let dragDepth=0;
-addEventListener("dragenter",e=>{ if(e.dataTransfer&&[...e.dataTransfer.types].includes("Files")){dragDepth++; if(emptyMode()) $("dropzone").classList.add("over"); else if(S.view!=="levels"&&S.view!=="law") $("drop").hidden=false} });
-addEventListener("dragleave",()=>{ dragDepth=Math.max(0,dragDepth-1); if(!dragDepth){ $("drop").hidden=true; $("dropzone").classList.remove("over") } });
+addEventListener("dragenter",e=>{ if(e.dataTransfer&&[...e.dataTransfer.types].includes("Files")){dragDepth++; if(document.body.classList.contains("onhydro")){ $("hyDrop").classList.add("over"); return } if(emptyMode()) $("dropzone").classList.add("over"); else if(S.view!=="levels"&&S.view!=="law") $("drop").hidden=false} });
+addEventListener("dragleave",()=>{ dragDepth=Math.max(0,dragDepth-1); if(!dragDepth){ $("drop").hidden=true; $("dropzone").classList.remove("over"); $("hyDrop").classList.remove("over") } });
 addEventListener("dragover",e=>e.preventDefault());
-addEventListener("drop",e=>{ e.preventDefault(); dragDepth=0; $("drop").hidden=true; $("dropzone").classList.remove("over"); const f=e.dataTransfer.files[0]; if(f) openFile(f) });
+addEventListener("drop",e=>{ e.preventDefault(); dragDepth=0; $("drop").hidden=true; $("dropzone").classList.remove("over"); $("hyDrop").classList.remove("over"); const f=e.dataTransfer.files[0]; if(!f) return; if(document.body.classList.contains("onhydro")) hyOpenFile(f); else openFile(f) });
 $("dropzone").onclick=e=>{ if(!e.target.closest("button,a,.dz-err")) $("fileInput").click() };
 $("btnOpen2").onclick=e=>{e.stopPropagation(); $("fileInput").click()};
 
@@ -1603,14 +1606,14 @@ document.body.dataset.mtab=document.body.dataset.mtab||"bilan";
 /* ---------- Accueil COMETEC : page d'ouverture avec logo animé ---------- */
 function hubOn(){ return document.body.classList.contains("onhub") }
 function showHub(anim){
-  const h=$("hub"), lg=$("hubLogo"); document.body.classList.remove("onsim","onprod","onctrl"); document.body.classList.add("onhub"); h.classList.remove("hub-anim"); window.scrollTo({top:0});
+  const h=$("hub"), lg=$("hubLogo"); document.body.classList.remove("onsim","onprod","onctrl","onhydro"); document.body.classList.add("onhub"); h.classList.remove("hub-anim"); window.scrollTo({top:0});
   if(anim&&!matchMedia("(prefers-reduced-motion: reduce)").matches){
     lg.style.setProperty("--hub-dy","0px"); const r=lg.getBoundingClientRect();
     lg.style.setProperty("--hub-dy",Math.max(0,innerHeight/2-(r.top+r.height/2))+"px"); void h.offsetWidth; h.classList.add("hub-anim") }
   document.body.classList.remove("hub-pre");
 }
 function simOn(){ return document.body.classList.contains("onsim") }
-function enterApp(push){ if(!hubOn()&&!simOn()&&!document.body.classList.contains("onprod")&&!document.body.classList.contains("onctrl")) return; document.body.classList.remove("onhub","onsim","onprod","onctrl","hub-pre"); $("hub").classList.remove("hub-anim"); if(push!==false) try{ history.pushState({app:1},"") }catch(e){} window.scrollTo({top:0}) }
+function enterApp(push){ if(!hubOn()&&!simOn()&&!document.body.classList.contains("onprod")&&!document.body.classList.contains("onctrl")&&!document.body.classList.contains("onhydro")) return; document.body.classList.remove("onhub","onsim","onprod","onctrl","onhydro","hub-pre"); $("hub").classList.remove("hub-anim"); if(push!==false) try{ history.pushState({app:1},"") }catch(e){} window.scrollTo({top:0}) }
 $("hubOpen").onclick=()=>enterApp();
 $("hubDemo").onclick=()=>{ enterApp(); startDemo() };
 document.querySelectorAll("header.top .logo, header.top .appicon").forEach(el=>{ el.classList.add("tohub"); el.title="Accueil COMETEC";
@@ -1621,7 +1624,8 @@ addEventListener("popstate",()=>{ const st=history.state;
   if(st&&st.prod){ showProd(st.prod===1?null:st.prod,false) }
   else if(st&&st.sim){ if(!simOn()) showSim(false) }
   else if(st&&st.ctrl){ if(!ctrlOn()) showCtrl(false) }
-  else if(st&&(st.app||st.mview)){ if(hubOn()||simOn()||prodOn()||ctrlOn()) enterApp(false) }
+  else if(st&&st.hydro){ if(!hydroOn()) showHydro(false) }
+  else if(st&&(st.app||st.mview)){ if(hubOn()||simOn()||prodOn()||ctrlOn()||hydroOn()) enterApp(false) }
   else if(!hubOn()) showHub(false) });
 { const ld=loadDataset; loadDataset=function(){ if(hubOn()) enterApp(); return ld.apply(this,arguments) } }
 
@@ -1702,7 +1706,7 @@ const PF={cat:null,sel:{},q:""};
 function prodOn(){ return document.body.classList.contains("onprod") }
 function curCat(){ return PROD_CATS.find(x=>x.id===PF.cat) }
 function showProd(cat,push){
-  document.body.classList.remove("onhub","onsim","onctrl"); $("hub").classList.remove("hub-anim"); document.body.classList.add("onprod");
+  document.body.classList.remove("onhub","onsim","onctrl","onhydro"); $("hub").classList.remove("hub-anim"); document.body.classList.add("onprod");
   if(push!==false) try{ history.pushState({prod:cat||1},"") }catch(e){}
   const changed=PF.cat!==(cat||null); PF.cat=cat||null; $("prodCats").hidden=!!cat; $("prodList").hidden=!cat;
   const c=curCat(); $("prodTitle").textContent=c?c.name:"Nos produits"; $("prodBackLab").textContent=c?"Nos produits":"Accueil";
@@ -1785,7 +1789,7 @@ function wetted(sh,D,H){ // D, H en mm → S (m²), P (m)
     const th=2*Math.acos((r-h)/r); return {S:r*r/2*(th-Math.sin(th)),P:r*th} }
   const L=D/1000, h=Math.max(0,H)/1000; return {S:L*h,P:L+2*h} }
 function strickler(w,Ks,I){ if(!(w.S>0)) return 0; return Ks*Math.pow(w.S/w.P,2/3)*Math.sqrt(I) } // V en m/s
-function showSim(push){ document.body.classList.remove("onhub","onprod","onctrl"); $("hub").classList.remove("hub-anim"); document.body.classList.add("onsim"); if(push!==false) try{ history.pushState({sim:1},"") }catch(e){} window.scrollTo({top:0}); simDraw() }
+function showSim(push){ document.body.classList.remove("onhub","onprod","onctrl","onhydro"); $("hub").classList.remove("hub-anim"); document.body.classList.add("onsim"); if(push!==false) try{ history.pushState({sim:1},"") }catch(e){} window.scrollTo({top:0}); simDraw() }
 $("hubSim").onclick=()=>showSim();
 $("simBack").onclick=()=>{ if(history.state&&history.state.sim) history.back(); else showHub(false) };
 function radio(sel,attr,val){ document.querySelectorAll(sel).forEach(b=>b.setAttribute("aria-checked",b.dataset[attr]===val)) }
@@ -1970,7 +1974,7 @@ function cvNewDraft(){ const p=cvPrefs.get(); const d={f:Object.assign({date:cvT
 let cvT=null;
 function cvSave(){ clearTimeout(cvT); cvT=setTimeout(()=>{ if(CV.d){ CV.d.t=Date.now(); CV.d.step=CV.step; cvDB.set("draft",CV.d) } },300) }
 function ctrlOn(){ return document.body.classList.contains("onctrl") }
-function showCtrl(push){ document.body.classList.remove("onhub","onprod","onsim"); $("hub").classList.remove("hub-anim"); document.body.classList.add("onctrl");
+function showCtrl(push){ document.body.classList.remove("onhub","onprod","onsim","onhydro"); $("hub").classList.remove("hub-anim"); document.body.classList.add("onctrl");
   if(push!==false) try{ history.pushState({ctrl:1},"") }catch(e){} window.scrollTo({top:0}); cvStartScreen() }
 async function cvStartScreen(){ $("cvWiz").hidden=true; $("cvStart").hidden=false; $("ctrlTitle").textContent="Constat RAVEN-EYE";
   const d=await cvDB.get("draft"); const has=d&&d.f&&(d.f.devis||d.f.societe||d.f.vt1);
@@ -1981,7 +1985,7 @@ function cvOpen(d,step){ CV.d=d; $("cvStart").hidden=true; $("cvWiz").hidden=fal
   document.querySelectorAll("#cvForm [data-k]").forEach(el=>{ const v=d.f[el.dataset.k]; el.value=v==null?(el.tagName==="SELECT"?el.options[0].value:""):v });
   ["site","cap1","cap2","cap3"].forEach(cvShowImg); $("cvSigMem").checked=!!cvPrefs.get().sig; cvSigDraw(); cvGo(step||1) }
 $("hubCtrl").onclick=()=>showCtrl();
-try{ if(history.state&&(history.state.ctrl||history.state.sim||history.state.prod)&&hubOn()) history.replaceState(null,"") }catch(e){}  // après un rechargement, l'appli repart de l'accueil
+try{ if(history.state&&(history.state.ctrl||history.state.sim||history.state.prod||history.state.hydro)&&hubOn()) history.replaceState(null,"") }catch(e){}  // après un rechargement, l'appli repart de l'accueil
 $("ctrlBack").onclick=()=>{ if(history.state&&history.state.ctrl) history.back(); else showHub(false) };
 $("cvNew").onclick=async()=>{ const d=await cvDB.get("draft"); if(d&&d.f&&(d.f.devis||d.f.societe||d.f.vt1)&&!d.example&&!confirmCv()) return; const n=cvNewDraft(); cvDB.set("draft",n); cvOpen(n,1) };
 function confirmCv(){ return window.confirm("Un constat est en cours sur cet appareil. Le remplacer par un nouveau constat vierge ?") }
@@ -2204,3 +2208,179 @@ $("contact").addEventListener("cancel",e=>{ e.preventDefault(); closeContact(fal
 $("contact").addEventListener("click",e=>{ if(e.target===$("contact")) closeContact(false) });
 $("ctExport").onclick=()=>{ ctShowCom("olivier",null); $("ctReg").textContent="Sud-Est & Export · clients hors de France" };
 addEventListener("popstate",()=>{ if($("contact").open&&!(history.state&&history.state.contact)) closeContact(true) });
+
+/* ---------- COMETEC Hydro : jaugeages du courantomètre FLUVIA (CSV ou Excel) ---------- */
+const HY_DEMO=%%HYDEMO%%;
+const HY={J:null,M:null,hover:null,show:{V:true,P:true,I:true},demo:false,geo:null};
+function hydroOn(){ return document.body.classList.contains("onhydro") }
+function showHydro(push){ document.body.classList.remove("onhub","onprod","onsim","onctrl"); $("hub").classList.remove("hub-anim"); document.body.classList.add("onhydro");
+  if(push!==false) try{ history.pushState({hydro:1},"") }catch(e){} window.scrollTo({top:0}); if(HY.M) requestAnimationFrame(hyRender) }
+$("hubHydro").onclick=()=>showHydro();
+$("hubHydroDemo").onclick=()=>{ showHydro(); hyLoadDemo() };
+$("hydroBack").onclick=()=>{ if(history.state&&history.state.hydro) history.back(); else showHub(false) };
+/* lecture : une ligne Excel peut contenir toute la ligne CSV dans une seule cellule */
+function hyRowsFromText(t){ return t.replace(/^﻿/,"").split(/\r?\n/).map(l=>l.split(l.includes(";")?";":",")) }
+function hyNormRows(rows){ return rows.map(r=>{ const c=(r||[]).map(v=>v==null?"":(typeof v==="object"&&v.richText?v.richText.map(x=>x.text).join(""):(typeof v==="object"&&"result" in v?String(v.result):String(v))));
+  const f=c.filter(v=>v.trim()!==""); return (f.length===1&&/[,;]/.test(f[0]))?f[0].split(f[0].includes(";")?";":","):c }).map(r=>r.map(x=>String(x).trim())) }
+const hyNum=s=>parseFloat(String(s).trim().replace(",","."));
+/* un jaugeage FLUVIA : une ligne « Verticale Numero … Distance … Profondeur … Vitesse », précédée de la ligne du profil (largeur, débit) */
+function hyFind(rows){ const i=rows.findIndex(r=>/^verticale/i.test(r[0]||"")&&r.some(c=>/distance/i.test(c))&&r.some(c=>/vitesse/i.test(c)));
+  if(i<1) return -1; const v=rows[i-1]; return (v.length>=6&&isFinite(hyNum(v[4]))&&isFinite(hyNum(v[5])))?i:-1 }
+function isFluviaRows(rows){ try{ return hyFind(hyNormRows(rows))>=0 }catch(e){ return false } }
+function hyParse(raw){
+  const rows=hyNormRows(raw).filter(r=>r.some(c=>c!==""));
+  const iv=hyFind(rows); if(iv<0) throw new Error("nofluvia");
+  const vals=rows[iv-1], names=iv>=2&&/profil/i.test(rows[iv-2][0])?rows[iv-2].map(k=>k.toLowerCase()):null;
+  const get=(key,pos)=>{ if(names){ const k=names.findIndex(n=>n.startsWith(key)); if(k>=0) return vals[k] } return vals[pos] };
+  const head={profil:get("profil",0),type:get("type",1),date:get("date",2),heure:get("heure",3),largeur:hyNum(get("largeur",4)),debit:hyNum(get("debit",5)),uQ:get("unites debit",8)||"L/s"};
+  const V=[]; let cur=null;
+  for(const r of rows.slice(iv+1)){
+    if(r[0]!==""){ if(!isFinite(hyNum(r[0]))||!isFinite(hyNum(r[1]))) continue; cur={n:+hyNum(r[0]),x:hyNum(r[1]),d:hyNum(r[2]),vm:hyNum(r[3]),pts:[]}; V.push(cur) }
+    if(cur&&r.length>5&&r[4]!==""&&r[5]!==""&&isFinite(hyNum(r[4]))&&isFinite(hyNum(r[5]))) cur.pts.push({h:hyNum(r[4]),v:hyNum(r[5])});
+  }
+  const ok=V.filter(v=>isFinite(v.x)&&v.d>0&&isFinite(v.vm));
+  if(ok.length<2||!(head.largeur>0)) throw new Error("noverticals");
+  ok.forEach(v=>v.pts.sort((a,b)=>a.h-b.h)); ok.sort((a,b)=>a.x-b.x);
+  return {head,V:ok};
+}
+async function hyReadFile(f){ const buf=await f.arrayBuffer(), b=new Uint8Array(buf);
+  if(b[0]===0x50&&b[1]===0x4B){ const sh=await sheetRows(buf); for(const s of sh){ if(isFluviaRows(s.rows)) return hyParse(s.rows) } throw new Error("nofluvia") }
+  return hyParse(hyRowsFromText(await readText(buf))) }
+function hyError(html){ const e=HY.M?$("hyErr2"):$("hyErr"); e.innerHTML=html; e.hidden=false }
+async function hyOpenFile(f){ $("hyErr").hidden=true; $("hyErr2").hidden=true;
+  try{ const j=await hyReadFile(f); j.name=f.name; hyShow(j,false); toast(`${f.name} ouvert : ${j.V.length} verticales`) }
+  catch(e){ console.warn(e);
+    if(e.message==="nofluvia"){ let bul=false; try{ await readFile(f); bul=true }catch(_){}
+      hyError(`<b>« ${esc(f.name)} » n'est pas reconnu comme un jaugeage FLUVIA.</b> ${bul?"C'est un enregistrement du BUL'R2 : ouvrez-le dans COMETEC Bilan.":"Ouvrez le fichier CSV ou Excel exporté par le courantomètre (lignes « Verticale Numero », distance de la rive, profondeur, vitesse)."}`) }
+    else if(e.message==="noverticals") hyError(`<b>« ${esc(f.name)} » ne contient pas assez de verticales lisibles.</b> Vérifiez que le jaugeage est complet.`);
+    else hyError(`<b>« ${esc(f.name)} » n'a pas pu être lu.</b> ${esc(e.message||"")}`) } }
+function hyLoadDemo(){ $("hyErr").hidden=true; $("hyErr2").hidden=true; const j=hyParse(hyRowsFromText(HY_DEMO)); j.name="Démonstration"; hyShow(j,true) }
+$("hyOpen").onclick=e=>{ e.stopPropagation(); $("hyInput").click() };
+$("hyOpen2").onclick=()=>$("hyInput").click();
+$("hyQuitDemo").onclick=()=>$("hyInput").click();
+$("hyDemo").onclick=e=>{ e.stopPropagation(); hyLoadDemo() };
+$("hyDrop").onclick=e=>{ if(!e.target.closest("button,a,.dz-err")) $("hyInput").click() };
+$("hyDrop").onkeydown=e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); $("hyInput").click() } };
+$("hyInput").onchange=e=>{ const f=e.target.files[0]; e.target.value=""; if(f) hyOpenFile(f) };
+/* modèle : fond interpolé (monotone), vitesses par hauteur relative entre verticales, débit par la section médiane */
+function hyBuild(j){
+  const W=j.head.largeur, V=j.V, X=[0,...V.map(v=>v.x),W], D=[0,...V.map(v=>v.d),0], n=X.length, dl=[], m=new Array(n).fill(0);
+  for(let i=0;i<n-1;i++) dl.push((D[i+1]-D[i])/((X[i+1]-X[i])||1e-6));
+  m[0]=dl[0]; m[n-1]=dl[n-2]; for(let i=1;i<n-1;i++) m[i]=(dl[i-1]*dl[i]<=0)?0:(dl[i-1]+dl[i])/2;
+  for(let i=0;i<n-1;i++){ if(dl[i]===0){m[i]=m[i+1]=0;continue} const a=m[i]/dl[i],b=m[i+1]/dl[i],s=a*a+b*b; if(s>9){const t=3/Math.sqrt(s);m[i]=t*a*dl[i];m[i+1]=t*b*dl[i]} }
+  const bed=x=>{ if(x<=0||x>=W) return 0; let i=0; while(i<n-2&&x>X[i+1]) i++; const h=(X[i+1]-X[i])||1e-6, t=(x-X[i])/h, t2=t*t,t3=t2*t;
+    return Math.max(0,(2*t3-3*t2+1)*D[i]+(t3-2*t2+t)*h*m[i]+(-2*t3+3*t2)*D[i+1]+(t3-t2)*h*m[i+1]) };
+  const prof=V.map(v=>{ const P=v.pts.map(p=>({s:Math.min(1,p.h/v.d),v:p.v})); return s=>{
+    if(!P.length) return v.vm; if(s<=P[0].s) return P[0].v*Math.pow(Math.max(s,0)/(P[0].s||1),1/6);
+    for(let k=0;k<P.length-1;k++) if(s<=P[k+1].s){ const t=(s-P[k].s)/((P[k+1].s-P[k].s)||1e-6); return P[k].v+t*(P[k+1].v-P[k].v) }
+    return P[P.length-1].v } });
+  const L=V.length-1;
+  const vel=(x,s)=>{ if(x<=V[0].x) return (V[0].x>0?x/V[0].x:1)*prof[0](s); if(x>=V[L].x) return (W>V[L].x?(W-x)/(W-V[L].x):1)*prof[L](s);
+    let i=0; while(x>V[i+1].x) i++; const t=(x-V[i].x)/((V[i+1].x-V[i].x)||1e-6); return Math.max(0,(1-t)*prof[i](s)+t*prof[i+1](s)) };
+  let Q=0; const seg=V.map((v,i)=>{ const a=(v.x+(i?V[i-1].x:0))/2, b=(v.x+(i<L?V[i+1].x:W))/2, q=v.d*v.vm; Q+=q*(b-a); return {a,b,q} });
+  seg.forEach(s=>s.part=Q>0?s.q*(s.b-s.a)/Q:0);
+  let A=0; for(let k=0;k<400;k++){ const x0=W*k/400,x1=W*(k+1)/400; A+=(bed(x0)+bed(x1))/2*(x1-x0) }
+  const vmaxPts=Math.max(0.01,...V.flatMap(v=>v.pts.map(p=>p.v)),...V.map(v=>v.vm));
+  const vStep=vmaxPts<0.2?0.01:0.05, vScale=Math.max(vStep,Math.ceil(vmaxPts/vStep-1e-9)*vStep), iso=[0.01,0.02,0.05,0.1,0.2,0.25,0.5].find(t=>vScale/t<=8)||1;
+  return {W,V,bed,vel,Q,A,seg,iso,vScale,vmaxPts,Dmax:Math.max(...V.map(v=>v.d)),vmax:Math.max(...V.map(v=>v.vm)),qmax:Math.max(...seg.map(s=>s.q))};
+}
+/* couleurs : bleu (lent) → rouge COMETEC (zone la plus rapide de ce profil) */
+const HY_ST=[[0,"#1B3F8B"],[.18,"#2470C7"],[.36,"#2FA7D6"],[.52,"#45C2A6"],[.66,"#B5D65A"],[.78,"#F5CF3E"],[.89,"#F2872F"],[1,"#E3000B"]].map(([t,h])=>[t,parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)]);
+function hyCol(t){ t=Math.max(0,Math.min(1,t)); let i=0; while(i<HY_ST.length-2&&t>HY_ST[i+1][0]) i++; const a=HY_ST[i],b=HY_ST[i+1],u=(t-a[0])/(b[0]-a[0]); return [a[1]+u*(b[1]-a[1]),a[2]+u*(b[2]-a[2]),a[3]+u*(b[3]-a[3])] }
+const hyCss=t=>`rgb(${hyCol(t).map(Math.round).join(",")})`;
+$("hyGrad").style.background=`linear-gradient(90deg,${HY_ST.map(s=>`rgb(${s[1]},${s[2]},${s[3]}) ${s[0]*100}%`).join(",")})`;
+const hyTok=k=>getComputedStyle(document.documentElement).getPropertyValue(k).trim();
+const hnf=(v,d=2)=>Number(v).toLocaleString("fr-FR",{minimumFractionDigits:d,maximumFractionDigits:d});
+function hyDrawSection(){
+  const M=HY.M, cv=$("hyCv"), cw=cv.parentElement.clientWidth; if(!cw) return; const dpr=Math.min(window.devicePixelRatio||1,2);
+  const ml=cw<520?34:52, mr=cw<520?28:38, mt=46, mb=34, pw=cw-ml-mr, sx=pw/M.W;
+  const target=Math.max(150,Math.min(pw*0.36,380)), exRaw=target/(M.Dmax*sx), ex=[1,2,3,4,5,6,8,10,12,15,20,30,40,50].reduce((a,b)=>Math.abs(b-exRaw)<Math.abs(a-exRaw)?b:a);
+  const ph=M.Dmax*sx*ex, gpad=Math.max(22,ph*0.12), ch=mt+ph+gpad+mb;
+  cv.width=Math.round(cw*dpr); cv.height=Math.round(ch*dpr); cv.style.height=ch+"px";
+  const g=cv.getContext("2d"); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,cw,ch);
+  const X=x=>ml+x*sx, Y=d=>mt+d*sx*ex; HY.geo={ml,mt,sx,ex,ph,ch};
+  const ink2=hyTok("--ink-2"), muted=hyTok("--muted"), line=hyTok("--line");
+  g.fillStyle=hyTok("--hy-air"); g.fillRect(ml,mt-26,pw,26);
+  g.beginPath(); g.moveTo(X(0),Y(0)); for(let k=0;k<=300;k++){const x=M.W*k/300; g.lineTo(X(x),Y(M.bed(x)))} g.lineTo(X(M.W),Y(0)); g.lineTo(X(M.W),mt+ph+gpad); g.lineTo(X(0),mt+ph+gpad); g.closePath(); g.fillStyle=hyTok("--hy-ground"); g.fill();
+  g.save(); g.clip(); g.strokeStyle=hyTok("--hy-ground2"); g.lineWidth=1; for(let x=-ph;x<pw+ph;x+=9){ g.beginPath(); g.moveTo(ml+x,mt+ph+gpad); g.lineTo(ml+x+gpad+ph,mt-6); g.stroke() } g.restore();
+  const w=Math.ceil(pw*dpr), h=Math.ceil(ph*dpr)+1, img=g.createImageData(w,h), px=img.data;
+  for(let i=0;i<w;i++){ const xm=(i/dpr)/sx, B=M.bed(xm); if(B<=0) continue;
+    for(let j=0;j<h;j++){ const dm=(j/dpr)/(sx*ex); if(dm>B) break; const c=hyCol(M.vel(xm,1-dm/B)/M.vScale), o=(j*w+i)*4; px[o]=c[0];px[o+1]=c[1];px[o+2]=c[2];px[o+3]=255 } }
+  const tmp=document.createElement("canvas"); tmp.width=w; tmp.height=h; tmp.getContext("2d").putImageData(img,0,0);
+  g.save(); g.setTransform(1,0,0,1,0,0); g.drawImage(tmp,Math.floor(ml*dpr),Math.floor(mt*dpr)); g.restore();
+  if(HY.show.I){ const st=3, nx=Math.ceil(pw/st)+1, ny=Math.ceil(ph/st)+1, F=[];
+    for(let i=0;i<nx;i++){ const xm=Math.min(M.W,(i*st)/sx), B=M.bed(xm); F.push([]); for(let j=0;j<ny;j++){ const dm=(j*st)/(sx*ex); F[i].push(B>0&&dm<=B?M.vel(xm,1-dm/B):NaN) } }
+    g.lineWidth=1; g.strokeStyle="rgba(255,255,255,.55)";
+    for(let k=1;k*M.iso<M.vScale-M.iso*0.2;k++){ const Lv=k*M.iso; g.beginPath();
+      for(let i=0;i<nx-1;i++) for(let j=0;j<ny-1;j++){ const a=F[i][j],b=F[i+1][j],c=F[i+1][j+1],d=F[i][j+1]; if(isNaN(a)||isNaN(b)||isNaN(c)||isNaN(d)) continue;
+        const p=[], ed=(v1,v2,x1,y1,x2,y2)=>{ if((v1<Lv)!==(v2<Lv)){ const t=(Lv-v1)/(v2-v1); p.push([ml+(x1+t*(x2-x1))*st,mt+(y1+t*(y2-y1))*st]) } };
+        ed(a,b,i,j,i+1,j); ed(b,c,i+1,j,i+1,j+1); ed(d,c,i,j+1,i+1,j+1); ed(a,d,i,j,i,j+1);
+        if(p.length>=2){ g.moveTo(p[0][0],p[0][1]); g.lineTo(p[1][0],p[1][1]) } if(p.length===4){ g.moveTo(p[2][0],p[2][1]); g.lineTo(p[3][0],p[3][1]) } }
+      g.stroke() } }
+  g.beginPath(); for(let k=0;k<=300;k++){const x=M.W*k/300; k?g.lineTo(X(x),Y(M.bed(x))):g.moveTo(X(x),Y(M.bed(x)))} g.strokeStyle=hyTok("--hy-bed"); g.lineWidth=2.2; g.stroke();
+  g.beginPath(); g.moveTo(X(0)-6,Y(0)); g.lineTo(X(M.W)+6,Y(0)); g.strokeStyle=hyTok("--brand"); g.lineWidth=2; g.stroke();
+  const tx=X(M.W)+(cw<520?16:24); g.beginPath(); g.moveTo(tx-6,Y(0)-11); g.lineTo(tx+6,Y(0)-11); g.lineTo(tx,Y(0)-2); g.closePath(); g.fillStyle=hyTok("--brand"); g.fill(); g.beginPath(); g.moveTo(tx-9,Y(0)-14); g.lineTo(tx+9,Y(0)-14); g.lineWidth=1.5; g.stroke();
+  M.V.forEach((v,i)=>{ const on=HY.hover===i, xx=X(v.x);
+    if(HY.show.V||on){ g.save(); g.setLineDash([4,4]); g.strokeStyle=on?"#FFFFFF":"rgba(255,255,255,.75)"; g.lineWidth=on?2:1.2; g.beginPath(); g.moveTo(xx,Y(0)); g.lineTo(xx,Y(v.d)); g.stroke(); g.restore() }
+    if(HY.show.P||on) v.pts.forEach(p=>{ g.beginPath(); g.arc(xx,Y(Math.max(0,v.d-p.h)),on?5.5:4.2,0,7); g.fillStyle=hyCss(p.v/M.vScale); g.fill(); g.lineWidth=1.6; g.strokeStyle="#FFFFFF"; g.stroke() });
+    const r=cw<520?8:10; g.beginPath(); g.arc(xx,mt-15,r,0,7); g.fillStyle=on?hyTok("--rule"):hyTok("--surface"); g.fill(); g.lineWidth=1.2; g.strokeStyle=on?hyTok("--rule"):line; g.stroke();
+    g.fillStyle=on?"#FFFFFF":ink2; g.font=`700 ${cw<520?9:11}px Arial, sans-serif`; g.textAlign="center"; g.textBaseline="middle"; g.fillText(v.n,xx,mt-14.5) });
+  g.fillStyle=muted; g.strokeStyle=line; g.font="12px Arial, sans-serif"; g.textBaseline="top"; g.textAlign="center"; g.lineWidth=1;
+  const step=M.W>12?2:M.W>6?1:0.5; for(let x=0;x<=M.W+1e-9;x+=step){ g.beginPath(); g.moveTo(X(x),mt+ph+gpad); g.lineTo(X(x),mt+ph+gpad+5); g.stroke(); g.fillText(hnf(x,x%1?1:0),X(x),mt+ph+gpad+8) }
+  g.textAlign="right"; g.fillText(`${hnf(M.W)} m`,X(M.W),mt+ph+gpad+20); g.textAlign="left"; g.fillText("distance à la rive (m)",X(0),mt+ph+gpad+20);
+  g.textAlign="right"; g.textBaseline="middle"; const dstep=M.Dmax>1.6?0.5:M.Dmax>0.8?0.2:0.1;
+  for(let d=0;d<=M.Dmax+1e-9;d+=dstep){ g.beginPath(); g.moveTo(ml-5,Y(d)); g.lineTo(ml,Y(d)); g.stroke(); g.fillText(hnf(d,1),ml-8,Y(d)) }
+  if(cw>=520){ g.save(); g.translate(12,mt+ph/2); g.rotate(-Math.PI/2); g.textAlign="center"; g.fillText("profondeur (m)",0,0); g.restore() }
+  const isoT=`isovitesses tous les ${hnf(M.iso,M.iso<0.1?2:1)} m/s`; $("hyExag").textContent=ex>1?`Échelle verticale exagérée × ${ex} · ${isoT}`:isoT.charAt(0).toUpperCase()+isoT.slice(1);
+  $("hyVmax").textContent=`${hnf(M.vScale,2)} m/s`;
+}
+function hyDrawQ(){
+  const M=HY.M, cv=$("hyCq"), cw=cv.parentElement.clientWidth; if(!cw) return; const dpr=Math.min(window.devicePixelRatio||1,2);
+  const ml=44, mr=8, mt=22, mb=32, ch=230, pw=cw-ml-mr, ph=ch-mt-mb;
+  cv.width=Math.round(cw*dpr); cv.height=Math.round(ch*dpr); cv.style.height=ch+"px";
+  const g=cv.getContext("2d"); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,cw,ch);
+  const qm=M.qmax*1000, qst=[1,2,5,10,20,25,50,100,200,500,1000].find(t=>qm/t<=5)||2000, top=Math.max(qst,Math.ceil(qm/qst)*qst), X=x=>ml+x/M.W*pw, Y=q=>mt+ph-(q*1000)/top*ph;
+  g.font="11px Arial, sans-serif"; g.fillStyle=hyTok("--muted"); g.strokeStyle=hyTok("--line"); g.textAlign="right"; g.textBaseline="middle"; g.lineWidth=1;
+  for(let q=0;q<=top+1e-9;q+=qst){ g.beginPath(); g.moveTo(ml,Y(q/1000)); g.lineTo(ml+pw,Y(q/1000)); g.stroke(); g.fillText(q,ml-6,Y(q/1000)) }
+  g.save(); g.translate(10,mt+ph/2); g.rotate(-Math.PI/2); g.textAlign="center"; g.fillText("L/s/m",0,0); g.restore();
+  M.seg.forEach((s,i)=>{ const x1=X(s.a)+1, x2=X(s.b)-1; g.fillStyle=hyCss(M.V[i].vm/M.vScale); g.globalAlpha=HY.hover===null||HY.hover===i?1:.45; g.fillRect(x1,Y(s.q),Math.max(1,x2-x1),Y(0)-Y(s.q)); g.globalAlpha=1;
+    if(x2-x1>22){ g.fillStyle=hyTok("--ink-2"); g.textAlign="center"; g.textBaseline="bottom"; g.font="600 10.5px Arial, sans-serif"; g.fillText(Math.round(s.part*100)+" %",(x1+x2)/2,Y(s.q)-3) } });
+  g.fillStyle=hyTok("--muted"); g.textAlign="center"; g.textBaseline="top"; g.font="11px Arial, sans-serif";
+  const step=M.W>12?2:M.W>6?1:0.5; for(let x=0;x<=M.W+1e-9;x+=step) g.fillText(hnf(x,x%1?1:0),X(x),mt+ph+6);
+  g.textAlign="right"; g.fillText("m",ml+pw,mt+ph+18);
+}
+function hyFill(){
+  const H=HY.J.head, M=HY.M, dd=H.debit<100?1:0, qd=M.qmax*1000<100?1:0, dQ=H.debit>0?(M.Q*1000-H.debit)/H.debit*100:0;
+  $("hyEyebrow").textContent=`Courantomètre FLUVIA · jaugeage ${/rivi/i.test(H.type||"")?"en rivière":String(H.type||"").toLowerCase()}`;
+  $("hyProfil").textContent=`Profil n° ${H.profil||"?"}`;
+  $("hyMeta").innerHTML=`<b>${esc(H.date||"")}</b>${H.heure?` à <b>${esc(H.heure)}</b>`:""} · ${M.V.length} verticales · ${HY.demo?"jaugeage de démonstration":`fichier <b>${esc(HY.J.name)}</b>`}`;
+  const K=[["main","Débit",`${hnf(H.debit,dd)}<small>${esc(H.uQ)}</small>`,`recalculé : ${hnf(M.Q*1000,dd)} L/s (${dQ>=0?"+":""}${hnf(dQ,1)} %)`],
+    ["","Largeur",`${hnf(M.W)}<small>m</small>`,`section mouillée ${hnf(M.A,2)} m²`],
+    ["","Profondeur max",`${hnf(M.Dmax)}<small>m</small>`,`moyenne ${hnf(M.A/M.W,2)} m`],
+    ["","Vitesse moyenne",`${hnf(M.A>0?M.Q/M.A:0)}<small>m/s</small>`,"débit / section"],
+    ["","Vitesse max",`${hnf(M.vmax)}<small>m/s</small>`,`ponctuelle ${hnf(M.vmaxPts)} m/s`],
+    ["","Débit unitaire max",`${hnf(M.qmax*1000,qd)}<small>L/s/m</small>`,`verticale ${M.V[M.seg.findIndex(s=>s.q===M.qmax)].n}`]];
+  $("hyKpis").innerHTML=K.map(k=>`<div class="hy-kpi ${k[0]}"><span>${k[1]}</span><b>${k[2]}</b><em>${k[3]}</em></div>`).join("");
+  const np=[...new Set(M.V.map(v=>v.pts.length))].sort((a,b)=>a-b);
+  $("hyMethod").textContent=`${np.length===1?np[0]:np.join(" à ")} point${np[np.length-1]>1?"s":""} de vitesse par verticale, placés par l'appareil selon la profondeur.`;
+  $("hyVt").innerHTML=`<thead><tr><th>N°</th><th>Distance</th><th>Prof.</th><th>V moy.</th><th>q</th><th>Part</th></tr></thead><tbody>`+
+    M.V.map((v,i)=>`<tr data-i="${i}"><td><span class="hy-dot" style="background:${hyCss(v.vm/M.vScale)}"></span>${v.n}</td><td>${hnf(v.x)} m</td><td>${hnf(v.d)} m</td><td>${hnf(v.vm)} m/s</td><td>${hnf(M.seg[i].q*1000,qd)} L/s/m</td><td>${hnf(M.seg[i].part*100,1)} %</td></tr>`).join("")+`</tbody>`;
+  const w=$("hyWarn"); if(M.vmax<0.1){ w.textContent="Vitesses très faibles : l'export arrondit les vitesses au centième de m/s, ce qui peut expliquer quelques pour cent d'écart entre le débit affiché par l'appareil et le débit recalculé."; w.hidden=false } else w.hidden=true;
+  $("hyDemoBar").hidden=!HY.demo;
+}
+function hyRender(){ if(!HY.M||!hydroOn()) return; hyDrawSection(); hyDrawQ(); document.querySelectorAll("#hyVt tbody tr").forEach(tr=>tr.classList.toggle("on",+tr.dataset.i===HY.hover)) }
+function hyShow(j,demo){ HY.J=j; HY.M=hyBuild(j); HY.demo=demo; HY.hover=null; $("hyTip").hidden=true; $("hyEmpty").hidden=true; $("hyView").hidden=false; hyFill(); window.scrollTo({top:0}); requestAnimationFrame(hyRender) }
+function hyPick(ev){ const r=$("hyCv").getBoundingClientRect(), x=ev.clientX-r.left, y=ev.clientY-r.top, G=HY.geo, M=HY.M; if(!G) return;
+  const xm=(x-G.ml)/G.sx; if(xm<-0.05||xm>M.W+0.05||y<G.mt-30||y>G.mt+G.ph+10){ HY.hover=null; $("hyTip").hidden=true; hyRender(); return }
+  let best=0; M.V.forEach((v,i)=>{ if(Math.abs(v.x-xm)<Math.abs(M.V[best].x-xm)) best=i }); HY.hover=best; hyRender();
+  const v=M.V[best], B=M.bed(Math.max(0,Math.min(M.W,xm))), dm=(y-G.mt)/(G.sx*G.ex), qd=M.qmax*1000<100?1:0;
+  const here=(dm>=0&&dm<=B)?`<div class="here">Ici : ≈ <b style="color:var(--ink);font-size:13px">${hnf(M.vel(xm,1-dm/B))} m/s</b> à ${hnf(dm)} m sous la surface</div>`:"";
+  const tip=$("hyTip"); tip.innerHTML=`<b>Verticale ${v.n}</b> · ${hnf(v.x)} m de la rive<table><tr><td>Profondeur</td><td>${hnf(v.d)} m</td></tr><tr><td>Vitesse moyenne</td><td>${hnf(v.vm)} m/s</td></tr>${v.pts.slice().reverse().map(p=>`<tr><td>à ${hnf(p.h)} m du fond</td><td>${hnf(p.v)} m/s</td></tr>`).join("")}<tr><td>Débit unitaire</td><td>${hnf(M.seg[best].q*1000,qd)} L/s/m</td></tr><tr><td>Part du débit</td><td>${hnf(M.seg[best].part*100,1)} %</td></tr></table>${here}`;
+  tip.hidden=false; const fw=$("hyFig").clientWidth, tw=tip.offsetWidth; let left=x+16; if(left+tw>fw) left=x-tw-16; tip.style.left=Math.max(0,left)+"px"; tip.style.top=Math.max(0,Math.min(y-20,G.ch-tip.offsetHeight))+"px" }
+$("hyCv").addEventListener("pointermove",hyPick); $("hyCv").addEventListener("pointerdown",hyPick);
+$("hyCv").addEventListener("pointerleave",e=>{ if(e.pointerType==="mouse"){ HY.hover=null; $("hyTip").hidden=true; hyRender() } });
+$("hyVt").addEventListener("pointerover",e=>{ const tr=e.target.closest("tr[data-i]"); if(tr){ HY.hover=+tr.dataset.i; $("hyTip").hidden=true; hyRender() } });
+[["hyTgV","V"],["hyTgP","P"],["hyTgI","I"]].forEach(([id,k])=>$(id).onclick=()=>{ HY.show[k]=!HY.show[k]; $(id).setAttribute("aria-pressed",HY.show[k]); hyRender() });
+{ let t=null; addEventListener("resize",()=>{ clearTimeout(t); t=setTimeout(hyRender,120) }) }
+try{ matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>hyRender()) }catch(e){}
+new MutationObserver(()=>hyRender()).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
