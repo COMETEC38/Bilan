@@ -1614,7 +1614,8 @@ function showHub(anim){
 }
 function simOn(){ return document.body.classList.contains("onsim") }
 function enterApp(push){ if(!hubOn()&&!simOn()&&!document.body.classList.contains("onprod")&&!document.body.classList.contains("onctrl")&&!document.body.classList.contains("onhydro")) return; document.body.classList.remove("onhub","onsim","onprod","onctrl","onhydro","hub-pre"); $("hub").classList.remove("hub-anim"); if(push!==false) try{ history.pushState({app:1},"") }catch(e){} window.scrollTo({top:0}) }
-$("hubOpen").onclick=()=>enterApp();
+$("hubOpen").onclick=()=>{ enterApp(); if(S.isExample) quitDemo() };  /* on repart de l'ouverture d'un fichier, pas de la démo */
+$("bilanHome").onclick=()=>{ if(history.state&&history.state.app) history.back(); else showHub(false) };
 $("hubDemo").onclick=()=>{ enterApp(); startDemo() };
 document.querySelectorAll("header.top .logo, header.top .appicon").forEach(el=>{ el.classList.add("tohub"); el.title="Accueil COMETEC";
   el.addEventListener("click",()=>{ if(history.state&&history.state.app) history.back(); else showHub(false) }) });
@@ -2215,7 +2216,8 @@ const HY={J:null,M:null,hover:null,show:{V:true,P:true,I:true},demo:false,geo:nu
 function hydroOn(){ return document.body.classList.contains("onhydro") }
 function showHydro(push){ document.body.classList.remove("onhub","onprod","onsim","onctrl"); $("hub").classList.remove("hub-anim"); document.body.classList.add("onhydro");
   if(push!==false) try{ history.pushState({hydro:1},"") }catch(e){} window.scrollTo({top:0}); if(HY.M) requestAnimationFrame(hyRender) }
-$("hubHydro").onclick=()=>showHydro();
+function hyReset(){ HY.J=null; HY.M=null; HY.demo=false; HY.hover=null; $("hyTip").hidden=true; $("hyErr").hidden=true; $("hyErr2").hidden=true; $("hyView").hidden=true; $("hyEmpty").hidden=false }
+$("hubHydro").onclick=()=>{ if(HY.demo) hyReset(); showHydro() };
 $("hubHydroDemo").onclick=()=>{ showHydro(); hyLoadDemo() };
 $("hydroBack").onclick=()=>{ if(history.state&&history.state.hydro) history.back(); else showHub(false) };
 /* lecture : une ligne Excel peut contenir toute la ligne CSV dans une seule cellule */
