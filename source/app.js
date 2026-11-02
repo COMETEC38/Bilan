@@ -175,7 +175,7 @@ async function readFile(file){
   } else sheets=[{name:"",rows:parseCSVText(await readText(buf))}];
   let best=null;
   for(const sh of sheets){
-    if(isFluviaRows(sh.rows)) throw Object.assign(new Error("fluvia"),{fluvia:true});
+    if(isFluviaRows(sh.rows)) throw new NativeError(["ce fichier est un jaugeage de courantomètre, pas un enregistrement du BUL'R2"]);
     if(sh.rows.slice(0,40).some(r=>(r||[]).some(c=>/corrig[ée]|du fichier \(/i.test(txt(c))))) throw new NativeError([ALREADY],true);
     try{ const ds=parseNative(sh.rows,file.name); ds.sheet=sh.name; return ds }
     catch(e){ if(!(e instanceof NativeError)) throw e; if(!best||e.reasons.length<best.reasons.length) best=e }
@@ -1085,7 +1085,6 @@ async function openFile(f){
   $("emptyErr").hidden=true; $("fileErr").hidden=true;
   try{ const ds=await readFile(f); loadDataset(ds,false); toast(`${f.name} ouvert : ${ds.t.length} mesures`) }
   catch(err){ console.warn(err);
-    if(err&&err.fluvia){ showHydro(); hyOpenFile(f); toast("Jaugeage FLUVIA reconnu : ouvert dans COMETEC Hydro"); return }
     const html = err instanceof NativeError
       ? (err.already?`<b>« ${esc(f.name)} » n'est pas accepté.</b> ${esc(ALREADY)}`
         :`<b>« ${esc(f.name)} » n'est pas reconnu comme un enregistrement du BUL'R2.</b> Ouvrez le fichier Excel ou CSV exporté par l'appareil.<ul>${err.reasons.slice(0,3).map(r=>`<li>${esc(r.charAt(0).toUpperCase()+r.slice(1))}.</li>`).join("")}</ul>`)
@@ -2254,8 +2253,7 @@ function hyError(html){ const e=HY.M?$("hyErr2"):$("hyErr"); e.innerHTML=html; e
 async function hyOpenFile(f){ $("hyErr").hidden=true; $("hyErr2").hidden=true;
   try{ const j=await hyReadFile(f); j.name=f.name; hyShow(j,false); toast(`${f.name} ouvert : ${j.V.length} verticales`) }
   catch(e){ console.warn(e);
-    if(e.message==="nofluvia"){ let bul=false; try{ await readFile(f); bul=true }catch(_){}
-      hyError(`<b>« ${esc(f.name)} » n'est pas reconnu comme un jaugeage FLUVIA.</b> ${bul?"C'est un enregistrement du BUL'R2 : ouvrez-le dans COMETEC Bilan.":"Ouvrez le fichier CSV ou Excel exporté par le courantomètre (lignes « Verticale Numero », distance de la rive, profondeur, vitesse)."}`) }
+    if(e.message==="nofluvia") hyError(`<b>« ${esc(f.name)} » n'est pas reconnu comme un jaugeage FLUVIA.</b> Ouvrez le fichier CSV ou Excel exporté par le courantomètre.`)
     else if(e.message==="noverticals") hyError(`<b>« ${esc(f.name)} » ne contient pas assez de verticales lisibles.</b> Vérifiez que le jaugeage est complet.`);
     else hyError(`<b>« ${esc(f.name)} » n'a pas pu être lu.</b> ${esc(e.message||"")}`) } }
 function hyLoadDemo(){ $("hyErr").hidden=true; $("hyErr2").hidden=true; const j=hyParse(hyRowsFromText(HY_DEMO)); j.name="Démonstration"; hyShow(j,true) }
@@ -2285,7 +2283,7 @@ function hyBuild(j){
   seg.forEach(s=>s.part=Q>0?s.q*(s.b-s.a)/Q:0);
   let A=0; for(let k=0;k<400;k++){ const x0=W*k/400,x1=W*(k+1)/400; A+=(bed(x0)+bed(x1))/2*(x1-x0) }
   const vmaxPts=Math.max(0.01,...V.flatMap(v=>v.pts.map(p=>p.v)),...V.map(v=>v.vm));
-  const vStep=vmaxPts<0.2?0.01:0.05, vScale=Math.max(vStep,Math.ceil(vmaxPts/vStep-1e-9)*vStep), iso=[0.01,0.02,0.05,0.1,0.2,0.25,0.5].find(t=>vScale/t<=8)||1;
+  const vStep=vmaxPts<0.2?0.01:0.05, vScale=Math.max(vStep,Math.ceil(vmaxPts/vStep-1e-9)*vStep), iso=[0.02,0.05,0.1,0.2,0.25,0.5].find(t=>vScale/t<=6)||1;
   return {W,V,bed,vel,Q,A,seg,iso,vScale,vmaxPts,Dmax:Math.max(...V.map(v=>v.d)),vmax:Math.max(...V.map(v=>v.vm)),qmax:Math.max(...seg.map(s=>s.q))};
 }
 /* couleurs : bleu (lent) → rouge COMETEC (zone la plus rapide de ce profil) */
@@ -2315,8 +2313,11 @@ function hyDrawSection(cv,cw,P,pdf){
   g.save(); g.setTransform(1,0,0,1,0,0); g.drawImage(tmp,Math.floor(ml*dpr),Math.floor(mt*dpr)); g.restore();
   if(HY.show.I){ const st=3, nx=Math.ceil(pw/st)+1, ny=Math.ceil(ph/st)+1, F=[];
     for(let i=0;i<nx;i++){ const xm=Math.min(M.W,(i*st)/sx), B=M.bed(xm); F.push([]); for(let j=0;j<ny;j++){ const dm=(j*st)/(sx*ex); F[i].push(B>0&&dm<=B?M.vel(xm,1-dm/B):NaN) } }
+    for(let pass=0;pass<3;pass++){ const G=F.map(c=>c.slice()); // lissage léger : les vitesses de l'export sont arrondies au centième (paliers)
+      for(let i=0;i<nx;i++) for(let j=0;j<ny;j++){ if(isNaN(F[i][j])) continue; let sm=0,n=0; for(let di=-1;di<=1;di++) for(let dj=-1;dj<=1;dj++){ const v=(F[i+di]||[])[j+dj]; if(v!=null&&!isNaN(v)){ sm+=v; n++ } } G[i][j]=sm/n }
+      for(let i=0;i<nx;i++) F[i]=G[i] }
     g.lineWidth=1; g.strokeStyle="rgba(255,255,255,.55)";
-    for(let k=1;k*M.iso<M.vScale-M.iso*0.2;k++){ const Lv=k*M.iso; g.beginPath();
+    for(let k=1;k*M.iso<M.vScale-M.iso*0.2;k++){ const Lv=k*M.iso-1e-6; g.beginPath();
       for(let i=0;i<nx-1;i++) for(let j=0;j<ny-1;j++){ const a=F[i][j],b=F[i+1][j],c=F[i+1][j+1],d=F[i][j+1]; if(isNaN(a)||isNaN(b)||isNaN(c)||isNaN(d)) continue;
         const p=[], ed=(v1,v2,x1,y1,x2,y2)=>{ if((v1<Lv)!==(v2<Lv)){ const t=(Lv-v1)/(v2-v1); p.push([ml+(x1+t*(x2-x1))*st,mt+(y1+t*(y2-y1))*st]) } };
         ed(a,b,i,j,i+1,j); ed(b,c,i+1,j,i+1,j+1); ed(d,c,i,j+1,i+1,j+1); ed(a,d,i,j,i,j+1);
@@ -2376,7 +2377,7 @@ function hyFill(){
   hyQualityUi();
 }
 function hyRender(){ if(!HY.M||!hydroOn()) return; hyDrawSection($("hyCv"),$("hyCv").parentElement.clientWidth); hyDrawQ($("hyCq"),$("hyCq").parentElement.clientWidth); document.querySelectorAll("#hyVt tbody tr").forEach(tr=>tr.classList.toggle("on",+tr.dataset.i===HY.hover)) }
-function hyShow(j,demo){ HY.J=j; HY.M=hyBuild(j); HY.demo=demo; HY.hover=null; HY.info=null; HY.photo=null; HY.rive=""; $("hyTip").hidden=true; $("hyEmpty").hidden=true; $("hyView").hidden=false; hyFill(); window.scrollTo({top:0}); requestAnimationFrame(hyRender) }
+function hyShow(j,demo){ HY.J=j; HY.M=hyBuild(j); HY.demo=demo; HY.hover=null; HY.info=null; HY.photo=null; HY.rive=""; HY.show.I=HY.M.vmaxPts>=0.1; $("hyTgI").setAttribute("aria-pressed",HY.show.I);  /* vitesses très faibles (arrondies au centième) : isovitesses masquées par défaut */ $("hyTip").hidden=true; $("hyEmpty").hidden=true; $("hyView").hidden=false; hyFill(); window.scrollTo({top:0}); requestAnimationFrame(hyRender) }
 function hyPick(ev){ const r=$("hyCv").getBoundingClientRect(), x=ev.clientX-r.left, y=ev.clientY-r.top, G=HY.geo, M=HY.M; if(!G) return;
   const xm=(x-G.ml)/G.sx; if(xm<-0.05||xm>M.W+0.05||y<G.mt-30||y>G.mt+G.ph+10){ HY.hover=null; $("hyTip").hidden=true; hyRender(); return }
   let best=0; M.V.forEach((v,i)=>{ if(Math.abs(v.x-xm)<Math.abs(M.V[best].x-xm)) best=i }); HY.hover=best; hyRender();
