@@ -1117,7 +1117,7 @@ body.onctrl{padding-bottom:0!important}
       <li><span class="hs-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.2 5.8L20 11l-5.8 2.2L12 19l-2.2-5.8L4 11l5.8-2.2z"/></svg></span><b>Nouveautés</b><small>Nouveaux produits et actualités</small><em>Bientôt</em></li>
       <li><span class="hs-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></span><b>Aide au paramétrage</b><small>Réglage pas à pas de vos appareils</small><em>Bientôt</em></li>
     </ul>
-    <p class="hub-foot">COMETEC · Instrumentation des eaux · Chapareillan (38) · version 2.11.4</p>
+    <p class="hub-foot">COMETEC · Instrumentation des eaux · Chapareillan (38) · version 2.11.5</p>
   </div>
 </section>
 <section class="sim ctrl" id="ctrl" aria-labelledby="ctrlTitle">
@@ -1556,7 +1556,7 @@ body.onctrl{padding-bottom:0!important}
     <button type="button" data-mtab="volumes"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 20V11M12 20V5M18 20v-7"/></svg></span>Volumes</button>
     <button type="button" data-mtab="export"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 20h16"/></svg></span>Exporter</button>
   </nav>
-  <footer>COMETEC · Instrumentation des eaux · ZA de Longifan, 38530 Chapareillan · application COMETEC version 2.11.4</footer>
+  <footer>COMETEC · Instrumentation des eaux · ZA de Longifan, 38530 Chapareillan · application COMETEC version 2.11.5</footer>
 </div>
 <div class="modal" id="reportModal" hidden role="dialog" aria-modal="true" aria-labelledby="t-report">
   <form class="modal-box" id="reportForm">
@@ -3556,7 +3556,7 @@ $("reportForm").onsubmit=async e=>{ e.preventDefault(); rpSave(); $("rpGo").disa
   try{ await buildReport() ; $("reportModal").hidden=true }catch(err){ console.error(err); toast("Rapport impossible : "+err.message) }
   finally{ $("rpGo").disabled=false; $("rpGo").textContent="Générer le rapport PDF" } };
 
-const pdfTxt=s=>String(s==null?"":s).replace(/[  ]/g," ").replace(/[–—]/g,"-").replace(/[’‘]/g,"'").replace(/→/g,"à").replace(/…/g,"...");
+const pdfTxt=s=>String(s==null?"":s).replace(/³/g,"3").replace(/[  ]/g," ").replace(/[–—]/g,"-").replace(/[’‘]/g,"'").replace(/→/g,"à").replace(/…/g,"...");
 function chartImage(option,w,h){
   const box=$("pdfCharts"); box.style.width=w+"px"; box.style.height=h+"px";
   const c=echarts.init(box,null,{renderer:"canvas",width:w,height:h});
@@ -4432,19 +4432,35 @@ function hyNormRows(rows){ return rows.map(r=>{ const c=(r||[]).map(v=>v==null?"
   const f=c.filter(v=>v.trim()!==""); return (f.length===1&&/[,;]/.test(f[0]))?f[0].split(f[0].includes(";")?";":","):c }).map(r=>r.map(x=>String(x).trim())) }
 const hyNum=s=>parseFloat(String(s).trim().replace(",","."));
 /* un jaugeage FLUVIA : une ligne « Verticale Numero … Distance … Profondeur … Vitesse », précédée de la ligne du profil (largeur, débit) */
-function hyFind(rows){ const i=rows.findIndex(r=>/^verticale/i.test(r[0]||"")&&r.some(c=>/distance/i.test(c))&&r.some(c=>/vitesse/i.test(c)));
+function hyFind(rows){ const i=rows.findIndex(r=>/^vertical/i.test(r[0]||"")&&r.some(c=>/distance/i.test(c))&&r.some(c=>/vitesse|velocity/i.test(c)));
   if(i<1) return -1; const v=rows[i-1]; return (v.length>=6&&isFinite(hyNum(v[4]))&&isFinite(hyNum(v[5])))?i:-1 }
+const hyKey=k=>String(k||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," ").trim();
+function hyUnitL(s){ const u=hyKey(s).replace(/[.\s]/g,""); return /^(f|ft|feet|foot|pieds?)$/.test(u)?{k:0.3048,t:"pieds"}:u==="cm"?{k:0.01,t:"cm"}:u==="mm"?{k:0.001,t:"mm"}:{k:1,t:"m"} }
+function hyUnitV(s){ const u=hyKey(s).replace(/[.\s]/g,""); return /^(f|ft|feet|pieds?)(\/s|ps|\/sec)$|^fps$/.test(u)?{k:0.3048,t:"ft/s"}:u==="cm/s"?{k:0.01,t:"cm/s"}:u==="mm/s"?{k:0.001,t:"mm/s"}:{k:1,t:"m/s"} }
+function hyUnitQ(s){ const u=hyKey(s).replace(/[.\s]/g,"").replace("³","3");
+  if(/^m3\/s$|^cumecs?$/.test(u)) return {k:1000,t:"m³/s"}; if(/^m3\/h$/.test(u)) return {k:1/3.6,t:"m³/h"}; if(/^m3\/(j|d|24h)$/.test(u)) return {k:1/86.4,t:"m³/j"};
+  if(/^(ft3\/s|cfs|pi3\/s)$/.test(u)) return {k:28.316846592,t:"ft³/s"}; if(/^(l\/min|lpm)$/.test(u)) return {k:1/60,t:"L/min"}; if(/^(gpm|usgpm)$/.test(u)) return {k:0.0630901964,t:"gal US/min"};
+  return {k:1,t:u?"L/s":""} }
+/* format des débits : L/s, ou m³/s dès 1000 L/s */
+function hyQF(){ const H=HY.J.head, M=HY.M, ref=H.debit>0?H.debit:M.Q*1000, big=Math.max(ref,M.Q*1000)>=1000, qr=M.qmax*1000;
+  const d=big?(ref/1000<100?2:1):(ref<100?1:0), qd=big?(qr/1000<1?3:2):(qr<100?1:0);
+  return {big,u:big?"m³/s":"L/s",uq:big?"m³/s/m":"L/s/m",Q:v=>hnf(big?v/1000:v,d),q:v=>hnf(big?v/1000:v,qd)} }
+const hyTypeFr=t=>{ const k=hyKey(t); return k==="river"||k==="riviere"?"rivière":k==="circular"||k==="circular pipe"?"conduite circulaire":k==="rectangular"?"canal rectangulaire":String(t||"").toLowerCase() };
+function hyNice(range,max,steps){ return steps.find(t=>range/t<=max)||steps[steps.length-1] }
 function isFluviaRows(rows){ try{ return hyFind(hyNormRows(rows))>=0 }catch(e){ return false } }
 function hyParse(raw){
   const rows=hyNormRows(raw).filter(r=>r.some(c=>c!==""));
   const iv=hyFind(rows); if(iv<0) throw new Error("nofluvia");
-  const vals=rows[iv-1], names=iv>=2&&/profil/i.test(rows[iv-2][0])?rows[iv-2].map(k=>k.toLowerCase()):null;
-  const get=(key,pos)=>{ if(names){ const k=names.findIndex(n=>n.startsWith(key)); if(k>=0) return vals[k] } return vals[pos] };
-  const head={profil:get("profil",0),type:get("type",1),date:get("date",2),heure:get("heure",3),largeur:hyNum(get("largeur",4)),debit:hyNum(get("debit",5)),uQ:get("unites debit",8)||"L/s"};
+  const vals=rows[iv-1], names=iv>=2&&/^profil/i.test(rows[iv-2][0])?rows[iv-2].map(k=>hyKey(k)):null;
+  const get=(keys,pos)=>{ if(names){ const k=names.findIndex(n=>keys.some(key=>n.startsWith(key))); if(k>=0) return vals[k] } return vals[pos] };
+  /* export français ou anglais ; unités converties en m, m/s et L/s */
+  const uL=hyUnitL(get(["unites dim","length unit"],6)), uV=hyUnitV(get(["unites vit","velocity unit"],7)), uQs=get(["unites deb","flow unit"],8), uQ=hyUnitQ(uQs);
+  const head={profil:get(["profil"],0),type:get(["type"],1),date:get(["date"],2),heure:get(["heure","time"],3),largeur:hyNum(get(["largeur","river width","width"],4))*uL.k,debit:hyNum(get(["debit","flow"],5))*uQ.k,uQ:"L/s",
+    src:{L:uL.t,V:uV.t,Q:uQ.t||String(uQs||"").trim(),conv:uL.k!==1||uV.k!==1||uQ.k!==1,lang:/velocity/i.test(rows[iv].join(" "))?"en":"fr"}};
   const V=[]; let cur=null;
   for(const r of rows.slice(iv+1)){
-    if(r[0]!==""){ if(!isFinite(hyNum(r[0]))||!isFinite(hyNum(r[1]))) continue; cur={n:+hyNum(r[0]),x:hyNum(r[1]),d:hyNum(r[2]),vm:hyNum(r[3]),pts:[]}; V.push(cur) }
-    if(cur&&r.length>5&&r[4]!==""&&r[5]!==""&&isFinite(hyNum(r[4]))&&isFinite(hyNum(r[5]))) cur.pts.push({h:hyNum(r[4]),v:hyNum(r[5])});
+    if(r[0]!==""){ if(!isFinite(hyNum(r[0]))||!isFinite(hyNum(r[1]))) continue; cur={n:+hyNum(r[0]),x:hyNum(r[1])*uL.k,d:hyNum(r[2])*uL.k,vm:hyNum(r[3])*uV.k,pts:[]}; V.push(cur) }
+    if(cur&&r.length>5&&r[4]!==""&&r[5]!==""&&isFinite(hyNum(r[4]))&&isFinite(hyNum(r[5]))) cur.pts.push({h:hyNum(r[4])*uL.k,v:hyNum(r[5])*uV.k});
   }
   const ok=V.filter(v=>isFinite(v.x)&&v.d>0&&isFinite(v.vm));
   if(ok.length<2||!(head.largeur>0)) throw new Error("noverticals");
@@ -4500,10 +4516,11 @@ const hyCss=t=>`rgb(${hyCol(t).map(Math.round).join(",")})`;
 $("hyGrad").style.background=`linear-gradient(90deg,${HY_ST.map(s=>`rgb(${s[1]},${s[2]},${s[3]}) ${s[0]*100}%`).join(",")})`;
 const hyTok=k=>getComputedStyle(document.documentElement).getPropertyValue(k).trim();
 const hnf=(v,d=2)=>Number(v).toLocaleString("fr-FR",{minimumFractionDigits:d,maximumFractionDigits:d});
+const hyExTxt=ex=>ex>1?`Échelle verticale exagérée × ${ex}`:`Échelle verticale réduite × ${hnf(ex,ex<0.25?1:2).replace(/0$/,"")}`;
 function hyDrawSection(cv,cw,P,pdf){
   const M=HY.M; if(!cw) return; P=P||hyTok; const dpr=pdf?2:Math.min(window.devicePixelRatio||1,2), hov=pdf?null:HY.hover;
   const ml=cw<520?34:52, mr=cw<520?28:38, mt=46, mb=34, pw=cw-ml-mr, sx=pw/M.W;
-  const target=Math.max(150,Math.min(pw*0.36,380)), exRaw=target/(M.Dmax*sx), ex=[1,2,3,4,5,6,8,10,12,15,20,30,40,50].reduce((a,b)=>Math.abs(b-exRaw)<Math.abs(a-exRaw)?b:a);
+  const target=Math.max(150,Math.min(pw*0.36,380)), exRaw=target/(M.Dmax*sx), ex=[0.1,0.2,0.25,0.5,1,2,3,4,5,6,8,10,12,15,20,30,40,50].reduce((a,b)=>Math.abs(b-exRaw)<Math.abs(a-exRaw)?b:a);
   const ph=M.Dmax*sx*ex, gpad=Math.max(22,ph*0.12), ch=mt+ph+gpad+mb;
   cv.width=Math.round(cw*dpr); cv.height=Math.round(ch*dpr); cv.style.height=ch+"px";
   const g=cv.getContext("2d"); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,cw,ch);
@@ -4539,13 +4556,13 @@ function hyDrawSection(cv,cw,P,pdf){
     const r=cw<520?8:10; g.beginPath(); g.arc(xx,mt-15,r,0,7); g.fillStyle=on?P("--rule"):P("--surface"); g.fill(); g.lineWidth=1.2; g.strokeStyle=on?P("--rule"):line; g.stroke();
     g.fillStyle=on?"#FFFFFF":ink2; g.font=`700 ${cw<520?9:11}px Arial, sans-serif`; g.textAlign="center"; g.textBaseline="middle"; g.fillText(v.n,xx,mt-14.5) });
   g.fillStyle=muted; g.strokeStyle=line; g.font="12px Arial, sans-serif"; g.textBaseline="top"; g.textAlign="center"; g.lineWidth=1;
-  const step=M.W>12?2:M.W>6?1:0.5; for(let x=0;x<=M.W+1e-9;x+=step){ g.beginPath(); g.moveTo(X(x),mt+ph+gpad); g.lineTo(X(x),mt+ph+gpad+5); g.stroke(); g.fillText(hnf(x,x%1?1:0),X(x),mt+ph+gpad+8) }
+  const step=hyNice(M.W,pw<420?6:12,[0.5,1,2,5,10,20,25,50,100,200,500]); for(let k=0;k*step<=M.W+1e-9;k++){ const x=k*step; g.beginPath(); g.moveTo(X(x),mt+ph+gpad); g.lineTo(X(x),mt+ph+gpad+5); g.stroke(); g.fillText(hnf(x,x%1?1:0),X(x),mt+ph+gpad+8) }
   g.textAlign="right"; g.fillText(`${hnf(M.W)} m`,X(M.W),mt+ph+gpad+20); g.textAlign="left"; g.fillText(HY.rive==="RG"?"distance depuis la rive gauche (m)":HY.rive==="RD"?"distance depuis la rive droite (m)":"distance à la rive (m)",X(0),mt+ph+gpad+20);
-  g.textAlign="right"; g.textBaseline="middle"; const dstep=M.Dmax>1.6?0.5:M.Dmax>0.8?0.2:0.1;
-  for(let d=0;d<=M.Dmax+1e-9;d+=dstep){ g.beginPath(); g.moveTo(ml-5,Y(d)); g.lineTo(ml,Y(d)); g.stroke(); g.fillText(hnf(d,1),ml-8,Y(d)) }
+  g.textAlign="right"; g.textBaseline="middle"; const dstep=hyNice(M.Dmax,8,[0.1,0.2,0.5,1,2,5,10,20]);
+  for(let k=0;k*dstep<=M.Dmax+1e-9;k++){ const d=k*dstep; g.beginPath(); g.moveTo(ml-5,Y(d)); g.lineTo(ml,Y(d)); g.stroke(); g.fillText(hnf(d,dstep<1?1:0),ml-8,Y(d)) }
   if(cw>=520){ g.save(); g.translate(12,mt+ph/2); g.rotate(-Math.PI/2); g.textAlign="center"; g.fillText("profondeur (m)",0,0); g.restore() }
   HY.exag=ex; if(pdf) return ch;
-  const isoT=`isovitesses tous les ${hnf(M.iso,M.iso<0.1?2:1)} m/s`; $("hyExag").textContent=ex>1?`Échelle verticale exagérée × ${ex} · ${isoT}`:isoT.charAt(0).toUpperCase()+isoT.slice(1);
+  const isoT=`isovitesses tous les ${hnf(M.iso,M.iso<0.1?2:1)} m/s`; $("hyExag").textContent=ex!==1?`${hyExTxt(ex)} · ${isoT}`:isoT.charAt(0).toUpperCase()+isoT.slice(1);
   $("hyVmax").textContent=`${hnf(M.vScale,2)} m/s`;
 }
 function hyDrawQ(cv,cw,P,pdf){
@@ -4554,31 +4571,32 @@ function hyDrawQ(cv,cw,P,pdf){
   cv.width=Math.round(cw*dpr); cv.height=Math.round(ch*dpr); cv.style.height=ch+"px";
   const g=cv.getContext("2d"); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,cw,ch);
   if(pdf){ g.fillStyle="#FFFFFF"; g.fillRect(0,0,cw,ch) }
-  const qm=M.qmax*1000, qst=[1,2,5,10,20,25,50,100,200,500,1000].find(t=>qm/t<=5)||2000, top=Math.max(qst,Math.ceil(qm/qst)*qst), X=x=>ml+x/M.W*pw, Y=q=>mt+ph-(q*1000)/top*ph;
+  const F=hyQF(), sc=F.big?1:1000, qm=M.qmax*sc, qst=hyNice(qm,5,[0.01,0.02,0.05,0.1,0.2,0.25,0.5,1,2,5,10,20,25,50,100,200,500,1000,2000,5000]), nt=Math.max(1,Math.ceil(qm/qst-1e-9)), top=nt*qst, X=x=>ml+x/M.W*pw, Y=q=>mt+ph-(q*sc)/top*ph;
   g.font="11px Arial, sans-serif"; g.fillStyle=P("--muted"); g.strokeStyle=P("--line"); g.textAlign="right"; g.textBaseline="middle"; g.lineWidth=1;
-  for(let q=0;q<=top+1e-9;q+=qst){ g.beginPath(); g.moveTo(ml,Y(q/1000)); g.lineTo(ml+pw,Y(q/1000)); g.stroke(); g.fillText(q,ml-6,Y(q/1000)) }
-  g.save(); g.translate(10,mt+ph/2); g.rotate(-Math.PI/2); g.textAlign="center"; g.fillText("L/s/m",0,0); g.restore();
+  const qdec=qst<0.1?2:qst<1?1:0; for(let k=0;k<=nt;k++){ const q=k*qst/sc; g.beginPath(); g.moveTo(ml,Y(q)); g.lineTo(ml+pw,Y(q)); g.stroke(); g.fillText(hnf(k*qst,qdec),ml-6,Y(q)) }
+  g.save(); g.translate(10,mt+ph/2); g.rotate(-Math.PI/2); g.textAlign="center"; g.fillText(F.uq,0,0); g.restore();
   M.seg.forEach((s,i)=>{ const x1=X(s.a)+1, x2=X(s.b)-1; g.fillStyle=hyCss(M.V[i].vm/M.vScale); g.globalAlpha=hov===null||hov===i?1:.45; g.fillRect(x1,Y(s.q),Math.max(1,x2-x1),Y(0)-Y(s.q)); g.globalAlpha=1;
     if(x2-x1>22){ g.fillStyle=P("--ink-2"); g.textAlign="center"; g.textBaseline="bottom"; g.font="600 10.5px Arial, sans-serif"; g.fillText(Math.round(s.part*100)+" %",(x1+x2)/2,Y(s.q)-3) } });
   g.fillStyle=P("--muted"); g.textAlign="center"; g.textBaseline="top"; g.font="11px Arial, sans-serif";
-  const step=M.W>12?2:M.W>6?1:0.5; for(let x=0;x<=M.W+1e-9;x+=step) g.fillText(hnf(x,x%1?1:0),X(x),mt+ph+6);
+  const step=hyNice(M.W,pw<420?6:12,[0.5,1,2,5,10,20,25,50,100,200,500]); for(let k=0;k*step<=M.W+1e-9;k++){ const x=k*step; g.fillText(hnf(x,x%1?1:0),X(x),mt+ph+6) }
   g.textAlign="right"; g.fillText("m",ml+pw,mt+ph+18); return ch;
 }
+const hySrcTxt=s=>[s.L!=="m"?`longueurs en ${s.L}`:"",s.V!=="m/s"?`vitesses en ${s.V}`:"",s.Q&&s.Q!=="L/s"?`débit en ${s.Q}`:""].filter(Boolean).join(", ");
 function hyFill(){
-  const H=HY.J.head, M=HY.M, dd=H.debit<100?1:0, qd=M.qmax*1000<100?1:0, dQ=H.debit>0?(M.Q*1000-H.debit)/H.debit*100:0;
+  const H=HY.J.head, M=HY.M, F=hyQF(), dQ=H.debit>0?(M.Q*1000-H.debit)/H.debit*100:0;
   $("hyProfil").textContent=`Profil n° ${H.profil||"?"}`;
   $("hyMeta").innerHTML=`<b>${esc(H.date||"")}</b>${H.heure?` à <b>${esc(H.heure)}</b>`:""} · ${M.V.length} verticales · ${HY.demo?"jaugeage de démonstration":`fichier <b>${esc(HY.J.name)}</b>`}`;
-  const K=[["main","Débit",`${hnf(H.debit,dd)}<small>${esc(H.uQ)}</small>`,`recalculé : ${hnf(M.Q*1000,dd)} L/s (${dQ>=0?"+":""}${hnf(dQ,1)} %)`],
+  const K=[["main","Débit",`${F.Q(H.debit)}<small>${F.u}</small>`,`recalculé : ${F.Q(M.Q*1000)} ${F.u} (${dQ>=0?"+":""}${hnf(dQ,1)} %)`],
     ["","Largeur",`${hnf(M.W)}<small>m</small>`,`section mouillée ${hnf(M.A,2)} m²`],
     ["","Profondeur max",`${hnf(M.Dmax)}<small>m</small>`,`moyenne ${hnf(M.A/M.W,2)} m`],
     ["","Vitesse moyenne",`${hnf(M.A>0?M.Q/M.A:0)}<small>m/s</small>`,"débit / section"],
     ["","Vitesse max",`${hnf(M.vmax)}<small>m/s</small>`,`ponctuelle ${hnf(M.vmaxPts)} m/s`],
-    ["","Débit unitaire max",`${hnf(M.qmax*1000,qd)}<small>L/s/m</small>`,`verticale ${M.V[M.seg.findIndex(s=>s.q===M.qmax)].n}`]];
+    ["","Débit unitaire max",`${F.q(M.qmax*1000)}<small>${F.uq}</small>`,`verticale ${M.V[M.seg.findIndex(s=>s.q===M.qmax)].n}`]];
   $("hyKpis").innerHTML=K.map(k=>`<div class="hy-kpi ${k[0]}"><span>${k[1]}</span><b>${k[2]}</b><em>${k[3]}</em></div>`).join("");
   const np=[...new Set(M.V.map(v=>v.pts.length))].sort((a,b)=>a-b);
-  $("hyMethod").textContent=`${np.length===1?np[0]:np.join(" à ")} point${np[np.length-1]>1?"s":""} de vitesse par verticale, placés par l'appareil selon la profondeur.`;
+  $("hyMethod").textContent=`${np.length===1?np[0]:np.join(" à ")} point${np[np.length-1]>1?"s":""} de vitesse par verticale, placés par l'appareil selon la profondeur.`+(H.src&&H.src.conv?` Valeurs converties en unités métriques (export en ${hySrcTxt(H.src)}).`:"");
   $("hyVt").innerHTML=`<thead><tr><th>N°</th><th>Distance</th><th>Prof.</th><th>V moy.</th><th>q</th><th>Part</th></tr></thead><tbody>`+
-    M.V.map((v,i)=>`<tr data-i="${i}"><td><span class="hy-dot" style="background:${hyCss(v.vm/M.vScale)}"></span>${v.n}</td><td>${hnf(v.x)} m</td><td>${hnf(v.d)} m</td><td>${hnf(v.vm)} m/s</td><td>${hnf(M.seg[i].q*1000,qd)} L/s/m</td><td>${hnf(M.seg[i].part*100,1)} %</td></tr>`).join("")+`</tbody>`;
+    M.V.map((v,i)=>`<tr data-i="${i}"><td><span class="hy-dot" style="background:${hyCss(v.vm/M.vScale)}"></span>${v.n}</td><td>${hnf(v.x)} m</td><td>${hnf(v.d)} m</td><td>${hnf(v.vm)} m/s</td><td>${F.q(M.seg[i].q*1000)} ${F.uq}</td><td>${hnf(M.seg[i].part*100,1)} %</td></tr>`).join("")+`</tbody>`;
   const w=$("hyWarn"); if(M.vmax<0.1){ w.textContent="Vitesses très faibles : l'export arrondit les vitesses au centième de m/s, ce qui peut expliquer quelques pour cent d'écart entre le débit affiché par l'appareil et le débit recalculé."; w.hidden=false } else w.hidden=true;
   $("hyDemoBar").hidden=!HY.demo;
   hyQualityUi();
@@ -4588,9 +4606,9 @@ function hyShow(j,demo){ HY.J=j; HY.M=hyBuild(j); HY.demo=demo; HY.hover=null; H
 function hyPick(ev){ const r=$("hyCv").getBoundingClientRect(), x=ev.clientX-r.left, y=ev.clientY-r.top, G=HY.geo, M=HY.M; if(!G) return;
   const xm=(x-G.ml)/G.sx; if(xm<-0.05||xm>M.W+0.05||y<G.mt-30||y>G.mt+G.ph+10){ HY.hover=null; $("hyTip").hidden=true; hyRender(); return }
   let best=0; M.V.forEach((v,i)=>{ if(Math.abs(v.x-xm)<Math.abs(M.V[best].x-xm)) best=i }); HY.hover=best; hyRender();
-  const v=M.V[best], B=M.bed(Math.max(0,Math.min(M.W,xm))), dm=(y-G.mt)/(G.sx*G.ex), qd=M.qmax*1000<100?1:0;
+  const v=M.V[best], B=M.bed(Math.max(0,Math.min(M.W,xm))), dm=(y-G.mt)/(G.sx*G.ex), F=hyQF();
   const here=(dm>=0&&dm<=B)?`<div class="here">Ici : ≈ <b style="color:var(--ink);font-size:13px">${hnf(M.vel(xm,1-dm/B))} m/s</b> à ${hnf(dm)} m sous la surface</div>`:"";
-  const tip=$("hyTip"); tip.innerHTML=`<b>Verticale ${v.n}</b> · ${hnf(v.x)} m de la rive<table><tr><td>Profondeur</td><td>${hnf(v.d)} m</td></tr><tr><td>Vitesse moyenne</td><td>${hnf(v.vm)} m/s</td></tr>${v.pts.slice().reverse().map(p=>`<tr><td>à ${hnf(p.h)} m du fond</td><td>${hnf(p.v)} m/s</td></tr>`).join("")}<tr><td>Débit unitaire</td><td>${hnf(M.seg[best].q*1000,qd)} L/s/m</td></tr><tr><td>Part du débit</td><td>${hnf(M.seg[best].part*100,1)} %</td></tr></table>${here}`;
+  const tip=$("hyTip"); tip.innerHTML=`<b>Verticale ${v.n}</b> · ${hnf(v.x)} m de la rive<table><tr><td>Profondeur</td><td>${hnf(v.d)} m</td></tr><tr><td>Vitesse moyenne</td><td>${hnf(v.vm)} m/s</td></tr>${v.pts.slice().reverse().map(p=>`<tr><td>à ${hnf(p.h)} m du fond</td><td>${hnf(p.v)} m/s</td></tr>`).join("")}<tr><td>Débit unitaire</td><td>${F.q(M.seg[best].q*1000)} ${F.uq}</td></tr><tr><td>Part du débit</td><td>${hnf(M.seg[best].part*100,1)} %</td></tr></table>${here}`;
   tip.hidden=false; const fw=$("hyFig").clientWidth, tw=tip.offsetWidth; let left=x+16; if(left+tw>fw) left=x-tw-16; tip.style.left=Math.max(0,left)+"px"; tip.style.top=Math.max(0,Math.min(y-20,G.ch-tip.offsetHeight))+"px" }
 $("hyCv").addEventListener("pointermove",hyPick); $("hyCv").addEventListener("pointerdown",hyPick);
 $("hyCv").addEventListener("pointerleave",e=>{ if(e.pointerType==="mouse"){ HY.hover=null; $("hyTip").hidden=true; hyRender() } });
@@ -4675,7 +4693,7 @@ async function hyBuildPdf(f){
   const doc=new jsPDF({unit:"mm",format:"a4",orientation:"portrait",compress:true}); const W=210,PH=297,Mg=15,CW=W-2*Mg;
   const T=(s,x,y,o)=>doc.text(pdfTxt(s),x,y,o), set=(sz,st,col)=>{ doc.setFont("helvetica",st||"normal"); doc.setFontSize(sz); doc.setTextColor(...(col||INK)) };
   const today=new Date(), todayS=`${p2(today.getDate())}/${p2(today.getMonth()+1)}/${today.getFullYear()}`;
-  const dd=H.debit<100?1:0, qd=M.qmax*1000<100?1:0, n2=(v,d=2)=>hnf(v,d);
+  const F=hyQF(), n2=(v,d=2)=>hnf(v,d);
   const when=[H.date,H.heure&&`à ${H.heure}`].filter(Boolean).join(" ");
   const header=()=>{ if(hyLogo){ const h=14, w=Math.min(48,hyLogo.w/hyLogo.h*h); doc.addImage(hyLogo.data,"JPEG",Mg,10,w,w/(hyLogo.w/hyLogo.h),"hyLogo") } else if(f.hyRpCompany){ set(11,"bold",INK); T(f.hyRpCompany,Mg,17) }
     set(14,"bold",INK); T(f.hyRpTitle||"Rapport de jaugeage",W-Mg,15,{align:"right"});
@@ -4696,12 +4714,12 @@ async function hyBuildPdf(f){
   const rive={RG:"Rive gauche",RD:"Rive droite"}[f.hyRpRive]||"Non précisée";
   const cote=(f.h0||f.h1)?[f.h0&&`${f.h0} m au début`,f.h1&&`${f.h1} m à la fin`].filter(Boolean).join(", "):"Non relevée";
   const np=[...new Set(M.V.map(v=>v.pts.length))].sort((a,b)=>a-b).join(" à ");
-  y=kv([["Appareil",`Courantomètre électromagnétique FLUVIA${f.hyRpSerial?` n° ${f.hyRpSerial}`:""}`],["Profil",`n° ${H.profil||"-"} (mode ${String(H.type||"").toLowerCase().replace("riviere","rivière")})`],
+  y=kv([["Appareil",`Courantomètre électromagnétique FLUVIA${f.hyRpSerial?` n° ${f.hyRpSerial}`:""}`],["Profil",`n° ${H.profil||"-"} (mode ${hyTypeFr(H.type)})`],...(H.src&&H.src.conv?[["Unités",`export en ${hySrcTxt(H.src)}, converti en unités métriques`]]:[]),
         ["Méthode","Exploration du champ des vitesses, section médiane (ISO 748)"],["Verticales",`${M.V.length}, ${np} point(s) de vitesse chacune`],
         ["Rive de départ",rive],["Largeur",`${n2(M.W)} m`],["Cote à l'échelle",cote],["Régime",f.hyRpRegime||"Non précisé"]],y);
   y+=2; y=section("Résultats",y);
   const dQ=H.debit>0?(M.Q*1000-H.debit)/H.debit*100:0;
-  const tiles=[["Débit (appareil)",`${n2(H.debit,dd)} L/s`,`recalculé ${n2(M.Q*1000,dd)} L/s (${dQ>=0?"+":""}${n2(dQ,1)} %)`],["Section mouillée",`${n2(M.A)} m²`,`largeur ${n2(M.W)} m`],
+  const tiles=[["Débit (appareil)",`${F.Q(H.debit)} ${F.u}`,`recalculé ${F.Q(M.Q*1000)} ${F.u} (${dQ>=0?"+":""}${n2(dQ,1)} %)`],["Section mouillée",`${n2(M.A)} m²`,`largeur ${n2(M.W)} m`],
     ["Vitesse moyenne",`${n2(M.A>0?M.Q/M.A:0)} m/s`,"débit / section"],["Vitesse maximale",`${n2(M.vmax)} m/s`,`ponctuelle ${n2(M.vmaxPts)} m/s`],["Profondeur maximale",`${n2(M.Dmax)} m`,`moyenne ${n2(M.A/M.W)} m`]];
   const tw=(CW-12)/5; tiles.forEach((t,i)=>{ const x=Mg+i*(tw+3); doc.setFillColor(...SOFT); doc.roundedRect(x,y,tw,20,1.5,1.5,"F"); set(7.5,"normal",MUT); T(t[0],x+3,y+5); set(11,"bold",i===0?ACC:INK); T(t[1],x+3,y+11.5); set(6.6,"normal",MUT); T(t[2],x+3,y+16.5) });
   y+=26;
@@ -4711,20 +4729,20 @@ async function hyBuildPdf(f){
   // légende des couleurs
   const gx=Mg, gw=60; for(let k=0;k<60;k++){ const c=hyCol(k/59); doc.setFillColor(Math.round(c[0]),Math.round(c[1]),Math.round(c[2])); doc.rect(gx+k*gw/60,y,gw/60+0.05,3,"F") }
   set(7.5,"normal",MUT); T("0",gx-1,y+2.5,{align:"right"}); T(`${n2(M.vScale)} m/s`,gx+gw+2,y+2.5);
-  T(`Rouge : zone la plus rapide de ce profil`,gx+gw+22,y+2.5); T(`Échelle verticale exagérée x ${HY.exag||1}  ·  isovitesses tous les ${n2(M.iso,M.iso<0.1?2:1)} m/s`,gx,y+7.5); y+=13;
+  T(`Rouge : zone la plus rapide de ce profil`,gx+gw+22,y+2.5); T(`${(HY.exag||1)!==1?hyExTxt(HY.exag).replace("×","x")+"  ·  ":""}isovitesses tous les ${n2(M.iso,M.iso<0.1?2:1)} m/s`,gx,y+7.5); y+=13;
   // ===== répartition du débit + tableau des verticales
   const qi=hyCanvasImg(hyDrawQ,900), qh=CW*qi.h/qi.w;
   y=ensure(y,qh+12); set(10,"bold",INK); T("Répartition du débit par verticale (débit unitaire, part du débit total)",Mg,y); y+=2; doc.addImage(qi.data,"JPEG",Mg,y,CW,qh,"hyQ","FAST"); y+=qh+6;
   y=ensure(y,30); y=section("Détail des verticales",y);
-  const cols=[["N°",9,"l"],["Dist. (m)",18,"r"],["Prof. (m)",18,"r"],["Points : hauteur / fond (m) > vitesse (m/s)",73,"l"],["V moy. (m/s)",21,"r"],["q (L/s/m)",21,"r"],["Part",20,"r"]];
+  const cols=[["N°",9,"l"],["Dist. (m)",18,"r"],["Prof. (m)",18,"r"],["Points : hauteur / fond (m) > vitesse (m/s)",73,"l"],["V moy. (m/s)",21,"r"],[`q (${F.uq})`,21,"r"],["Part",20,"r"]];
   const head=yy=>{ doc.setFillColor(...ACC); doc.rect(Mg,yy-4,CW,6.5,"F"); set(7.3,"bold",[255,255,255]); let x=Mg; cols.forEach(c=>{ T(c[0],c[2]==="r"?x+c[1]-1.5:x+1.5,yy,{align:c[2]==="r"?"right":"left"}); x+=c[1] }); return yy+6 };
   y=head(y);
   M.V.forEach((v,i)=>{ const pts=v.pts.slice().reverse().map(p=>`${n2(p.h)} > ${n2(p.v)}`).join("   ");
-    const cells=[String(v.n),n2(v.x),n2(v.d),pts||"-",n2(v.vm),n2(M.seg[i].q*1000,qd),`${n2(M.seg[i].part*100,1)} %`];
+    const cells=[String(v.n),n2(v.x),n2(v.d),pts||"-",n2(v.vm),F.q(M.seg[i].q*1000),`${n2(M.seg[i].part*100,1)} %`];
     if(y>PH-22){ doc.addPage(); header(); y=head(40) }
     if(i%2){ doc.setFillColor(...SOFT); doc.rect(Mg,y-4,CW,6,"F") }
     set(8,"normal",INK); let x=Mg; cells.forEach((c,k)=>{ const col=cols[k]; if(k===6&&M.seg[i].part>0.1) set(8,"bold",RED); T(c,col[2]==="r"?x+col[1]-1.5:x+1.5,y,{align:col[2]==="r"?"right":"left"}); set(8,"normal",INK); x+=col[1] }); y+=6 });
-  set(7.5,"normal",MUT); T(`Débit recalculé par la section médiane : ${n2(M.Q*1000,dd)} L/s  ·  section mouillée ${n2(M.A)} m²  ·  vitesse moyenne ${n2(M.A>0?M.Q/M.A:0)} m/s`,Mg,y+1); y+=7;
+  set(7.5,"normal",MUT); T(`Débit recalculé par la section médiane : ${F.Q(M.Q*1000)} ${F.u}  ·  section mouillée ${n2(M.A)} m²  ·  vitesse moyenne ${n2(M.A>0?M.Q/M.A:0)} m/s`,Mg,y+1); y+=7;
   // ===== contrôle qualité
   y=ensure(y,20+q.it.length*11); y=section("Contrôle qualité (repères ISO 748)",y);
   const stc={ok:[23,100,58],info:[122,86,0],warn:[155,44,16]}, stb={ok:[221,241,228],info:[255,241,199],warn:[253,224,214]};
