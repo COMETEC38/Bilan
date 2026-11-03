@@ -765,6 +765,11 @@ body.onhydro{padding-bottom:0!important}
 .hy-scale i{display:block;width:220px;max-width:46vw;height:12px;border-radius:6px}
 .hy-warn{margin:0;font-size:13px;color:var(--ink-2);background:var(--surface-2);border-radius:10px;padding:8px 12px}
 .hy-head-act{display:flex;flex-wrap:wrap;gap:8px}
+.hy-unit{display:inline-flex;align-items:center;gap:2px;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:3px}
+.hy-unit span{font-size:12.5px;font-weight:600;color:var(--muted);padding:0 8px 0 7px;white-space:nowrap}
+.hy-unit button{border:none;background:none;border-radius:7px;padding:7px 10px;font:inherit;font-weight:700;font-size:13px;color:var(--muted);cursor:pointer;white-space:nowrap}
+.hy-unit button[aria-checked="true"]{background:var(--surface);color:var(--brand);box-shadow:0 1px 4px rgba(18,56,56,.15)}
+.hy-unit button:focus-visible{outline:2px solid var(--brand);outline-offset:1px}
 .hy-head-act .btn svg{width:17px;height:17px}
 .hy-q{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
 .hy-q li{display:grid;grid-template-columns:96px minmax(0,1fr);gap:2px 12px;align-items:start;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
@@ -777,7 +782,8 @@ body.onhydro{padding-bottom:0!important}
 .hy-unc{margin:0;font-size:13.5px;color:var(--ink-2)}
 .hy-unc b{color:var(--ink);font-size:15px}
 .hy-cols{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:18px}
-.hy-tw{overflow-x:auto}
+.hy-tw{overflow:auto;max-height:560px}
+.hy-vt thead th{position:sticky;top:0;background:var(--surface);z-index:1}
 .hy-vt{width:100%;border-collapse:collapse;font-size:13.5px;font-variant-numeric:tabular-nums}
 .hy-vt th{text-align:right;font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:700;padding:6px 8px;border-bottom:1.5px solid var(--line);white-space:nowrap}
 .hy-vt td{text-align:right;padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
@@ -1620,7 +1626,7 @@ body.onctrl{padding-bottom:0!important}
   <div class="sim-body" id="hyView" hidden>
     <div class="hy-head">
       <div><h2 id="hyProfil">Profil</h2><div class="hy-meta" id="hyMeta"></div></div>
-      <div class="hy-head-act"><button class="btn primary" id="hyReportBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6M9 13h8M9 17h8"/></svg>Rapport PDF</button><button class="btn" id="hyOpen2" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3m0 0-5 5m5-5 5 5M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>Ouvrir un autre jaugeage</button></div>
+      <div class="hy-head-act"><div class="hy-unit" id="hyUnit" role="radiogroup" aria-label="Unité de débit"><span>Débit en</span><button type="button" role="radio" data-u="L/s" aria-checked="false">L/s</button><button type="button" role="radio" data-u="m³/s" aria-checked="false">m³/s</button><button type="button" role="radio" data-u="m³/h" aria-checked="false">m³/h</button></div><button class="btn primary" id="hyReportBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6M9 13h8M9 17h8"/></svg>Rapport PDF</button><button class="btn" id="hyOpen2" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3m0 0-5 5m5-5 5 5M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>Ouvrir un autre jaugeage</button></div>
     </div>
     <div class="demobar" id="hyDemoBar" hidden><span><b>Mode démonstration</b> · jaugeage fictif fourni par COMETEC. Ouvrez votre propre jaugeage quand vous voulez.</span><span class="inline"><button class="btn small" id="hyQuitDemo" type="button">Quitter la démo</button></span></div>
     <div class="dz-err" id="hyErr2" role="alert" hidden></div>

@@ -765,6 +765,11 @@ body.onhydro{padding-bottom:0!important}
 .hy-scale i{display:block;width:220px;max-width:46vw;height:12px;border-radius:6px}
 .hy-warn{margin:0;font-size:13px;color:var(--ink-2);background:var(--surface-2);border-radius:10px;padding:8px 12px}
 .hy-head-act{display:flex;flex-wrap:wrap;gap:8px}
+.hy-unit{display:inline-flex;align-items:center;gap:2px;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:3px}
+.hy-unit span{font-size:12.5px;font-weight:600;color:var(--muted);padding:0 8px 0 7px;white-space:nowrap}
+.hy-unit button{border:none;background:none;border-radius:7px;padding:7px 10px;font:inherit;font-weight:700;font-size:13px;color:var(--muted);cursor:pointer;white-space:nowrap}
+.hy-unit button[aria-checked="true"]{background:var(--surface);color:var(--brand);box-shadow:0 1px 4px rgba(18,56,56,.15)}
+.hy-unit button:focus-visible{outline:2px solid var(--brand);outline-offset:1px}
 .hy-head-act .btn svg{width:17px;height:17px}
 .hy-q{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
 .hy-q li{display:grid;grid-template-columns:96px minmax(0,1fr);gap:2px 12px;align-items:start;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
@@ -777,7 +782,8 @@ body.onhydro{padding-bottom:0!important}
 .hy-unc{margin:0;font-size:13.5px;color:var(--ink-2)}
 .hy-unc b{color:var(--ink);font-size:15px}
 .hy-cols{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:18px}
-.hy-tw{overflow-x:auto}
+.hy-tw{overflow:auto;max-height:560px}
+.hy-vt thead th{position:sticky;top:0;background:var(--surface);z-index:1}
 .hy-vt{width:100%;border-collapse:collapse;font-size:13.5px;font-variant-numeric:tabular-nums}
 .hy-vt th{text-align:right;font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:700;padding:6px 8px;border-bottom:1.5px solid var(--line);white-space:nowrap}
 .hy-vt td{text-align:right;padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
@@ -1117,7 +1123,7 @@ body.onctrl{padding-bottom:0!important}
       <li><span class="hs-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.2 5.8L20 11l-5.8 2.2L12 19l-2.2-5.8L4 11l5.8-2.2z"/></svg></span><b>Nouveautés</b><small>Nouveaux produits et actualités</small><em>Bientôt</em></li>
       <li><span class="hs-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></span><b>Aide au paramétrage</b><small>Réglage pas à pas de vos appareils</small><em>Bientôt</em></li>
     </ul>
-    <p class="hub-foot">COMETEC · Instrumentation des eaux · Chapareillan (38) · version 2.11.5</p>
+    <p class="hub-foot">COMETEC · Instrumentation des eaux · Chapareillan (38) · version 2.12.0</p>
   </div>
 </section>
 <section class="sim ctrl" id="ctrl" aria-labelledby="ctrlTitle">
@@ -1556,7 +1562,7 @@ body.onctrl{padding-bottom:0!important}
     <button type="button" data-mtab="volumes"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 20V11M12 20V5M18 20v-7"/></svg></span>Volumes</button>
     <button type="button" data-mtab="export"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 20h16"/></svg></span>Exporter</button>
   </nav>
-  <footer>COMETEC · Instrumentation des eaux · ZA de Longifan, 38530 Chapareillan · application COMETEC version 2.11.5</footer>
+  <footer>COMETEC · Instrumentation des eaux · ZA de Longifan, 38530 Chapareillan · application COMETEC version 2.12.0</footer>
 </div>
 <div class="modal" id="reportModal" hidden role="dialog" aria-modal="true" aria-labelledby="t-report">
   <form class="modal-box" id="reportForm">
@@ -1620,7 +1626,7 @@ body.onctrl{padding-bottom:0!important}
   <div class="sim-body" id="hyView" hidden>
     <div class="hy-head">
       <div><h2 id="hyProfil">Profil</h2><div class="hy-meta" id="hyMeta"></div></div>
-      <div class="hy-head-act"><button class="btn primary" id="hyReportBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6M9 13h8M9 17h8"/></svg>Rapport PDF</button><button class="btn" id="hyOpen2" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3m0 0-5 5m5-5 5 5M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>Ouvrir un autre jaugeage</button></div>
+      <div class="hy-head-act"><div class="hy-unit" id="hyUnit" role="radiogroup" aria-label="Unité de débit"><span>Débit en</span><button type="button" role="radio" data-u="L/s" aria-checked="false">L/s</button><button type="button" role="radio" data-u="m³/s" aria-checked="false">m³/s</button><button type="button" role="radio" data-u="m³/h" aria-checked="false">m³/h</button></div><button class="btn primary" id="hyReportBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6M9 13h8M9 17h8"/></svg>Rapport PDF</button><button class="btn" id="hyOpen2" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3m0 0-5 5m5-5 5 5M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>Ouvrir un autre jaugeage</button></div>
     </div>
     <div class="demobar" id="hyDemoBar" hidden><span><b>Mode démonstration</b> · jaugeage fictif fourni par COMETEC. Ouvrez votre propre jaugeage quand vous voulez.</span><span class="inline"><button class="btn small" id="hyQuitDemo" type="button">Quitter la démo</button></span></div>
     <div class="dz-err" id="hyErr2" role="alert" hidden></div>
@@ -4418,7 +4424,7 @@ addEventListener("popstate",()=>{ if($("contact").open&&!(history.state&&history
 
 /* ---------- COMETEC Hydro : jaugeages du courantomètre FLUVIA (CSV ou Excel) ---------- */
 const HY_DEMO="Profile Numero          ,Type de Profil          ,Date                    ,Heure                   ,Largeur Riviere         ,Debit                   ,Unites Dimensions       ,Unites Vitesse          ,Unites Debit            \n1                       ,Riviere                 ,14/09/26                ,10:12:05                ,4.20                    ,651                     ,m                       ,m/s                     ,L/s                     \nVerticale Numero        ,Distance de la Rive     ,Profondeur              ,Vitesse Moyenne         ,Hauteur                 ,Vitesse                 \n1                       ,0.15                    ,0.19                    ,0.16                    ,0.15                    ,0.18                    \n                        ,                        ,                        ,                        ,0.08                    ,0.16                    \n                        ,                        ,                        ,                        ,0.04                    ,0.14                    \n2                       ,0.43                    ,0.28                    ,0.22                    ,0.22                    ,0.25                    \n                        ,                        ,                        ,                        ,0.11                    ,0.23                    \n                        ,                        ,                        ,                        ,0.06                    ,0.19                    \n3                       ,0.71                    ,0.36                    ,0.33                    ,0.29                    ,0.36                    \n                        ,                        ,                        ,                        ,0.14                    ,0.33                    \n                        ,                        ,                        ,                        ,0.07                    ,0.28                    \n4                       ,0.99                    ,0.42                    ,0.45                    ,0.34                    ,0.50                    \n                        ,                        ,                        ,                        ,0.17                    ,0.46                    \n                        ,                        ,                        ,                        ,0.08                    ,0.38                    \n5                       ,1.27                    ,0.47                    ,0.57                    ,0.38                    ,0.64                    \n                        ,                        ,                        ,                        ,0.19                    ,0.59                    \n                        ,                        ,                        ,                        ,0.09                    ,0.48                    \n6                       ,1.55                    ,0.49                    ,0.67                    ,0.39                    ,0.74                    \n                        ,                        ,                        ,                        ,0.20                    ,0.68                    \n                        ,                        ,                        ,                        ,0.10                    ,0.56                    \n7                       ,1.83                    ,0.51                    ,0.68                    ,0.41                    ,0.76                    \n                        ,                        ,                        ,                        ,0.20                    ,0.70                    \n                        ,                        ,                        ,                        ,0.10                    ,0.57                    \n8                       ,2.11                    ,0.50                    ,0.63                    ,0.40                    ,0.70                    \n                        ,                        ,                        ,                        ,0.20                    ,0.64                    \n                        ,                        ,                        ,                        ,0.10                    ,0.53                    \n9                       ,2.39                    ,0.48                    ,0.52                    ,0.38                    ,0.58                    \n                        ,                        ,                        ,                        ,0.19                    ,0.53                    \n                        ,                        ,                        ,                        ,0.10                    ,0.44                    \n10                      ,2.67                    ,0.45                    ,0.39                    ,0.36                    ,0.44                    \n                        ,                        ,                        ,                        ,0.18                    ,0.40                    \n                        ,                        ,                        ,                        ,0.09                    ,0.33                    \n11                      ,2.95                    ,0.41                    ,0.28                    ,0.33                    ,0.31                    \n                        ,                        ,                        ,                        ,0.16                    ,0.28                    \n                        ,                        ,                        ,                        ,0.08                    ,0.23                    \n12                      ,3.23                    ,0.35                    ,0.19                    ,0.28                    ,0.21                    \n                        ,                        ,                        ,                        ,0.14                    ,0.20                    \n                        ,                        ,                        ,                        ,0.07                    ,0.16                    \n13                      ,3.51                    ,0.29                    ,0.14                    ,0.23                    ,0.16                    \n                        ,                        ,                        ,                        ,0.12                    ,0.14                    \n                        ,                        ,                        ,                        ,0.06                    ,0.12                    \n14                      ,3.79                    ,0.22                    ,0.12                    ,0.18                    ,0.13                    \n                        ,                        ,                        ,                        ,0.09                    ,0.12                    \n                        ,                        ,                        ,                        ,0.04                    ,0.10                    \n15                      ,4.07                    ,0.14                    ,0.10                    ,0.11                    ,0.11                    \n                        ,                        ,                        ,                        ,0.06                    ,0.10                    \n                        ,                        ,                        ,                        ,0.03                    ,0.09                    \n";
-const HY={J:null,M:null,hover:null,show:{V:true,P:true,I:true},demo:false,geo:null};
+const HY={qu:(()=>{ try{ return localStorage.getItem("cometecHydroUnit") }catch(e){ return null } })(),J:null,M:null,hover:null,show:{V:true,P:true,I:true},demo:false,geo:null};
 function hydroOn(){ return document.body.classList.contains("onhydro") }
 function showHydro(push){ document.body.classList.remove("onhub","onprod","onsim","onctrl"); $("hub").classList.remove("hub-anim"); document.body.classList.add("onhydro");
   if(push!==false) try{ history.pushState({hydro:1},"") }catch(e){} window.scrollTo({top:0}); if(HY.M) requestAnimationFrame(hyRender) }
@@ -4441,12 +4447,17 @@ function hyUnitQ(s){ const u=hyKey(s).replace(/[.\s]/g,"").replace("³","3");
   if(/^m3\/s$|^cumecs?$/.test(u)) return {k:1000,t:"m³/s"}; if(/^m3\/h$/.test(u)) return {k:1/3.6,t:"m³/h"}; if(/^m3\/(j|d|24h)$/.test(u)) return {k:1/86.4,t:"m³/j"};
   if(/^(ft3\/s|cfs|pi3\/s)$/.test(u)) return {k:28.316846592,t:"ft³/s"}; if(/^(l\/min|lpm)$/.test(u)) return {k:1/60,t:"L/min"}; if(/^(gpm|usgpm)$/.test(u)) return {k:0.0630901964,t:"gal US/min"};
   return {k:1,t:u?"L/s":""} }
-/* format des débits : L/s, ou m³/s dès 1000 L/s */
-function hyQF(){ const H=HY.J.head, M=HY.M, ref=H.debit>0?H.debit:M.Q*1000, big=Math.max(ref,M.Q*1000)>=1000, qr=M.qmax*1000;
-  const d=big?(ref/1000<100?2:1):(ref<100?1:0), qd=big?(qr/1000<1?3:2):(qr<100?1:0);
-  return {big,u:big?"m³/s":"L/s",uq:big?"m³/s/m":"L/s/m",Q:v=>hnf(big?v/1000:v,d),q:v=>hnf(big?v/1000:v,qd)} }
+/* unités de débit : choix de l'utilisateur (mémorisé), sinon L/s puis m³/s dès 1000 L/s */
+const HY_QU={"L/s":{k:1,q:"L/s/m"},"m³/s":{k:0.001,q:"m³/s/m"},"m³/h":{k:3.6,q:"m³/h/m"}};
+const hySigDec=(v,n=3,max=4)=>{ v=Math.abs(v); return v>0?Math.max(0,Math.min(max,n-1-Math.floor(Math.log10(v)+1e-9))):0 };
+const hySig=(v,n=3,max=3)=>hnf(v,hySigDec(v,n,max));
+function hyQF(){ const H=HY.J.head, M=HY.M, ref=H.debit>0?H.debit:M.Q*1000, auto=Math.max(ref,M.Q*1000)>=1000?"m³/s":"L/s";
+  const u=HY_QU[HY.qu]?HY.qu:auto, k=HY_QU[u].k, dec=v=>u==="L/s"?(v<1?2:v<100?1:0):u==="m³/s"?(v<0.1?4:v<1?3:v<10?2:1):(v<10?2:v<100?1:0), d=dec(ref*k), qd=dec(M.qmax*1000*k);
+  return {u,uq:HY_QU[u].q,k,Q:v=>hnf(v*k,d),q:v=>hnf(v*k,Math.max(qd,v>0?hySigDec(v*k,2,4):0))} }
 const hyTypeFr=t=>{ const k=hyKey(t); return k==="river"||k==="riviere"?"rivière":k==="circular"||k==="circular pipe"?"conduite circulaire":k==="rectangular"?"canal rectangulaire":String(t||"").toLowerCase() };
-function hyNice(range,max,steps){ return steps.find(t=>range/t<=max)||steps[steps.length-1] }
+/* pas de graduation « rond » (1, 2, 2,5, 5 × 10ⁿ) pour au plus maxT intervalles */
+function hyStep(range,maxT){ const raw=Math.max(range,1e-9)/Math.max(1,maxT), p=Math.pow(10,Math.floor(Math.log10(raw))); for(const m of [1,2,2.5,5,10]) if(m*p>=raw*(1-1e-9)) return +(m*p).toPrecision(6); return 10*p }
+const hyDec=st=>{ const t=String(+(+st).toPrecision(6)); return t.includes(".")?t.split(".")[1].length:0 };
 function isFluviaRows(rows){ try{ return hyFind(hyNormRows(rows))>=0 }catch(e){ return false } }
 function hyParse(raw){
   const rows=hyNormRows(raw).filter(r=>r.some(c=>c!==""));
@@ -4550,16 +4561,24 @@ function hyDrawSection(cv,cw,P,pdf){
   g.beginPath(); for(let k=0;k<=300;k++){const x=M.W*k/300; k?g.lineTo(X(x),Y(M.bed(x))):g.moveTo(X(x),Y(M.bed(x)))} g.strokeStyle=P("--hy-bed"); g.lineWidth=2.2; g.stroke();
   g.beginPath(); g.moveTo(X(0)-6,Y(0)); g.lineTo(X(M.W)+6,Y(0)); g.strokeStyle=P("--brand"); g.lineWidth=2; g.stroke();
   const tx=X(M.W)+(cw<520?16:24); g.beginPath(); g.moveTo(tx-6,Y(0)-11); g.lineTo(tx+6,Y(0)-11); g.lineTo(tx,Y(0)-2); g.closePath(); g.fillStyle=P("--brand"); g.fill(); g.beginPath(); g.moveTo(tx-9,Y(0)-14); g.lineTo(tx+9,Y(0)-14); g.lineWidth=1.5; g.stroke();
+  /* numéros et points adaptés à l'écart entre verticales (de 0,5 m à plus de 100 m de large) */
+  const gap=M.V.reduce((a,v,i)=>i?Math.min(a,X(v.x)-X(M.V[i-1].x)):a,Infinity), r0=cw<520?8:10, wide=String(Math.max(...M.V.map(v=>v.n))).length>1;
+  let r=Math.min(r0,Math.max(6.5,(gap-2)/2)), every=1; if(gap<2*r+2){ r=r0; every=[2,5,10,20,50].find(k=>gap*k>=2*r0+6)||100 }
+  const fsz=r>=10?11:r>=8?(wide?8.5:9.5):(wide?7:8), pr=Math.max(1.8,Math.min(4.2,gap/3.4)), sparse=gap<9;
+  const bub=(v,on,rr)=>{ const xx=X(v.x); g.beginPath(); g.arc(xx,mt-15,rr,0,7); g.fillStyle=on?P("--rule"):P("--surface"); g.fill(); g.lineWidth=1.2; g.strokeStyle=on?P("--rule"):line; g.stroke();
+    g.fillStyle=on?"#FFFFFF":ink2; g.font=`700 ${on?Math.max(fsz,cw<520?9:11):fsz}px Arial, sans-serif`; g.textAlign="center"; g.textBaseline="middle"; g.fillText(v.n,xx,mt-14.5) };
+  let lastLab=-Infinity;
   M.V.forEach((v,i)=>{ const on=hov===i, xx=X(v.x);
-    if(HY.show.V||on){ g.save(); g.setLineDash([4,4]); g.strokeStyle=on?"#FFFFFF":"rgba(255,255,255,.75)"; g.lineWidth=on?2:1.2; g.beginPath(); g.moveTo(xx,Y(0)); g.lineTo(xx,Y(v.d)); g.stroke(); g.restore() }
-    if(HY.show.P||on) v.pts.forEach(p=>{ g.beginPath(); g.arc(xx,Y(Math.max(0,v.d-p.h)),on?5.5:4.2,0,7); g.fillStyle=hyCss(p.v/M.vScale); g.fill(); g.lineWidth=1.6; g.strokeStyle="#FFFFFF"; g.stroke() });
-    const r=cw<520?8:10; g.beginPath(); g.arc(xx,mt-15,r,0,7); g.fillStyle=on?P("--rule"):P("--surface"); g.fill(); g.lineWidth=1.2; g.strokeStyle=on?P("--rule"):line; g.stroke();
-    g.fillStyle=on?"#FFFFFF":ink2; g.font=`700 ${cw<520?9:11}px Arial, sans-serif`; g.textAlign="center"; g.textBaseline="middle"; g.fillText(v.n,xx,mt-14.5) });
+    if(HY.show.V||on){ g.save(); g.setLineDash(sparse&&!on?[3,4]:[4,4]); g.strokeStyle=on?"#FFFFFF":sparse?"rgba(255,255,255,.5)":"rgba(255,255,255,.75)"; g.lineWidth=on?2:sparse?0.8:1.2; g.beginPath(); g.moveTo(xx,Y(0)); g.lineTo(xx,Y(v.d)); g.stroke(); g.restore() }
+    if(HY.show.P||on) v.pts.forEach(p=>{ g.beginPath(); g.arc(xx,Y(Math.max(0,v.d-p.h)),on?5.5:pr,0,7); g.fillStyle=hyCss(p.v/M.vScale); g.fill(); g.lineWidth=on||pr>3?1.6:pr>2.2?1:0.7; g.strokeStyle="#FFFFFF"; g.stroke() });
+    const lab=every===1||((i===0||v.n%every===0||i===M.V.length-1)&&xx-lastLab>=2*r0+4);
+    if(lab){ bub(v,false,r); lastLab=xx } else { g.beginPath(); g.arc(xx,mt-15,2.2,0,7); g.fillStyle=muted; g.fill() } });
+  if(hov!==null&&M.V[hov]) bub(M.V[hov],true,Math.max(r,cw<520?9:11));
   g.fillStyle=muted; g.strokeStyle=line; g.font="12px Arial, sans-serif"; g.textBaseline="top"; g.textAlign="center"; g.lineWidth=1;
-  const step=hyNice(M.W,pw<420?6:12,[0.5,1,2,5,10,20,25,50,100,200,500]); for(let k=0;k*step<=M.W+1e-9;k++){ const x=k*step; g.beginPath(); g.moveTo(X(x),mt+ph+gpad); g.lineTo(X(x),mt+ph+gpad+5); g.stroke(); g.fillText(hnf(x,x%1?1:0),X(x),mt+ph+gpad+8) }
+  const step=hyStep(M.W,Math.floor(pw/(cw<520?52:80))), xd=hyDec(step); for(let k=0;k*step<=M.W+1e-9;k++){ const x=k*step; g.beginPath(); g.moveTo(X(x),mt+ph+gpad); g.lineTo(X(x),mt+ph+gpad+5); g.stroke(); g.fillText(hnf(x,xd),X(x),mt+ph+gpad+8) }
   g.textAlign="right"; g.fillText(`${hnf(M.W)} m`,X(M.W),mt+ph+gpad+20); g.textAlign="left"; g.fillText(HY.rive==="RG"?"distance depuis la rive gauche (m)":HY.rive==="RD"?"distance depuis la rive droite (m)":"distance à la rive (m)",X(0),mt+ph+gpad+20);
-  g.textAlign="right"; g.textBaseline="middle"; const dstep=hyNice(M.Dmax,8,[0.1,0.2,0.5,1,2,5,10,20]);
-  for(let k=0;k*dstep<=M.Dmax+1e-9;k++){ const d=k*dstep; g.beginPath(); g.moveTo(ml-5,Y(d)); g.lineTo(ml,Y(d)); g.stroke(); g.fillText(hnf(d,dstep<1?1:0),ml-8,Y(d)) }
+  g.textAlign="right"; g.textBaseline="middle"; const dstep=hyStep(M.Dmax,Math.max(2,Math.floor(ph/40))), ddec=hyDec(dstep);
+  for(let k=0;k*dstep<=M.Dmax+1e-9;k++){ const d=k*dstep; g.beginPath(); g.moveTo(ml-5,Y(d)); g.lineTo(ml,Y(d)); g.stroke(); g.fillText(hnf(d,ddec),ml-8,Y(d)) }
   if(cw>=520){ g.save(); g.translate(12,mt+ph/2); g.rotate(-Math.PI/2); g.textAlign="center"; g.fillText("profondeur (m)",0,0); g.restore() }
   HY.exag=ex; if(pdf) return ch;
   const isoT=`isovitesses tous les ${hnf(M.iso,M.iso<0.1?2:1)} m/s`; $("hyExag").textContent=ex!==1?`${hyExTxt(ex)} · ${isoT}`:isoT.charAt(0).toUpperCase()+isoT.slice(1);
@@ -4567,18 +4586,21 @@ function hyDrawSection(cv,cw,P,pdf){
 }
 function hyDrawQ(cv,cw,P,pdf){
   const M=HY.M; if(!cw) return; P=P||hyTok; const dpr=pdf?2:Math.min(window.devicePixelRatio||1,2), hov=pdf?null:HY.hover;
-  const ml=44, mr=8, mt=22, mb=32, ch=pdf?210:230, pw=cw-ml-mr, ph=ch-mt-mb;
+  const mr=8, mt=22, mb=32, ch=pdf?210:230, ph=ch-mt-mb;
   cv.width=Math.round(cw*dpr); cv.height=Math.round(ch*dpr); cv.style.height=ch+"px";
   const g=cv.getContext("2d"); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,cw,ch);
   if(pdf){ g.fillStyle="#FFFFFF"; g.fillRect(0,0,cw,ch) }
-  const F=hyQF(), sc=F.big?1:1000, qm=M.qmax*sc, qst=hyNice(qm,5,[0.01,0.02,0.05,0.1,0.2,0.25,0.5,1,2,5,10,20,25,50,100,200,500,1000,2000,5000]), nt=Math.max(1,Math.ceil(qm/qst-1e-9)), top=nt*qst, X=x=>ml+x/M.W*pw, Y=q=>mt+ph-(q*sc)/top*ph;
-  g.font="11px Arial, sans-serif"; g.fillStyle=P("--muted"); g.strokeStyle=P("--line"); g.textAlign="right"; g.textBaseline="middle"; g.lineWidth=1;
-  const qdec=qst<0.1?2:qst<1?1:0; for(let k=0;k<=nt;k++){ const q=k*qst/sc; g.beginPath(); g.moveTo(ml,Y(q)); g.lineTo(ml+pw,Y(q)); g.stroke(); g.fillText(hnf(k*qst,qdec),ml-6,Y(q)) }
+  const F=hyQF(), qm=M.qmax*1000*F.k, qst=hyStep(qm,Math.max(2,Math.floor(ph/38))), nt=Math.max(1,Math.ceil(qm/qst-1e-9)), top=nt*qst, qdec=hyDec(qst);
+  g.font="11px Arial, sans-serif"; const ml=Math.max(44,Math.ceil(g.measureText(hnf(top,qdec)).width)+26), pw=cw-ml-mr;
+  const X=x=>ml+x/M.W*pw, Y=v=>mt+ph-v/top*ph;
+  g.fillStyle=P("--muted"); g.strokeStyle=P("--line"); g.textAlign="right"; g.textBaseline="middle"; g.lineWidth=1;
+  for(let k=0;k<=nt;k++){ const v=k*qst; g.beginPath(); g.moveTo(ml,Y(v)); g.lineTo(ml+pw,Y(v)); g.stroke(); g.fillText(hnf(v,qdec),ml-6,Y(v)) }
   g.save(); g.translate(10,mt+ph/2); g.rotate(-Math.PI/2); g.textAlign="center"; g.fillText(F.uq,0,0); g.restore();
-  M.seg.forEach((s,i)=>{ const x1=X(s.a)+1, x2=X(s.b)-1; g.fillStyle=hyCss(M.V[i].vm/M.vScale); g.globalAlpha=hov===null||hov===i?1:.45; g.fillRect(x1,Y(s.q),Math.max(1,x2-x1),Y(0)-Y(s.q)); g.globalAlpha=1;
-    if(x2-x1>22){ g.fillStyle=P("--ink-2"); g.textAlign="center"; g.textBaseline="bottom"; g.font="600 10.5px Arial, sans-serif"; g.fillText(Math.round(s.part*100)+" %",(x1+x2)/2,Y(s.q)-3) } });
+  const gp=M.seg.length>40?0.5:1;
+  M.seg.forEach((sg,i)=>{ const x1=X(sg.a)+gp, x2=X(sg.b)-gp, v=sg.q*1000*F.k; g.fillStyle=hyCss(M.V[i].vm/M.vScale); g.globalAlpha=hov===null||hov===i?1:.45; g.fillRect(x1,Y(v),Math.max(1,x2-x1),Y(0)-Y(v)); g.globalAlpha=1;
+    if(x2-x1>24){ g.fillStyle=P("--ink-2"); g.textAlign="center"; g.textBaseline="bottom"; g.font="600 10.5px Arial, sans-serif"; g.fillText(Math.round(sg.part*100)+" %",(x1+x2)/2,Y(v)-3) } });
   g.fillStyle=P("--muted"); g.textAlign="center"; g.textBaseline="top"; g.font="11px Arial, sans-serif";
-  const step=hyNice(M.W,pw<420?6:12,[0.5,1,2,5,10,20,25,50,100,200,500]); for(let k=0;k*step<=M.W+1e-9;k++){ const x=k*step; g.fillText(hnf(x,x%1?1:0),X(x),mt+ph+6) }
+  const step=hyStep(M.W,Math.floor(pw/(cw<520?52:80))), xd=hyDec(step); for(let k=0;k*step<=M.W+1e-9;k++){ const x=k*step; g.fillText(hnf(x,xd),X(x),mt+ph+6) }
   g.textAlign="right"; g.fillText("m",ml+pw,mt+ph+18); return ch;
 }
 const hySrcTxt=s=>[s.L!=="m"?`longueurs en ${s.L}`:"",s.V!=="m/s"?`vitesses en ${s.V}`:"",s.Q&&s.Q!=="L/s"?`débit en ${s.Q}`:""].filter(Boolean).join(", ");
@@ -4587,7 +4609,7 @@ function hyFill(){
   $("hyProfil").textContent=`Profil n° ${H.profil||"?"}`;
   $("hyMeta").innerHTML=`<b>${esc(H.date||"")}</b>${H.heure?` à <b>${esc(H.heure)}</b>`:""} · ${M.V.length} verticales · ${HY.demo?"jaugeage de démonstration":`fichier <b>${esc(HY.J.name)}</b>`}`;
   const K=[["main","Débit",`${F.Q(H.debit)}<small>${F.u}</small>`,`recalculé : ${F.Q(M.Q*1000)} ${F.u} (${dQ>=0?"+":""}${hnf(dQ,1)} %)`],
-    ["","Largeur",`${hnf(M.W)}<small>m</small>`,`section mouillée ${hnf(M.A,2)} m²`],
+    ["","Largeur",`${hnf(M.W)}<small>m</small>`,`section mouillée ${hySig(M.A)} m²`],
     ["","Profondeur max",`${hnf(M.Dmax)}<small>m</small>`,`moyenne ${hnf(M.A/M.W,2)} m`],
     ["","Vitesse moyenne",`${hnf(M.A>0?M.Q/M.A:0)}<small>m/s</small>`,"débit / section"],
     ["","Vitesse max",`${hnf(M.vmax)}<small>m/s</small>`,`ponctuelle ${hnf(M.vmaxPts)} m/s`],
@@ -4599,6 +4621,7 @@ function hyFill(){
     M.V.map((v,i)=>`<tr data-i="${i}"><td><span class="hy-dot" style="background:${hyCss(v.vm/M.vScale)}"></span>${v.n}</td><td>${hnf(v.x)} m</td><td>${hnf(v.d)} m</td><td>${hnf(v.vm)} m/s</td><td>${F.q(M.seg[i].q*1000)} ${F.uq}</td><td>${hnf(M.seg[i].part*100,1)} %</td></tr>`).join("")+`</tbody>`;
   const w=$("hyWarn"); if(M.vmax<0.1){ w.textContent="Vitesses très faibles : l'export arrondit les vitesses au centième de m/s, ce qui peut expliquer quelques pour cent d'écart entre le débit affiché par l'appareil et le débit recalculé."; w.hidden=false } else w.hidden=true;
   $("hyDemoBar").hidden=!HY.demo;
+  document.querySelectorAll("#hyUnit button").forEach(b=>b.setAttribute("aria-checked",b.dataset.u===F.u));
   hyQualityUi();
 }
 function hyRender(){ if(!HY.M||!hydroOn()) return; hyDrawSection($("hyCv"),$("hyCv").parentElement.clientWidth); hyDrawQ($("hyCq"),$("hyCq").parentElement.clientWidth); document.querySelectorAll("#hyVt tbody tr").forEach(tr=>tr.classList.toggle("on",+tr.dataset.i===HY.hover)) }
@@ -4613,6 +4636,7 @@ function hyPick(ev){ const r=$("hyCv").getBoundingClientRect(), x=ev.clientX-r.l
 $("hyCv").addEventListener("pointermove",hyPick); $("hyCv").addEventListener("pointerdown",hyPick);
 $("hyCv").addEventListener("pointerleave",e=>{ if(e.pointerType==="mouse"){ HY.hover=null; $("hyTip").hidden=true; hyRender() } });
 $("hyVt").addEventListener("pointerover",e=>{ const tr=e.target.closest("tr[data-i]"); if(tr){ HY.hover=+tr.dataset.i; $("hyTip").hidden=true; hyRender() } });
+document.querySelectorAll("#hyUnit button").forEach(b=>b.onclick=()=>{ HY.qu=b.dataset.u; try{ localStorage.setItem("cometecHydroUnit",HY.qu) }catch(e){} if(HY.M){ hyFill(); hyRender() } });
 [["hyTgV","V"],["hyTgP","P"],["hyTgI","I"]].forEach(([id,k])=>$(id).onclick=()=>{ HY.show[k]=!HY.show[k]; $(id).setAttribute("aria-pressed",HY.show[k]); hyRender() });
 { let t=null; addEventListener("resize",()=>{ clearTimeout(t); t=setTimeout(hyRender,120) }) }
 try{ matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>hyRender()) }catch(e){}
@@ -4719,7 +4743,7 @@ async function hyBuildPdf(f){
         ["Rive de départ",rive],["Largeur",`${n2(M.W)} m`],["Cote à l'échelle",cote],["Régime",f.hyRpRegime||"Non précisé"]],y);
   y+=2; y=section("Résultats",y);
   const dQ=H.debit>0?(M.Q*1000-H.debit)/H.debit*100:0;
-  const tiles=[["Débit (appareil)",`${F.Q(H.debit)} ${F.u}`,`recalculé ${F.Q(M.Q*1000)} ${F.u} (${dQ>=0?"+":""}${n2(dQ,1)} %)`],["Section mouillée",`${n2(M.A)} m²`,`largeur ${n2(M.W)} m`],
+  const tiles=[["Débit (appareil)",`${F.Q(H.debit)} ${F.u}`,`recalculé ${F.Q(M.Q*1000)} ${F.u} (${dQ>=0?"+":""}${n2(dQ,1)} %)`],["Section mouillée",`${hySig(M.A)} m²`,`largeur ${n2(M.W)} m`],
     ["Vitesse moyenne",`${n2(M.A>0?M.Q/M.A:0)} m/s`,"débit / section"],["Vitesse maximale",`${n2(M.vmax)} m/s`,`ponctuelle ${n2(M.vmaxPts)} m/s`],["Profondeur maximale",`${n2(M.Dmax)} m`,`moyenne ${n2(M.A/M.W)} m`]];
   const tw=(CW-12)/5; tiles.forEach((t,i)=>{ const x=Mg+i*(tw+3); doc.setFillColor(...SOFT); doc.roundedRect(x,y,tw,20,1.5,1.5,"F"); set(7.5,"normal",MUT); T(t[0],x+3,y+5); set(11,"bold",i===0?ACC:INK); T(t[1],x+3,y+11.5); set(6.6,"normal",MUT); T(t[2],x+3,y+16.5) });
   y+=26;
@@ -4742,7 +4766,7 @@ async function hyBuildPdf(f){
     if(y>PH-22){ doc.addPage(); header(); y=head(40) }
     if(i%2){ doc.setFillColor(...SOFT); doc.rect(Mg,y-4,CW,6,"F") }
     set(8,"normal",INK); let x=Mg; cells.forEach((c,k)=>{ const col=cols[k]; if(k===6&&M.seg[i].part>0.1) set(8,"bold",RED); T(c,col[2]==="r"?x+col[1]-1.5:x+1.5,y,{align:col[2]==="r"?"right":"left"}); set(8,"normal",INK); x+=col[1] }); y+=6 });
-  set(7.5,"normal",MUT); T(`Débit recalculé par la section médiane : ${F.Q(M.Q*1000)} ${F.u}  ·  section mouillée ${n2(M.A)} m²  ·  vitesse moyenne ${n2(M.A>0?M.Q/M.A:0)} m/s`,Mg,y+1); y+=7;
+  set(7.5,"normal",MUT); T(`Débit recalculé par la section médiane : ${F.Q(M.Q*1000)} ${F.u}  ·  section mouillée ${hySig(M.A)} m²  ·  vitesse moyenne ${n2(M.A>0?M.Q/M.A:0)} m/s`,Mg,y+1); y+=7;
   // ===== contrôle qualité
   y=ensure(y,20+q.it.length*11); y=section("Contrôle qualité (repères ISO 748)",y);
   const stc={ok:[23,100,58],info:[122,86,0],warn:[155,44,16]}, stb={ok:[221,241,228],info:[255,241,199],warn:[253,224,214]};
