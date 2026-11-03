@@ -1117,7 +1117,7 @@ body.onctrl{padding-bottom:0!important}
       <li><span class="hs-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.2 5.8L20 11l-5.8 2.2L12 19l-2.2-5.8L4 11l5.8-2.2z"/></svg></span><b>Nouveautés</b><small>Nouveaux produits et actualités</small><em>Bientôt</em></li>
       <li><span class="hs-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></span><b>Aide au paramétrage</b><small>Réglage pas à pas de vos appareils</small><em>Bientôt</em></li>
     </ul>
-    <p class="hub-foot">COMETEC · Instrumentation des eaux · Chapareillan (38) · version 2.11.3</p>
+    <p class="hub-foot">COMETEC · Instrumentation des eaux · Chapareillan (38) · version 2.11.4</p>
   </div>
 </section>
 <section class="sim ctrl" id="ctrl" aria-labelledby="ctrlTitle">
@@ -1556,7 +1556,7 @@ body.onctrl{padding-bottom:0!important}
     <button type="button" data-mtab="volumes"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 20V11M12 20V5M18 20v-7"/></svg></span>Volumes</button>
     <button type="button" data-mtab="export"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 20h16"/></svg></span>Exporter</button>
   </nav>
-  <footer>COMETEC · Instrumentation des eaux · ZA de Longifan, 38530 Chapareillan · application COMETEC version 2.11.3</footer>
+  <footer>COMETEC · Instrumentation des eaux · ZA de Longifan, 38530 Chapareillan · application COMETEC version 2.11.4</footer>
 </div>
 <div class="modal" id="reportModal" hidden role="dialog" aria-modal="true" aria-labelledby="t-report">
   <form class="modal-box" id="reportForm">
@@ -4471,7 +4471,9 @@ $("hyDrop").onkeydown=e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault();
 $("hyInput").onchange=e=>{ const f=e.target.files[0]; e.target.value=""; if(f) hyOpenFile(f) };
 /* modèle : fond interpolé (monotone), vitesses par hauteur relative entre verticales, débit par la section médiane */
 function hyBuild(j){
-  const W=j.head.largeur, V=j.V, X=[0,...V.map(v=>v.x),W], D=[0,...V.map(v=>v.d),0], n=X.length, dl=[], m=new Array(n).fill(0);
+  // largeur saisie sur l'appareil plus petite que la position de la dernière verticale : on l'élargit juste assez (signalé dans le contrôle qualité)
+  const V0=j.V, xl=V0[V0.length-1].x, gap=V0.length>1?xl-V0[V0.length-2].x:0.1, wFix=xl>=j.head.largeur?{from:j.head.largeur,to:+(xl+Math.min(0.1,Math.max(0.02,gap/2))).toFixed(2)}:null;
+  const W=wFix?wFix.to:j.head.largeur, V=j.V, X=[0,...V.map(v=>v.x),W], D=[0,...V.map(v=>v.d),0], n=X.length, dl=[], m=new Array(n).fill(0);
   for(let i=0;i<n-1;i++) dl.push((D[i+1]-D[i])/((X[i+1]-X[i])||1e-6));
   m[0]=dl[0]; m[n-1]=dl[n-2]; for(let i=1;i<n-1;i++) m[i]=(dl[i-1]*dl[i]<=0)?0:(dl[i-1]+dl[i])/2;
   for(let i=0;i<n-1;i++){ if(dl[i]===0){m[i]=m[i+1]=0;continue} const a=m[i]/dl[i],b=m[i+1]/dl[i],s=a*a+b*b; if(s>9){const t=3/Math.sqrt(s);m[i]=t*a*dl[i];m[i+1]=t*b*dl[i]} }
@@ -4488,8 +4490,8 @@ function hyBuild(j){
   seg.forEach(s=>s.part=Q>0?s.q*(s.b-s.a)/Q:0);
   let A=0; for(let k=0;k<400;k++){ const x0=W*k/400,x1=W*(k+1)/400; A+=(bed(x0)+bed(x1))/2*(x1-x0) }
   const vmaxPts=Math.max(0.01,...V.flatMap(v=>v.pts.map(p=>p.v)),...V.map(v=>v.vm));
-  const vStep=vmaxPts<0.2?0.01:0.05, vScale=Math.max(vStep,Math.ceil(vmaxPts/vStep-1e-9)*vStep), iso=[0.02,0.05,0.1,0.2,0.25,0.5].find(t=>vScale/t<=6)||1;
-  return {W,V,bed,vel,Q,A,seg,iso,vScale,vmaxPts,Dmax:Math.max(...V.map(v=>v.d)),vmax:Math.max(...V.map(v=>v.vm)),qmax:Math.max(...seg.map(s=>s.q))};
+  const vStep=vmaxPts<0.2?0.01:0.05, vScale=Math.max(vStep,Math.ceil(vmaxPts/vStep-1e-9)*vStep), iso=[0.02,0.05,0.1,0.2,0.25,0.5].find(t=>vScale/t<=8)||1;
+  return {W,wFix,V,bed,vel,Q,A,seg,iso,vScale,vmaxPts,Dmax:Math.max(...V.map(v=>v.d)),vmax:Math.max(...V.map(v=>v.vm)),qmax:Math.max(...seg.map(s=>s.q))};
 }
 /* couleurs : bleu (lent) → rouge COMETEC (zone la plus rapide de ce profil) */
 const HY_ST=[[0,"#1B3F8B"],[.18,"#2470C7"],[.36,"#2FA7D6"],[.52,"#45C2A6"],[.66,"#B5D65A"],[.78,"#F5CF3E"],[.89,"#F2872F"],[1,"#E3000B"]].map(([t,h])=>[t,parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)]);
@@ -4610,6 +4612,7 @@ function hyNumIn(v){ const x=parseFloat(String(v||"").replace(",",".")); return 
 function hyQuality(){ const M=HY.M, H=HY.J.head, it=[], info=HY.info||{};
   const dQ=H.debit>0?(M.Q*1000-H.debit)/H.debit*100:0, ad=Math.abs(dQ);
   it.push({st:ad<=2?"ok":ad<=5?"info":"warn",t:"Débit recalculé / débit de l'appareil",v:`${dQ>=0?"+":""}${hnf(dQ,1)} %`,n:ad<=2?"Les deux calculs concordent.":ad<=5?"Écart modéré : vérifiez les verticales de rive et les vitesses faibles.":"Écart important : vérifiez la largeur saisie et les verticales."});
+  if(M.wFix) it.push({st:"warn",t:"Largeur du cours d'eau",v:`${hnf(M.wFix.from)} m saisie`,n:`La dernière verticale est à ${hnf(M.V[M.V.length-1].x)} m, au-delà de la largeur saisie sur l'appareil : la largeur a été portée à ${hnf(M.wFix.to)} m pour les calculs. Vérifiez la largeur.`});
   const im=M.seg.reduce((a,s,i)=>s.part>M.seg[a].part?i:a,0), pm=M.seg[im].part*100;
   it.push({st:pm<=5?"ok":pm<=10?"info":"warn",t:"Part maximale du débit dans une verticale",v:`${hnf(pm,1)} % (verticale ${M.V[im].n})`,n:pm<=5?"Conforme à la recommandation (5 % au plus).":pm<=10?"Acceptable : l'ISO 748 demande 10 % au plus, idéalement 5 %.":"Dépasse 10 % : ajoutez des verticales autour de la verticale "+M.V[im].n+" lors du prochain jaugeage."});
   const m=M.V.length;
