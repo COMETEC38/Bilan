@@ -1,5 +1,5 @@
-// Application COMETEC 2.12.0 – fonctionnement hors ligne
-const CACHE='cometec-bilan-2.12.0-340ed16e';
+// Application COMETEC 2.12.1 – fonctionnement hors ligne
+const CACHE='cometec-bilan-2.12.1-d1730cab';
 const FILES=['./','index.html','manifest.webmanifest','icons/icon-192.png','icons/icon-512.png','icons/icon-maskable-512.png','icons/apple-touch-icon.png','icons/favicon-64.png'];
 self.addEventListener('install',e=>{ e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting())) });
 self.addEventListener('activate',e=>{ e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(n=>n!==CACHE).map(n=>caches.delete(n)))).then(()=>self.clients.claim())) });
