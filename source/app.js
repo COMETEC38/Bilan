@@ -2217,7 +2217,7 @@ const HY={qu:(()=>{ try{ return localStorage.getItem("cometecHydroUnit") }catch(
 function hydroOn(){ return document.body.classList.contains("onhydro") }
 function showHydro(push){ document.body.classList.remove("onhub","onprod","onsim","onctrl"); $("hub").classList.remove("hub-anim"); document.body.classList.add("onhydro");
   if(push!==false) try{ history.pushState({hydro:1},"") }catch(e){} window.scrollTo({top:0}); if(HY.M) requestAnimationFrame(hyRender) }
-function hyReset(){ HY.J=null; HY.M=null; HY.demo=false; HY.hover=null; $("hyTip").hidden=true; $("hyErr").hidden=true; $("hyErr2").hidden=true; $("hyView").hidden=true; $("hyEmpty").hidden=false }
+function hyReset(){ HY.usbRaw=null; $("hyUsbSave2").hidden=true; HY.J=null; HY.M=null; HY.demo=false; HY.hover=null; $("hyTip").hidden=true; $("hyErr").hidden=true; $("hyErr2").hidden=true; $("hyView").hidden=true; $("hyEmpty").hidden=false }
 $("hubHydro").onclick=()=>{ if(HY.demo) hyReset(); showHydro() };
 $("hubHydroDemo").onclick=()=>{ showHydro(); hyLoadDemo() };
 $("hydroBack").onclick=()=>{ if(history.state&&history.state.hydro) history.back(); else showHub(false) };
@@ -2279,13 +2279,90 @@ async function hyReadFile(f){ const buf=await f.arrayBuffer(), b=new Uint8Array(
   if(b[0]===0x50&&b[1]===0x4B){ const sh=await sheetRows(buf); for(const s of sh){ if(isFluviaRows(s.rows)) return hyParse(s.rows) } throw new Error("nofluvia") }
   return hyParse(hyRowsFromText(await readText(buf))) }
 function hyError(html){ const e=HY.M?$("hyErr2"):$("hyErr"); e.innerHTML=html; e.hidden=false }
-async function hyOpenFile(f){ $("hyErr").hidden=true; $("hyErr2").hidden=true;
+async function hyOpenFile(f){ $("hyErr").hidden=true; $("hyErr2").hidden=true; HY.usbRaw=null; $("hyUsbSave2").hidden=true;
   try{ const j=await hyReadFile(f); j.name=f.name; hyShow(j,false); toast(`${f.name} ouvert : ${j.V.length} verticales`) }
   catch(e){ console.warn(e);
     if(e.message==="nofluvia") hyError(`<b>« ${esc(f.name)} » n'est pas reconnu comme un jaugeage FLUVIA.</b> Ouvrez le fichier CSV ou Excel exporté par le courantomètre.`)
     else if(e.message==="noverticals") hyError(`<b>« ${esc(f.name)} » ne contient pas assez de verticales lisibles.</b> Vérifiez que le jaugeage est complet.`);
     else hyError(`<b>« ${esc(f.name)} » n'a pas pu être lu.</b> ${esc(e.message||"")}`) } }
-function hyLoadDemo(){ $("hyErr").hidden=true; $("hyErr2").hidden=true; const j=hyParse(hyRowsFromText(HY_DEMO)); j.name="Démonstration"; hyShow(j,true) }
+function hyLoadDemo(){ $("hyErr").hidden=true; $("hyErr2").hidden=true; HY.usbRaw=null; $("hyUsbSave2").hidden=true; const j=hyParse(hyRowsFromText(HY_DEMO)); j.name="Démonstration"; hyShow(j,true) }
+/* ---------- Déchargement direct du FLUVIA par le câble USB (Web Serial : Chrome / Edge sur ordinateur) ----------
+   Le câble crée un port série (puce FTDI) ; le FLUVIA envoie le texte du profil en 9600 bauds 8N1 quand on lance « Décharger ».
+   Rien n'est envoyé au FLUVIA : on écoute seulement. ?fluviasim dans l'adresse simule un FLUVIA (démonstration et tests). */
+const HY_USB_IDS=[{usbVendorId:0x0403},{usbVendorId:0x067B},{usbVendorId:0x10C4},{usbVendorId:0x1A86}]; /* FTDI (câble FLUVIA), Prolific, Silicon Labs, WCH */
+const HYU={port:null,reader:null,text:"",busy:false,timer:null,last:0,t0:0,file:"",profs:[]};
+if(/[?&]fluviasim\b/.test(location.search)&&!window.CMT_FAKE_SERIAL) window.CMT_FAKE_SERIAL={ getPorts:async()=>[], requestPort:async()=>{
+  const txt=window.CMT_FAKE_FLUVIA??("FLUVIA - RC3 - www.Aqua-Data.com\r\n"+HY_DEMO.replace(/\r?\n/g,"\r\n")+(/profil fait/i.test(HY_DEMO)?"":"\r\nProfil Fait\r\n"));
+  const port={getInfo:()=>({usbVendorId:0x0403,usbProductId:0x6001}), readable:null,
+    open:async()=>{ let tm; port.readable=new ReadableStream({ start(c){ const b=new TextEncoder().encode(txt); let i=0;
+        const push=()=>{ if(i>=b.length) return; c.enqueue(b.slice(i,i+48)); i+=48; tm=setTimeout(push,25) }; tm=setTimeout(push,window.CMT_FAKE_DELAY??2200) },
+      cancel(){ clearTimeout(tm) } }) },
+    close:async()=>{} }; return port } };
+const hySerial=()=>window.CMT_FAKE_SERIAL||navigator.serial;
+function hyUsbInit(){ const ok=!!hySerial()&&!window.CMT_LOCAL;
+  $("hyUsbBtn").hidden=!ok; $("hyUsbBtn2").hidden=!ok;
+  $("hyUsbNote").hidden=ok||!!window.CMT_LOCAL||!(window.matchMedia&&matchMedia("(pointer:fine)").matches) }
+function hyUsbStep(n){ document.querySelectorAll("#hyUsbSteps li").forEach(li=>{ const s=+li.dataset.s; li.classList.toggle("on",s===n); li.classList.toggle("done",s<n) }) }
+function hyUsbStatus(html,kind){ const e=$("hyUsbSt"); e.innerHTML=html; e.className="hy-usb-st"+(kind?" "+kind:"") }
+function hyUsbReset(again){ $("hyUsbGo").hidden=false; $("hyUsbGo").textContent=again?"Réessayer":"Choisir le port et démarrer"; $("hyUsbAll").hidden=false; $("hyUsbStop").hidden=true }
+function hyUsbOpen(){ if(HYU.busy) return; HYU.text=""; HYU.profs=[]; $("hyUsbRaw").textContent=""; $("hyUsbRawBox").open=false; $("hyUsbList").hidden=true; $("hyUsbList").innerHTML=""; $("hyUsbSave").hidden=true;
+  hyUsbReset(false); hyUsbStep(1); hyUsbStatus("Le traitement se fait sur cet ordinateur : rien n'est envoyé en ligne.",""); $("hyUsb").hidden=false; $("hyUsbGo").focus() }
+async function hyUsbPick(all){ const S=hySerial();
+  if(!all){ try{ const known=(await S.getPorts()).filter(p=>{ const i=p.getInfo?p.getInfo():{}; return HY_USB_IDS.some(f=>f.usbVendorId===i.usbVendorId) }); if(known.length===1) return known[0] }catch(e){} }
+  return S.requestPort(all?{}:{filters:HY_USB_IDS}) }
+async function hyUsbStart(all){ if(HYU.busy) return; hyUsbStep(2); let port;
+  try{ port=await hyUsbPick(all) }
+  catch(e){ hyUsbStep(1); hyUsbStatus(e&&e.name==="NotFoundError"?"<b>Aucun port choisi.</b> Vérifiez que le câble est bien branché (il apparaît alors dans la liste), puis réessayez. Si votre câble n'est pas proposé, utilisez « Autre câble ».":`<b>Le port n'a pas pu être choisi.</b> ${esc(e.message||String(e))}`,"warn"); return }
+  try{ await port.open({baudRate:9600,dataBits:8,stopBits:1,parity:"none",flowControl:"none",bufferSize:65536}) }
+  catch(e){ hyUsbStatus("<b>Le port ne s'ouvre pas.</b> Il est peut-être déjà ouvert dans un autre logiciel (Termite, un autre onglet…) : fermez-le, débranchez et rebranchez le câble, puis réessayez.","warn"); hyUsbReset(true); return }
+  Object.assign(HYU,{port,busy:true,text:"",last:0,t0:Date.now(),hint:false});
+  $("hyUsbGo").hidden=true; $("hyUsbAll").hidden=true; $("hyUsbStop").hidden=false; $("hyUsbSave").hidden=true; $("hyUsbList").hidden=true; hyUsbStep(3);
+  hyUsbStatus("<b>Câble prêt.</b> Lancez maintenant « Décharger les données » sur le FLUVIA…","wait");
+  const dec=new TextDecoder("windows-1252"); HYU.timer=setInterval(hyUsbTick,300);
+  try{ HYU.reader=port.readable.getReader();
+    for(;;){ const {value,done}=await HYU.reader.read(); if(done) break;
+      if(value&&value.length){ HYU.text+=dec.decode(value,{stream:true}); HYU.last=Date.now(); hyUsbProgress() } } }
+  catch(e){ if(HYU.busy){ hyUsbStatus(`<b>La liaison a été coupée</b> (${esc(e.message||String(e))}). Vérifiez le câble ; ce qui a été reçu reste disponible.`,"warn"); hyUsbFinish(true) } }
+  finally{ try{ HYU.reader&&HYU.reader.releaseLock() }catch(e){} }
+}
+const hyUsbEnds=t=>(t.match(/^\s*profile?\s+(fait|done)\b/gim)||[]).length;
+function hyUsbProgress(){ const t=HYU.text, n=t.split(/\r?\n/).filter(l=>l.trim()).length, e=hyUsbEnds(t);
+  hyUsbStatus(`<b>Réception en cours…</b> ${n} ligne${n>1?"s":""} reçue${n>1?"s":""}${e?` · ${e} profil${e>1?"s":""} complet${e>1?"s":""}`:""}`,"wait");
+  const pre=$("hyUsbRaw"); pre.textContent=t.length>12000?"…\n"+t.slice(-12000):t; pre.scrollTop=pre.scrollHeight }
+function hyUsbTick(){ if(!HYU.busy) return; const now=Date.now();
+  if(HYU.last){ const quiet=now-HYU.last, m=[...HYU.text.matchAll(/^\s*profile?\s+(fait|done)\b.*$/gim)], lm=m[m.length-1], ended=!!lm&&!/\S/.test(HYU.text.slice(lm.index+lm[0].length));
+    if(quiet>(ended?1800:6000)) hyUsbFinish(false) }
+  else if(!HYU.hint&&now-HYU.t0>45000){ HYU.hint=true; hyUsbStatus("<b>Toujours rien reçu.</b> Vérifiez que le déchargement est bien lancé sur le FLUVIA et que le bon port a été choisi. On continue d'écouter…","wait") } }
+async function hyUsbStop(){ HYU.busy=false; clearInterval(HYU.timer);
+  try{ HYU.reader&&await HYU.reader.cancel() }catch(e){} try{ HYU.port&&await HYU.port.close() }catch(e){} HYU.port=null; HYU.reader=null }
+function hyUsbSplit(t){ const lines=t.replace(/\r\n?/g,"\n").split("\n"), out=[]; let cur=[];
+  const flush=end=>{ const seg=cur.join("\n"); cur=[]; if(!/\S/.test(seg)) return; const rows=hyRowsFromText(seg); if(!isFluviaRows(rows)) return; try{ out.push({text:seg,j:hyParse(rows),done:end}) }catch(e){} };
+  for(const l of lines){ cur.push(l); if(/^\s*profile?\s+(fait|done)\b/i.test(l)) flush(true) } flush(false); return out }
+async function hyUsbFinish(cut){ if(!HYU.busy&&!cut) return; await hyUsbStop();
+  const t=HYU.text; $("hyUsbStop").hidden=true;
+  if(!/\S/.test(t)){ hyUsbStep(1); hyUsbStatus("<b>Aucune donnée reçue.</b> Vérifiez le branchement, le port choisi et que le déchargement a bien été lancé sur le FLUVIA.","warn"); hyUsbReset(true); return }
+  const d=new Date(), p2=n=>String(n).padStart(2,"0"); HYU.file=`FLUVIA_${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}_${p2(d.getHours())}h${p2(d.getMinutes())}.csv`;
+  $("hyUsbSave").hidden=false; HYU.profs=hyUsbSplit(t); hyUsbStep(4);
+  if(!HYU.profs.length){ $("hyUsbRawBox").open=true; hyUsbReset(true);
+    hyUsbStatus(/date\s*,\s*heure\s*,\s*d[ée]bit|date\s*,\s*time\s*,\s*flow/i.test(t)?"<b>Ce déchargement contient un enregistrement en continu</b> (date, heure, vitesse), pas un profil de jaugeage : Hydro lit les profils. Vous pouvez enregistrer le fichier reçu.":"<b>Les données reçues ne contiennent pas de profil de jaugeage lisible.</b> Elles sont affichées ci-dessous ; enregistrez le fichier reçu et envoyez-le à COMETEC si besoin.","warn"); return }
+  const fq=l=>l>=1000?`${hnf(l/1000,l/1000<10?2:1)} m³/s`:`${hnf(l,l<100?1:0)} L/s`, L=$("hyUsbList"); L.innerHTML="";
+  HYU.profs.forEach((p,i)=>{ const H=p.j.head, b=document.createElement("button"); b.type="button";
+    b.innerHTML=`<span><b>Profil n° ${esc(String(H.profil||i+1).trim())}</b><br><small>${[H.date&&esc(H.date)+(H.heure?" à "+esc(H.heure):""),`${p.j.V.length} verticales`,H.debit>0?fq(H.debit):""].filter(Boolean).join(" · ")}${p.done?"":` · <b class="bad">réception incomplète</b>`}</small></span><span class="go">Ouvrir ›</span>`;
+    b.onclick=()=>hyUsbShow(i); L.appendChild(b) });
+  const n=HYU.profs.length; if(n===1&&HYU.profs[0].done){ hyUsbShow(0); return }
+  L.hidden=false;
+  if(HYU.profs.some(p=>!p.done)) hyUsbStatus("<b>Réception incomplète :</b> la fin du profil (« Profil Fait ») n'est pas arrivée, des verticales peuvent manquer. Relancez le déchargement de préférence.","warn"); else
+  hyUsbStatus(n===1?"<b>Profil reçu.</b> Ouvrez-le, et enregistrez le fichier reçu pour l'archiver.":`<b>${n} profils reçus.</b> Choisissez celui à ouvrir.`,"ok");
+  L.querySelector("button").focus() }
+function hyUsbShow(i){ const p=HYU.profs[i]; if(!p) return; const j=hyParse(hyRowsFromText(p.text)); j.name=HYU.profs.length>1?HYU.file.replace(".csv",`_profil${String(j.head.profil||i+1).trim()}.csv`):HYU.file;
+  $("hyErr").hidden=true; $("hyErr2").hidden=true; $("hyUsb").hidden=true; hyShow(j,false); HY.usbRaw={text:HYU.text,file:HYU.file}; $("hyUsbSave2").hidden=false; toast(p.done?`Profil reçu du FLUVIA : ${j.V.length} verticales`:`Attention : réception incomplète (${j.V.length} verticales reçues)`) }
+function hyUsbSave(r){ r=r&&r.text?r:{text:HYU.text,file:HYU.file}; const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([r.text],{type:"text/csv;charset=windows-1252"})); a.download=r.file; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),4000) }
+async function hyUsbClose(){ if(HYU.busy) await hyUsbStop(); $("hyUsb").hidden=true }
+$("hyUsbBtn").onclick=e=>{ e.stopPropagation(); hyUsbOpen() }; $("hyUsbBtn2").onclick=hyUsbOpen;
+$("hyUsbGo").onclick=()=>hyUsbStart(false); $("hyUsbAll").onclick=()=>hyUsbStart(true);
+$("hyUsbStop").onclick=()=>hyUsbFinish(true); $("hyUsbSave").onclick=()=>hyUsbSave(); $("hyUsbSave2").onclick=()=>hyUsbSave(HY.usbRaw); $("hyUsbClose").onclick=hyUsbClose;
+addEventListener("keydown",e=>{ if(e.key==="Escape"&&!$("hyUsb").hidden) hyUsbClose() });
+hyUsbInit();
 $("hyOpen").onclick=e=>{ e.stopPropagation(); $("hyInput").click() };
 $("hyOpen2").onclick=()=>$("hyInput").click();
 $("hyQuitDemo").onclick=()=>{ hyReset(); window.scrollTo({top:0}) };

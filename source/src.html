@@ -765,6 +765,26 @@ body.onhydro{padding-bottom:0!important}
 .hy-scale i{display:block;width:220px;max-width:46vw;height:12px;border-radius:6px}
 .hy-warn{margin:0;font-size:13px;color:var(--ink-2);background:var(--surface-2);border-radius:10px;padding:8px 12px}
 .hy-head-act{display:flex;flex-wrap:wrap;gap:8px}
+.hy-usb-note{margin:4px 0 0;text-align:center}
+.hy-usb-steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;counter-reset:st}
+.hy-usb-steps li{counter-increment:st;display:grid;grid-template-columns:30px 1fr;gap:10px;align-items:start;padding:10px 12px;border:1px solid var(--line);border-radius:12px;color:var(--ink-2);font-size:14px;background:var(--bg)}
+.hy-usb-steps li::before{content:counter(st);width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:13px;background:var(--surface-2);color:var(--muted);border:1px solid var(--line)}
+.hy-usb-steps li.on{border-color:var(--brand);color:var(--ink);background:var(--surface)}
+.hy-usb-steps li.on::before{background:var(--brand);color:#fff;border-color:var(--brand)}
+.hy-usb-steps li.done::before{content:"✓";background:#DDF1E4;color:#17643A;border-color:#BFE3CB}
+.hy-usb-st{font-size:14px;color:var(--ink-2);min-height:20px}
+.hy-usb-st.wait::before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;background:#F2B705;margin-right:8px;animation:hyPulse 1.1s ease-in-out infinite}
+.hy-usb-st.ok{color:#17643A}.hy-usb-st.warn{color:#9B2C10}
+@keyframes hyPulse{50%{opacity:.25;transform:scale(.7)}}
+@media (prefers-reduced-motion:reduce){.hy-usb-st.wait::before{animation:none}}
+.hy-usb-list{display:flex;flex-direction:column;gap:8px}
+.hy-usb-list button{display:flex;justify-content:space-between;gap:12px;align-items:center;text-align:left;width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);font:inherit;color:var(--ink);cursor:pointer}
+.hy-usb-list button:hover{border-color:var(--brand)}
+.hy-usb-list button small{color:var(--muted);font-size:13px}
+.hy-usb-list button small b.bad{color:#C2410C}
+.hy-usb-list button span.go{font-weight:700;color:var(--brand);white-space:nowrap}
+.hy-usb-raw summary{cursor:pointer;font-size:13px;color:var(--muted)}
+.hy-usb-raw pre{max-height:220px;overflow:auto;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px;font-size:11.5px;line-height:1.45;margin:8px 0 0;white-space:pre}
 .hy-unit{display:inline-flex;align-items:center;gap:2px;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:3px}
 .hy-unit span{font-size:12.5px;font-weight:600;color:var(--muted);padding:0 8px 0 7px;white-space:nowrap}
 .hy-unit button{border:none;background:none;border-radius:7px;padding:7px 10px;font:inherit;font-weight:700;font-size:13px;color:var(--muted);cursor:pointer;white-space:nowrap}
@@ -1616,8 +1636,10 @@ body.onctrl{padding-bottom:0!important}
         <p>Glissez ici le fichier CSV ou Excel exporté par le courantomètre, ou choisissez-le.</p>
         <div class="hy-drop-act">
           <button class="btn primary big" id="hyOpen" type="button">Ouvrir un jaugeage</button>
+          <button class="btn big" id="hyUsbBtn" type="button" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v14"/><path d="m9 6 3-3 3 3"/><circle cx="12" cy="19" r="2"/><path d="M12 15 7 12V9"/><path d="M12 13l5-3V8"/><rect x="5.5" y="7" width="3" height="2" rx=".5"/><circle cx="17" cy="7" r="1.2"/></svg>Décharger le FLUVIA (USB)</button>
           <button class="btn big demo" id="hyDemo" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 4v16l13-8z"/></svg>Essayer avec un jaugeage de démonstration</button>
         </div>
+        <p class="help hy-usb-note" id="hyUsbNote" hidden>Le déchargement direct du FLUVIA par câble USB est disponible avec Chrome ou Edge sur ordinateur.</p>
         <div class="dz-err" id="hyErr" role="alert" hidden></div>
         <p class="private"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Le fichier est traité sur votre appareil : rien n'est envoyé en ligne.</p>
       </div>
@@ -1626,7 +1648,7 @@ body.onctrl{padding-bottom:0!important}
   <div class="sim-body" id="hyView" hidden>
     <div class="hy-head">
       <div><h2 id="hyProfil">Profil</h2><div class="hy-meta" id="hyMeta"></div></div>
-      <div class="hy-head-act"><div class="hy-unit" id="hyUnit" role="radiogroup" aria-label="Unité de débit"><span>Débit en</span><button type="button" role="radio" data-u="L/s" aria-checked="false">L/s</button><button type="button" role="radio" data-u="m³/s" aria-checked="false">m³/s</button><button type="button" role="radio" data-u="m³/h" aria-checked="false">m³/h</button></div><button class="btn primary" id="hyReportBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6M9 13h8M9 17h8"/></svg>Rapport PDF</button><button class="btn" id="hyOpen2" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3m0 0-5 5m5-5 5 5M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>Ouvrir un autre jaugeage</button></div>
+      <div class="hy-head-act"><div class="hy-unit" id="hyUnit" role="radiogroup" aria-label="Unité de débit"><span>Débit en</span><button type="button" role="radio" data-u="L/s" aria-checked="false">L/s</button><button type="button" role="radio" data-u="m³/s" aria-checked="false">m³/s</button><button type="button" role="radio" data-u="m³/h" aria-checked="false">m³/h</button></div><button class="btn primary" id="hyReportBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6M9 13h8M9 17h8"/></svg>Rapport PDF</button><button class="btn" id="hyUsbSave2" type="button" hidden title="Enregistrer les données reçues du FLUVIA"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>Fichier reçu</button><button class="btn" id="hyUsbBtn2" type="button" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v14"/><path d="m9 6 3-3 3 3"/><circle cx="12" cy="19" r="2"/><path d="M12 15 7 12V9"/><path d="M12 13l5-3V8"/><rect x="5.5" y="7" width="3" height="2" rx=".5"/><circle cx="17" cy="7" r="1.2"/></svg>Décharger (USB)</button><button class="btn" id="hyOpen2" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3m0 0-5 5m5-5 5 5M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>Ouvrir un autre jaugeage</button></div>
     </div>
     <div class="demobar" id="hyDemoBar" hidden><span><b>Mode démonstration</b> · jaugeage fictif fourni par COMETEC. Ouvrez votre propre jaugeage quand vous voulez.</span><span class="inline"><button class="btn small" id="hyQuitDemo" type="button">Quitter la démo</button></span></div>
     <div class="dz-err" id="hyErr2" role="alert" hidden></div>
@@ -1649,6 +1671,20 @@ body.onctrl{padding-bottom:0!important}
     <p class="hy-note">Les vitesses entre les points de mesure sont interpolées (le long de chaque verticale, puis d'une verticale à l'autre) ; près du fond et des rives, la vitesse décroît jusqu'à zéro. Le rouge correspond à la zone la plus rapide de ce profil. Le débit recalculé utilise la méthode de la section médiane (ISO 748) avec les vitesses moyennes fournies par l'appareil.</p>
   </div>
 </section>
+<div class="modal" id="hyUsb" hidden role="dialog" aria-modal="true" aria-labelledby="hyUsbT">
+  <div class="modal-box">
+    <div class="rubrique"><h2 id="hyUsbT">Décharger le FLUVIA</h2><button class="link" type="button" id="hyUsbClose">Fermer</button></div>
+    <ol class="hy-usb-steps" id="hyUsbSteps">
+      <li data-s="1"><span><b>Branchez le câble de déchargement</b> entre le FLUVIA et un port USB de l'ordinateur.</span></li>
+      <li data-s="2"><span><b>Choisissez le port du câble</b> dans la fenêtre qui s'ouvre (en général « USB Serial Port (COMx) »).</span></li>
+      <li data-s="3"><span><b>Sur le FLUVIA, lancez « Décharger les données ».</b> La réception se termine toute seule.</span></li>
+    </ol>
+    <div class="hy-usb-st" id="hyUsbSt" role="status" aria-live="polite"></div>
+    <div class="hy-usb-list" id="hyUsbList" hidden></div>
+    <details class="hy-usb-raw" id="hyUsbRawBox"><summary>Données reçues (diagnostic)</summary><pre id="hyUsbRaw"></pre></details>
+    <div class="inline modal-actions"><button class="link" id="hyUsbAll" type="button">Autre câble : afficher tous les ports</button><button class="btn" id="hyUsbSave" type="button" hidden>Enregistrer le fichier reçu</button><button class="btn" id="hyUsbStop" type="button" hidden>Terminer la réception</button><button class="btn primary" id="hyUsbGo" type="button">Choisir le port et démarrer</button></div>
+  </div>
+</div>
 <div class="modal" id="hyReport" hidden role="dialog" aria-modal="true" aria-labelledby="hyRpT">
   <form class="modal-box" id="hyRpForm">
     <div class="rubrique"><h2 id="hyRpT">Rapport PDF du jaugeage</h2><button class="link" type="button" id="hyRpClose">Fermer</button></div>
