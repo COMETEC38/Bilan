@@ -1677,7 +1677,7 @@ body.onctrl{padding-bottom:0!important}
     <ol class="hy-usb-steps" id="hyUsbSteps">
       <li data-s="1"><span><b>Branchez le câble de déchargement</b> entre le FLUVIA et un port USB de l'ordinateur.</span></li>
       <li data-s="2"><span><b>Choisissez le port du câble</b> dans la fenêtre qui s'ouvre (en général « USB Serial Port (COMx) »).</span></li>
-      <li data-s="3"><span><b>Sur le FLUVIA, lancez « Décharger les données ».</b> La réception se termine toute seule.</span></li>
+      <li data-s="3"><span><b>Sur le FLUVIA, lancez « Décharger Série ».</b> La réception se termine toute seule.</span></li>
     </ol>
     <div class="hy-usb-st" id="hyUsbSt" role="status" aria-live="polite"></div>
     <div class="hy-usb-list" id="hyUsbList" hidden></div>
@@ -4564,7 +4564,7 @@ async function hyUsbStart(all){ if(HYU.busy) return; hyUsbStep(2); let port;
   catch(e){ hyUsbStatus("<b>Le port ne s'ouvre pas.</b> Il est peut-être déjà ouvert dans un autre logiciel (Termite, un autre onglet…) : fermez-le, débranchez et rebranchez le câble, puis réessayez.","warn"); hyUsbReset(true); return }
   Object.assign(HYU,{port,busy:true,text:"",last:0,t0:Date.now(),hint:false});
   $("hyUsbGo").hidden=true; $("hyUsbAll").hidden=true; $("hyUsbStop").hidden=false; $("hyUsbSave").hidden=true; $("hyUsbList").hidden=true; hyUsbStep(3);
-  hyUsbStatus("<b>Câble prêt.</b> Lancez maintenant « Décharger les données » sur le FLUVIA…","wait");
+  hyUsbStatus("<b>Câble prêt.</b> Lancez maintenant « Décharger Série » sur le FLUVIA…","wait");
   const dec=new TextDecoder("windows-1252"); HYU.timer=setInterval(hyUsbTick,300);
   try{ HYU.reader=port.readable.getReader();
     for(;;){ const {value,done}=await HYU.reader.read(); if(done) break;

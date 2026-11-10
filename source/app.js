@@ -2317,7 +2317,7 @@ async function hyUsbStart(all){ if(HYU.busy) return; hyUsbStep(2); let port;
   catch(e){ hyUsbStatus("<b>Le port ne s'ouvre pas.</b> Il est peut-être déjà ouvert dans un autre logiciel (Termite, un autre onglet…) : fermez-le, débranchez et rebranchez le câble, puis réessayez.","warn"); hyUsbReset(true); return }
   Object.assign(HYU,{port,busy:true,text:"",last:0,t0:Date.now(),hint:false});
   $("hyUsbGo").hidden=true; $("hyUsbAll").hidden=true; $("hyUsbStop").hidden=false; $("hyUsbSave").hidden=true; $("hyUsbList").hidden=true; hyUsbStep(3);
-  hyUsbStatus("<b>Câble prêt.</b> Lancez maintenant « Décharger les données » sur le FLUVIA…","wait");
+  hyUsbStatus("<b>Câble prêt.</b> Lancez maintenant « Décharger Série » sur le FLUVIA…","wait");
   const dec=new TextDecoder("windows-1252"); HYU.timer=setInterval(hyUsbTick,300);
   try{ HYU.reader=port.readable.getReader();
     for(;;){ const {value,done}=await HYU.reader.read(); if(done) break;
