@@ -2243,7 +2243,7 @@ function hyUnitQ(s){ const u=hyKey(s).replace(/[.\s]/g,"").replace("³","3");
 const HY_QU={"L/s":{k:1,q:"L/s/m"},"m³/s":{k:0.001,q:"m³/s/m"},"m³/h":{k:3.6,q:"m³/h/m"}};
 const hySigDec=(v,n=3,max=4)=>{ v=Math.abs(v); return v>0?Math.max(0,Math.min(max,n-1-Math.floor(Math.log10(v)+1e-9))):0 };
 const hySig=(v,n=3,max=3)=>hnf(v,hySigDec(v,n,max));
-function hyQF(){ const H=HY.J.head, M=HY.M, ref=H.debit>0?H.debit:M.Q*1000, auto=Math.max(ref,M.Q*1000)>=1000?"m³/s":"L/s";
+function hyQF(){ const H=HY.J.head, M=HY.M, ref=H.debit>0?H.debit:M.Q*1000, auto=ref>=1000?"m³/s":"L/s";
   const u=HY_QU[HY.qu]?HY.qu:auto, k=HY_QU[u].k, dec=v=>u==="L/s"?(v<1?2:v<100?1:0):u==="m³/s"?(v<0.1?4:v<1?3:v<10?2:1):(v<10?2:v<100?1:0), d=dec(ref*k), qd=dec(M.qmax*1000*k);
   return {u,uq:HY_QU[u].q,k,Q:v=>hnf(v*k,d),q:v=>hnf(v*k,Math.max(qd,v>0?hySigDec(v*k,2,4):0))} }
 const hyTypeFr=t=>{ const k=hyKey(t); return k==="river"||k==="riviere"?"rivière":k==="circular"||k==="circular pipe"?"conduite circulaire":k==="rectangular"?"canal rectangulaire":String(t||"").toLowerCase() };
@@ -2389,7 +2389,7 @@ function hyBuild(j){
     let i=0; while(x>V[i+1].x) i++; const t=(x-V[i].x)/((V[i+1].x-V[i].x)||1e-6); return Math.max(0,(1-t)*prof[i](s)+t*prof[i+1](s)) };
   let Q=0; const seg=V.map((v,i)=>{ const a=(v.x+(i?V[i-1].x:0))/2, b=(v.x+(i<L?V[i+1].x:W))/2, q=v.d*v.vm; Q+=q*(b-a); return {a,b,q} });
   seg.forEach(s=>s.part=Q>0?s.q*(s.b-s.a)/Q:0);
-  let A=0; for(let k=0;k<400;k++){ const x0=W*k/400,x1=W*(k+1)/400; A+=(bed(x0)+bed(x1))/2*(x1-x0) }
+  let A=0; for(let i=0;i<n-1;i++) A+=(D[i]+D[i+1])/2*(X[i+1]-X[i]);  /* section mouillée en segments droits entre les verticales mesurées (comme le FLUVIA) ; seul le dessin est arrondi */
   const vmaxPts=Math.max(0.01,...V.flatMap(v=>v.pts.map(p=>p.v)),...V.map(v=>v.vm));
   const vStep=vmaxPts<0.2?0.01:0.05, vScale=Math.max(vStep,Math.ceil(vmaxPts/vStep-1e-9)*vStep), iso=[0.02,0.05,0.1,0.2,0.25,0.5].find(t=>vScale/t<=8)||1;
   return {W,wFix,V,bed,vel,Q,A,seg,iso,vScale,vmaxPts,Dmax:Math.max(...V.map(v=>v.d)),vmax:Math.max(...V.map(v=>v.vm)),qmax:Math.max(...seg.map(s=>s.q))};
@@ -2478,14 +2478,16 @@ function hyDrawQ(cv,cw,P,pdf){
   g.textAlign="right"; g.fillText("m",ml+pw,mt+ph+18); return ch;
 }
 const hySrcTxt=s=>[s.L!=="m"?`longueurs en ${s.L}`:"",s.V!=="m/s"?`vitesses en ${s.V}`:"",s.Q&&s.Q!=="L/s"?`débit en ${s.Q}`:""].filter(Boolean).join(", ");
+/* le débit affiché est toujours celui calculé par le FLUVIA : aucun débit recalculé n'est présenté */
+const hyVmoy=()=>{ const H=HY.J.head, M=HY.M; return H.debit>0&&M.A>0?H.debit/1000/M.A:null };
 function hyFill(){
-  const H=HY.J.head, M=HY.M, F=hyQF(), dQ=H.debit>0?(M.Q*1000-H.debit)/H.debit*100:0;
+  const H=HY.J.head, M=HY.M, F=hyQF(), vm=hyVmoy();
   $("hyProfil").textContent=`Profil n° ${H.profil||"?"}`;
   $("hyMeta").innerHTML=`${H.date?`<b>${esc(H.date)}</b>${H.heure?` à <b>${esc(H.heure)}</b>`:""} · `:""}${M.V.length} verticales · ${HY.demo?"jaugeage de démonstration":`fichier <b>${esc(HY.J.name)}</b>`}`;
-  const K=[["main","Débit",`${F.Q(H.debit)}<small>${F.u}</small>`,`recalculé : ${F.Q(M.Q*1000)} ${F.u} (${dQ>=0?"+":""}${hnf(dQ,1)} %)`],
+  const K=[["main","Débit",H.debit>0?`${F.Q(H.debit)}<small>${F.u}</small>`:"—",H.debit>0?"calculé par le FLUVIA":"non fourni dans l'export"],
     ["","Largeur",`${hnf(M.W)}<small>m</small>`,`section mouillée ${hySig(M.A)} m²`],
     ["","Profondeur max",`${hnf(M.Dmax)}<small>m</small>`,`moyenne ${hnf(M.A/M.W,2)} m`],
-    ["","Vitesse moyenne",`${hnf(M.A>0?M.Q/M.A:0)}<small>m/s</small>`,"débit / section"],
+    ["","Vitesse moyenne",vm!=null?`${hnf(vm)}<small>m/s</small>`:"—","débit / section"],
     ["","Vitesse max",`${hnf(M.vmax)}<small>m/s</small>`,`ponctuelle ${hnf(M.vmaxPts)} m/s`],
     ["","Débit unitaire max",`${F.q(M.qmax*1000)}<small>${F.uq}</small>`,`verticale ${M.V[M.seg.findIndex(s=>s.q===M.qmax)].n}`]];
   $("hyKpis").innerHTML=K.map(k=>`<div class="hy-kpi ${k[0]}"><span>${k[1]}</span><b>${k[2]}</b><em>${k[3]}</em></div>`).join("");
@@ -2493,7 +2495,7 @@ function hyFill(){
   $("hyMethod").textContent=`${np.length===1?np[0]:np[0]+" à "+np[np.length-1]} point${np[np.length-1]>1?"s":""} de vitesse par verticale, placés par l'appareil selon la profondeur.`+(H.ref==="P"?" Positions des points relevées depuis la surface (réglage « Profondeur » du FLUVIA), ramenées à la hauteur au-dessus du fond.":"")+(H.src&&H.src.conv?` Valeurs converties en unités métriques (export en ${hySrcTxt(H.src)}).`:"");
   $("hyVt").innerHTML=`<thead><tr><th>N°</th><th>Distance</th><th>Prof.</th><th>V moy.</th><th>q</th><th>Part</th></tr></thead><tbody>`+
     M.V.map((v,i)=>`<tr data-i="${i}"><td><span class="hy-dot" style="background:${hyCss(v.vm/M.vScale)}"></span>${v.n}</td><td>${hnf(v.x)} m</td><td>${hnf(v.d)} m</td><td>${hnf(v.vm)} m/s</td><td>${F.q(M.seg[i].q*1000)} ${F.uq}</td><td>${hnf(M.seg[i].part*100,1)} %</td></tr>`).join("")+`</tbody>`;
-  const w=$("hyWarn"); if(M.vmax<0.1){ w.textContent="Vitesses très faibles : l'export arrondit les vitesses au centième de m/s, ce qui peut expliquer quelques pour cent d'écart entre le débit affiché par l'appareil et le débit recalculé."; w.hidden=false } else w.hidden=true;
+  const w=$("hyWarn"); if(M.vmax<0.1){ w.textContent="Vitesses très faibles : l'export arrondit les vitesses au centième de m/s, la répartition du débit entre les verticales est donc approximative."; w.hidden=false } else w.hidden=true;
   $("hyDemoBar").hidden=!HY.demo;
   document.querySelectorAll("#hyUnit button").forEach(b=>b.setAttribute("aria-checked",b.dataset.u===F.u));
   hyQualityUi();
@@ -2526,8 +2528,6 @@ function hyUncert(M){ const Q=M.Q; if(!(Q>0)) return null; let s2=0;
   const u=Math.sqrt(HY_US**2+hyUm(M.V.length)**2+s2/(Q*Q)); return {u,U:2*u} }
 function hyNumIn(v){ const x=parseFloat(String(v||"").replace(",",".")); return isFinite(x)?x:null }
 function hyQuality(){ const M=HY.M, H=HY.J.head, it=[], info=HY.info||{};
-  const dQ=H.debit>0?(M.Q*1000-H.debit)/H.debit*100:0, ad=Math.abs(dQ);
-  it.push({st:ad<=2?"ok":ad<=5?"info":"warn",t:"Débit recalculé / débit de l'appareil",v:`${dQ>=0?"+":""}${hnf(dQ,1)} %`,n:ad<=2?"Les deux calculs concordent.":ad<=5?"Écart modéré : vérifiez les verticales de rive et les vitesses faibles.":"Écart important : vérifiez la largeur saisie et les verticales."});
   if(M.wFix) it.push({st:"warn",t:"Largeur du cours d'eau",v:`${hnf(M.wFix.from)} m saisie`,n:`La dernière verticale est à ${hnf(M.V[M.V.length-1].x)} m, au-delà de la largeur saisie sur l'appareil : la largeur a été portée à ${hnf(M.wFix.to)} m pour les calculs. Vérifiez la largeur.`});
   const im=M.seg.reduce((a,s,i)=>s.part>M.seg[a].part?i:a,0), pm=M.seg[im].part*100;
   it.push({st:pm<=5?"ok":pm<=10?"info":"warn",t:"Part maximale du débit dans une verticale",v:`${hnf(pm,1)} % (verticale ${M.V[im].n})`,n:pm<=5?"Conforme à la recommandation (5 % au plus).":pm<=10?"Acceptable : l'ISO 748 demande 10 % au plus, idéalement 5 %.":"Dépasse 10 % : ajoutez des verticales autour de la verticale "+M.V[im].n+" lors du prochain jaugeage."});
@@ -2615,12 +2615,12 @@ async function hyBuildPdf(f){
   const cote=(f.h0||f.h1)?[f.h0&&`${f.h0} m au début`,f.h1&&`${f.h1} m à la fin`].filter(Boolean).join(", "):"Non relevée";
   const np=(u=>u.length>1?u[0]+" à "+u[u.length-1]:String(u[0]))([...new Set(M.V.map(v=>v.pts.length))].sort((a,b)=>a-b));
   y=kv([["Appareil",`Courantomètre électromagnétique FLUVIA${f.hyRpSerial?` n° ${f.hyRpSerial}`:""}`],["Profil",`n° ${H.profil||"-"} (mode ${hyTypeFr(H.type)})`],...(H.src&&H.src.conv?[["Unités",`export en ${hySrcTxt(H.src)}, converti en unités métriques`]]:[]),
-        ["Méthode","Exploration du champ des vitesses, section médiane (ISO 748)"],["Verticales",`${M.V.length}, ${np} point(s) de vitesse chacune`],
+        ["Méthode","Exploration du champ des vitesses (ISO 748), débit calculé par le FLUVIA"],["Verticales",`${M.V.length}, ${np} point(s) de vitesse chacune`],
         ["Rive de départ",rive],["Largeur",`${n2(M.W)} m`],["Cote à l'échelle",cote],["Régime",f.hyRpRegime||"Non précisé"]],y);
   y+=2; y=section("Résultats",y);
-  const dQ=H.debit>0?(M.Q*1000-H.debit)/H.debit*100:0;
-  const tiles=[["Débit (appareil)",`${F.Q(H.debit)} ${F.u}`,`recalculé ${F.Q(M.Q*1000)} ${F.u} (${dQ>=0?"+":""}${n2(dQ,1)} %)`],["Section mouillée",`${hySig(M.A)} m²`,`largeur ${n2(M.W)} m`],
-    ["Vitesse moyenne",`${n2(M.A>0?M.Q/M.A:0)} m/s`,"débit / section"],["Vitesse maximale",`${n2(M.vmax)} m/s`,`ponctuelle ${n2(M.vmaxPts)} m/s`],["Profondeur maximale",`${n2(M.Dmax)} m`,`moyenne ${n2(M.A/M.W)} m`]];
+  const vmo=hyVmoy();
+  const tiles=[["Débit",H.debit>0?`${F.Q(H.debit)} ${F.u}`:"-",H.debit>0?"calculé par le FLUVIA":"non fourni dans l'export"],["Section mouillée",`${hySig(M.A)} m²`,`largeur ${n2(M.W)} m`],
+    ["Vitesse moyenne",vmo!=null?`${n2(vmo)} m/s`:"-","débit / section"],["Vitesse maximale",`${n2(M.vmax)} m/s`,`ponctuelle ${n2(M.vmaxPts)} m/s`],["Profondeur maximale",`${n2(M.Dmax)} m`,`moyenne ${n2(M.A/M.W)} m`]];
   const tw=(CW-12)/5; tiles.forEach((t,i)=>{ const x=Mg+i*(tw+3); doc.setFillColor(...SOFT); doc.roundedRect(x,y,tw,20,1.5,1.5,"F"); set(7.5,"normal",MUT); T(t[0],x+3,y+5); set(11,"bold",i===0?ACC:INK); T(t[1],x+3,y+11.5); set(6.6,"normal",MUT); T(t[2],x+3,y+16.5) });
   y+=26;
   const sec=hyCanvasImg(hyDrawSection,900); const sh=CW*sec.h/sec.w;
@@ -2642,7 +2642,7 @@ async function hyBuildPdf(f){
     if(y>PH-22){ doc.addPage(); header(); y=head(40) }
     if(i%2){ doc.setFillColor(...SOFT); doc.rect(Mg,y-4,CW,6,"F") }
     set(8,"normal",INK); let x=Mg; cells.forEach((c,k)=>{ const col=cols[k]; if(k===6&&M.seg[i].part>0.1) set(8,"bold",RED); T(c,col[2]==="r"?x+col[1]-1.5:x+1.5,y,{align:col[2]==="r"?"right":"left"}); set(8,"normal",INK); x+=col[1] }); y+=6 });
-  set(7.5,"normal",MUT); T(`Débit recalculé par la section médiane : ${F.Q(M.Q*1000)} ${F.u}  ·  section mouillée ${hySig(M.A)} m²  ·  vitesse moyenne ${n2(M.A>0?M.Q/M.A:0)} m/s`,Mg,y+1); y+=7;
+  set(7.5,"normal",MUT); T(`${H.debit>0?`Débit calculé par le FLUVIA : ${F.Q(H.debit)} ${F.u}  ·  `:""}section mouillée ${hySig(M.A)} m²${vmo!=null?`  ·  vitesse moyenne ${n2(vmo)} m/s`:""}`,Mg,y+1); y+=7;
   // ===== contrôle qualité
   y=ensure(y,20+q.it.length*11); y=section("Contrôle qualité (repères ISO 748)",y);
   const stc={ok:[23,100,58],info:[122,86,0],warn:[155,44,16]}, stb={ok:[221,241,228],info:[255,241,199],warn:[253,224,214]};
