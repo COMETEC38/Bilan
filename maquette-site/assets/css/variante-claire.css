@@ -1,0 +1,81 @@
+/* =========================================================
+   COMETEC — variante claire (à charger après site.css)
+   Fond blanc et gris-vert comme les fiches PDF, gris du logo
+   pour l'interface, ardoise réservée aux données, rouge en
+   ponctuation. Une seule grande zone sombre : la photo d'accueil.
+   ========================================================= */
+:root{
+  --papier:#FFFFFF;
+  --brume:#EFF3F3;
+  --trait:#DCE4E4;
+  --encre:#1C2122;
+  --encre-2:#556364;
+  --gris-fonce:#3B4546;
+  --nuit:#1E2425;
+}
+
+/* Boutons et liens d'interface : gris du logo */
+.btn-plein{background:var(--gris-logo)}
+.btn-plein:hover{background:var(--gris-fonce)}
+.btn-clair{color:var(--nuit)}
+.tel{color:var(--encre)}
+a.puce:hover{background:var(--gris-logo);border-color:var(--gris-logo)}
+.famille:hover h3{color:var(--encre)}
+.secteur .actions a:hover{background:var(--gris-logo);border-color:var(--gris-logo)}
+.service-etapes li::before{border-color:var(--gris-logo);color:var(--gris-logo)}
+.mega-app span{background-color:var(--gris-fonce)}
+.voile{background:rgba(28,33,34,.5)}
+.sous-nav{background:rgba(255,255,255,.94)}
+
+/* Héros : la seule zone sombre, en gris neutre plutôt qu'en bleu nuit */
+.heros{background:var(--nuit)}
+.heros::before{background:
+  linear-gradient(90deg,rgba(30,36,37,.9) 0%,rgba(30,36,37,.7) 34%,rgba(30,36,37,.16) 72%,rgba(30,36,37,.04) 100%),
+  linear-gradient(0deg,rgba(30,36,37,.72) 0%,rgba(30,36,37,0) 38%),
+  linear-gradient(rgba(85,99,100,.22),rgba(85,99,100,.22))}
+.heros-media img{filter:saturate(.55)}
+.heros .btn-clair:hover{background:var(--givre)}
+.heros .btn-trait:hover{color:var(--nuit)}
+
+/* De la source au rejet : fond clair, les photos portent la couleur */
+.parcours{background:var(--brume);color:var(--encre)}
+.parcours-tete .chapo{color:var(--encre-2)}
+.ligne-eau .fond{stroke:rgba(28,33,34,.16)}
+.ligne-eau .plein{stroke:var(--ardoise)}
+.etapes-eau{color:var(--encre-2)}
+.etapes-eau button.actif{color:var(--encre)}
+.terrain-photo{background:var(--trait)}
+.terrain-photo img{filter:saturate(.85) contrast(1.04)}
+.terrain-photo::after{background:linear-gradient(rgba(85,99,100,.08),rgba(28,33,34,.16))}
+.terrain-texte p{color:var(--encre-2)}
+.terrain-texte li a{border-color:var(--trait);background:#fff}
+.terrain-texte li a:hover{background:var(--gris-logo);color:#fff;border-color:var(--gris-logo)}
+.terrain-texte .lien{color:var(--encre)}
+
+/* Application COMETEC : section claire, seul l'écran de l'appli reste sombre */
+.sombre{background:#fff;color:var(--encre)}
+.sombre .chapo{color:var(--encre-2)}
+.modules{border-top-color:var(--trait)}
+.modules li{border-bottom-color:var(--trait)}
+.modules svg{color:var(--ardoise)}
+.modules span{color:var(--encre-2)}
+.sombre .btn-clair{background:var(--gris-logo);color:#fff}
+.sombre .btn-clair:hover{background:var(--gris-fonce)}
+.sombre .btn-trait:hover{background:var(--encre);color:#fff;border-color:var(--encre)}
+.ecran{background:#18292A;box-shadow:0 50px 90px -50px rgba(28,33,34,.55)}
+
+/* Interlocuteurs : bande gris-vert */
+#contact{background:var(--brume)}
+.carte-france path{stroke:var(--brume)}
+
+/* Fiche appareil */
+.ideal li,.doc .type-doc em{color:var(--encre)}
+.tableau tbody th{color:var(--encre);background:#F3F6F6}
+.dn-outil{background:var(--ardoise)}
+.interloc{background:var(--brume);color:var(--encre);border:1px solid var(--trait)}
+.interloc .chapo{color:var(--encre-2)}
+.interloc .dep-recherche label{color:var(--encre)}
+.interloc .dep-recherche input{border-color:var(--trait);background:#fff;color:var(--encre)}
+.interloc-res span{color:var(--encre-2)}
+.interloc .btn-clair{background:var(--gris-logo);color:#fff}
+.interloc .btn-trait{color:var(--encre)}

@@ -1,0 +1,165 @@
+/* =========================================================
+   COMETEC — données du site (maquette)
+   Un seul endroit pour le catalogue, les terrains et les secteurs.
+   En production, ces données seront des fichiers par appareil.
+   ========================================================= */
+
+/* Photos d'illustration provisoires : Unsplash, licence libre (usage commercial, sans attribution).
+   À remplacer par les photos COMETEC et à héberger sur le serveur du site avant la mise en ligne. */
+window.PHOTO = function (id, w) {
+  return "https://images.unsplash.com/" + id + "?auto=format&fit=crop&w=" + (w || 1600) + "&q=72";
+};
+
+window.FAMILLES = [
+  {
+    id: "debitmetres", nom: "Débitmètres", desc: "Surface libre, canal de comptage, conduite en charge et cours d’eau.",
+    photo: "photo-1585793451936-e321aa5efb24",
+    groupes: [
+      { nom: "Hauteur-vitesse", items: [
+        ["RAVEN-EYE", "Débitmètre hauteur-vitesse radar sans contact", "appareils/raven-eye.html"],
+        ["BELUGA", "Débitmètre Doppler hauteur-vitesse"],
+        ["BELUGA A/V", "Débitmètre Doppler hauteur-vitesse"],
+        ["LOG’R", "Débitmètre hauteur-vitesse portable autonome"],
+        ["Solutions autonomes", "Hauteur-vitesse sur enregistreur autonome"] ] },
+      { nom: "Canal de comptage", items: [
+        ["DEBULLE", "Débitmètre bulle à bulle, poste fixe"],
+        ["BUL’R2", "Débitmètre bulle à bulle portable"],
+        ["OC90", "Afficheur-transmetteur de débit pour canal"],
+        ["Canal Venturi AMV", "Canal de mesure ISO 4359"],
+        ["Canal Palmer-Bowlus", "Canal de mesure"] ] },
+      { nom: "Conduite en charge", items: [
+        ["TORPEE-MAG", "Débitmètre électromagnétique à insertion, DN 100 à 2500", "appareils/torpee-mag.html"],
+        ["TORPEE-Z", "Débitmètre électromagnétique à insertion, DN 100 à 300"],
+        ["KF100", "Débitmètre à ultrasons à temps de transit, poste fixe"],
+        ["KF200", "Débitmètre à ultrasons à temps de transit, portable"],
+        ["KF210", "Débitmètre à ultrasons à temps de transit, en mallette"] ] },
+      { nom: "Rivière et jaugeage", items: [
+        ["FLUVIA", "Courantomètre électromagnétique"],
+        ["FloStick", "Courantomètre compact"],
+        ["RADAR-MATE 2", "Radar de vitesse portable"],
+        ["PHOENIX", "Débitmètre radar pour rivière"],
+        ["EASYFLOW", "Débitmètre par traçage au sel"] ] }
+    ]
+  },
+  {
+    id: "preleveurs", nom: "Préleveurs", desc: "Fixes ou portables, réfrigérés, péristaltiques, version ATEX.",
+    photo: "photo-1674578745937-c73f81bdda07",
+    groupes: [
+      { nom: "Fixes", items: [
+        ["SP5 DK", "Préleveur pour conduites en charge"],
+        ["SP5 ATEX", "Préleveur fixe réfrigéré ATEX"],
+        ["SP5C", "Préleveur fixe réfrigéré compact"],
+        ["SP5B", "Préleveur fixe réfrigéré péristaltique"],
+        ["TP5 W", "Préleveur mural monoflacon"] ] },
+      { nom: "Portables", items: [
+        ["MicroMAXX", "Pompe de prélèvement"],
+        ["MAXX P6", "Préleveur portable compact"],
+        ["TP5 P", "Préleveur portable réfrigéré"],
+        ["TP5 C", "Préleveur portable réfrigéré péristaltique"] ] }
+    ]
+  },
+  {
+    id: "qualite", nom: "Qualité de l’eau", desc: "Sondes physico-chimiques, voile de boue et matières en suspension.",
+    photo: "photo-1671250973481-252cca9c9c51",
+    groupes: [
+      { nom: "Physico-chimie", items: [
+        ["Sondes et transmetteurs", "pH, oxygène dissous, redox, température, conductivité, MES, turbidité, chlore"] ] },
+      { nom: "Boues et MES", items: [
+        ["DTR01", "Détecteur de niveau de boue"],
+        ["DTR02", "Détecteur de niveau de boue"],
+        ["R812", "MESmètre portable"] ] }
+    ]
+  },
+  {
+    id: "niveau", nom: "Niveau", desc: "Ultrasons, radar, détection de surverse et piézométrie.",
+    photo: "photo-1774031052552-86e96d08c202",
+    groupes: [
+      { nom: "Niveau et surverse", items: [
+        ["ULS02", "Capteur de niveau à ultrasons 4-20 mA"],
+        ["ULS06", "Capteur de niveau à ultrasons 4-20 mA"],
+        ["R60", "Capteur de niveau radar"],
+        ["DTS01", "Détecteur de surverse"],
+        ["Sondes lumineuses BF", "Sondes piézométriques"] ] }
+    ]
+  },
+  {
+    id: "hydrocarbures", nom: "Hydrocarbures", desc: "Détection sans contact, HAP dissous et contrôle manuel d’interface.",
+    photo: "photo-1767274714714-dda4c25c6376",
+    groupes: [
+      { nom: "Hydrocarbures", items: [
+        ["LDI ROW", "Détecteur d’hydrocarbures sans contact"],
+        ["EnviroFlu", "Sonde HAP dissous"],
+        ["SOLINST 122", "Détecteur manuel d’interface"] ] }
+    ]
+  },
+  {
+    id: "pluviometrie", nom: "Pluviométrie", desc: "Pluviomètres pour l’autosurveillance et le suivi des bassins versants.",
+    photo: "photo-1776837048959-b7439cd9fdf7",
+    groupes: [
+      { nom: "Pluviomètres", items: [
+        ["Pluviomètre professionnel", "Pluviomètre sans alimentation, sortie contact"],
+        ["Pluviomètre météo", "Pluviomètre"] ] }
+    ]
+  }
+];
+
+/* Le parcours de l'eau : les pages Applications */
+window.TERRAINS = [
+  { id: "rivieres", nom: "Rivières et milieu naturel", court: "Rivières",
+    photo: "photo-1543503484-ba590cb1f903",
+    texte: "Jaugeage, hauteur d’eau et débit en cours d’eau, pluie sur le bassin versant. Des appareils portables pour les campagnes, fixes pour les stations.",
+    appareils: ["FLUVIA", "PHOENIX", "RADAR-MATE 2", "EASYFLOW", "FloStick", "Pluviomètre professionnel"] },
+  { id: "souterraines", nom: "Eaux souterraines", court: "Nappes",
+    photo: "photo-1786327319386-762e16cf32f1",
+    texte: "Suivi du niveau des nappes et de leur qualité, en poste fixe ou en campagne de relevés.",
+    appareils: ["Sondes lumineuses BF", "Sondes et transmetteurs", "MicroMAXX"] },
+  { id: "eau-potable", nom: "Eau potable", court: "Eau potable",
+    photo: "photo-1495647688236-ed6ef40cb28b",
+    texte: "Comptage sur les conduites en charge, du DN 100 au DN 2500, posé sans coupure d’eau.",
+    appareils: ["TORPEE-MAG", "TORPEE-Z", "KF100", "KF200", "KF210", "Sondes et transmetteurs"] },
+  { id: "reseaux", nom: "Réseaux d’assainissement", court: "Réseaux",
+    photo: "photo-1551516116-27394c95a55f",
+    texte: "Points d’autosurveillance, déversoirs d’orage, diagnostic permanent : mesurer le débit là où il n’y a ni place ni alimentation.",
+    appareils: ["RAVEN-EYE", "BELUGA", "LOG’R", "Solutions autonomes", "DTS01", "TP5 P"] },
+  { id: "step", nom: "Station d’épuration", court: "Station",
+    photo: "photo-1622322977767-2c71d1787205",
+    texte: "Comptage en entrée et en sortie, bilans 24 h asservis au débit, voile de boue et paramètres de traitement.",
+    appareils: ["DEBULLE", "OC90", "Canal Venturi AMV", "SP5B", "DTR02", "Sondes et transmetteurs"] },
+  { id: "industrie", nom: "Industrie et process", court: "Industrie",
+    photo: "photo-1765218933298-dc55fdfb517a",
+    texte: "Détection d’hydrocarbures avant rejet, débit en conduite de process, contrôle des effluents.",
+    appareils: ["LDI ROW", "EnviroFlu", "KF200", "TORPEE-MAG", "SP5 ATEX"] }
+];
+
+/* Secteurs commerciaux (carte des secteurs COMETEC, octobre 2026) */
+window.SECTEURS = [
+  { id: "nord-ouest", nom: "Benoît Paris", zone: "Nord-Ouest et Île-de-France", couleur: "#5E8C8B",
+    deps: "02 14 18 22 27 28 29 35 36 37 41 44 45 49 50 53 56 59 60 61 62 72 75 76 77 78 80 91 92 93 94 95" },
+  { id: "est", nom: "Hugo Saccani", zone: "Rhône-Alpes et Grand Est", couleur: "#1A4D4D",
+    deps: "01 03 08 10 21 25 38 39 42 51 52 54 55 57 58 63 67 68 69 70 71 73 74 88 89 90" },
+  { id: "sud-ouest", nom: "Alexis Crozatier", zone: "Sud-Ouest et Outre-mer", couleur: "#9DBDBB",
+    deps: "*" /* tous les autres départements de métropole, et l'outre-mer */ },
+  { id: "sud-est", nom: "Olivier Paillard", zone: "Sud-Est et Export", couleur: "#0F3637",
+    deps: "04 05 06 07 11 12 13 15 26 30 34 43 48 66 83 84 2A 2B" }
+];
+
+window.CONTACT = {
+  tel: "01 48 90 40 79", telLien: "tel:+33148904079",
+  mail: "contact@cometec.fr",
+  rdv: "https://bookings.cloud.microsoft/book/COMETEC1@cometec.fr/"
+};
+
+/* Visuels du catalogue : photo détourée (assets/img/appareils/<nom>.webp)
+   et, quand elle existe, une photo de terrain affichée au survol (<nom>-situ.webp).
+   Source : documentations des appareils. À remplacer par les photos HD quand elles arrivent. */
+window.VISUELS = {
+  "RAVEN-EYE": ["raven-eye", 1], "BELUGA": ["beluga", 1], "BELUGA A/V": ["beluga-av", 1], "LOG’R": ["logr", 1],
+  "DEBULLE": ["debulle", 1], "BUL’R2": ["bulr2", 1], "Canal Venturi AMV": ["venturi-amv", 1], "Canal Palmer-Bowlus": ["palmer-bowlus", 1],
+  "TORPEE-MAG": ["torpee-mag", 1], "KF100": ["kf100", 0], "KF210": ["kf210", 0],
+  "FLUVIA": ["fluvia", 1], "FloStick": ["flostick", 1], "RADAR-MATE 2": ["radar-mate-2", 1], "PHOENIX": ["phoenix", 1], "EASYFLOW": ["easyflow", 1],
+  "SP5C": ["sp5c", 1], "TP5 W": ["tp5-w", 1], "MAXX P6": ["maxx-p6", 1], "TP5 P": ["tp5-p", 1], "TP5 C": ["tp5-c", 1],
+  "Sondes et transmetteurs": ["sondes-transmetteurs", 1], "R812": ["r812", 0], "DTR01": ["dtr01", 0],
+  "DTS01": ["dts01", 0], "Sondes lumineuses BF": ["sondes-bf", 1],
+  "LDI ROW": ["ldi-row", 1], "EnviroFlu": ["enviroflu", 1],
+  "Pluviomètre professionnel": ["pluvio-pro", 1], "Pluviomètre météo": ["pluvio-meteo", 1]
+};
