@@ -116,6 +116,71 @@
   }
 
   var etat = { fermerDevis: function () {} };
+
+  /* ---------- « Ma demande » : lignes de devis gardées d'une fiche à l'autre ---------- */
+  var CLE = "cometec-demande";
+  function lireDemande() { try { return JSON.parse(win.localStorage.getItem(CLE)) || []; } catch (e) { return etat.demande || []; } }
+  function ecrireDemande(l) { etat.demande = l; try { win.localStorage.setItem(CLE, JSON.stringify(l)); } catch (e) {} majBadge(); }
+  var badge = null;
+  if (entete) {
+    var zone = $(".entete-actions");
+    if (zone) {
+      zone.insertAdjacentHTML("afterbegin", '<button class="ma-demande" type="button" data-ouvrir-demande hidden aria-label="Ma demande de devis"><span class="lib">Ma demande</span><b>0</b></button>');
+      badge = $(".ma-demande", zone);
+    }
+  }
+  function majBadge() {
+    var n = lireDemande().length;
+    if (badge) { badge.hidden = n === 0; $("b", badge).textContent = n; }
+    $$(".devis-panier").forEach(function (p) { p.hidden = n === 0; $(".nb-demande", p).textContent = n; });
+  }
+  doc.body.insertAdjacentHTML("beforeend",
+    '<div class="voile voile-demande" role="dialog" aria-modal="true" aria-labelledby="t-demande"><div class="fenetre">' +
+    '<div class="fenetre-tete"><div><h2 id="t-demande">Ma demande de devis</h2><p style="color:var(--encre-2);margin-top:6px">Elle est transmise au technico-commercial du département de votre site.</p></div><button class="fermer" type="button" aria-label="Fermer">×</button></div>' +
+    '<div class="recap-lignes"></div>' +
+    '<form class="formulaire" novalidate>' +
+    '<div class="champ"><label for="d-nom">Nom</label><input id="d-nom" autocomplete="name" required></div>' +
+    '<div class="champ"><label for="d-org">Société ou collectivité</label><input id="d-org" autocomplete="organization" required></div>' +
+    '<div class="champ"><label for="d-mail">E-mail</label><input id="d-mail" type="email" autocomplete="email" required></div>' +
+    '<div class="champ"><label for="d-tel">Téléphone</label><input id="d-tel" type="tel" autocomplete="tel"></div>' +
+    '<div class="champ"><label for="d-dep">Département du site</label><input id="d-dep" maxlength="3" required></div>' +
+    '<div class="champ"><label for="d-delai">Échéance</label><select id="d-delai"><option>Sans urgence</option><option>Sous un mois</option><option>Projet chiffré pour un marché</option></select></div>' +
+    '<div class="champ large"><label for="d-msg">Précisions</label><textarea id="d-msg" placeholder="Point de mesure, accès, alimentation disponible…"></textarea></div>' +
+    '<p class="retour" aria-live="polite"></p>' +
+    '<button class="btn btn-rouge" type="submit">Envoyer la demande</button></form></div></div>');
+  var voileD = $(".voile-demande"), dernierD = null;
+  function dessinerRecap() {
+    var l = lireDemande(), zoneL = $(".recap-lignes", voileD);
+    zoneL.innerHTML = l.length ? l.map(function (x, i) {
+      return '<div class="recap-ligne"><div><b>' + echap(x.produit) + "</b><span>" + echap(x.details.join(" · ")) + '</span></div><em>× ' + x.qte + '</em><button type="button" data-retirer="' + i + '" aria-label="Retirer ' + echap(x.produit) + '">×</button></div>';
+    }).join("") : '<p class="recap-vide">Votre demande est vide. Composez-la depuis la fiche d’un appareil.</p>';
+  }
+  function ouvrirDemande(dep) {
+    dessinerRecap(); dernierD = doc.activeElement; voileD.classList.add("ouvert");
+    var dd = $("#d-dep", voileD); if (dep && !dd.value) dd.value = dep;
+    setTimeout(function () { var c = $("#d-nom", voileD); if (c) c.focus(); }, 60);
+  }
+  function fermerDemande() { if (voileD.classList.contains("ouvert")) { voileD.classList.remove("ouvert"); if (dernierD) dernierD.focus(); } }
+  doc.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-ouvrir-demande]");
+    if (b) { e.preventDefault(); var dep = $("#dep-fiche"); ouvrirDemande(dep && dep.value); }
+  });
+  voileD.addEventListener("click", function (e) {
+    if (e.target === voileD || e.target.closest(".fermer")) fermerDemande();
+    var r = e.target.closest("[data-retirer]");
+    if (r) { var l = lireDemande(); l.splice(+r.getAttribute("data-retirer"), 1); ecrireDemande(l); dessinerRecap(); }
+  });
+  doc.addEventListener("keydown", function (e) { if (e.key === "Escape") fermerDemande(); });
+  $("form", voileD).addEventListener("submit", function (e) {
+    e.preventDefault();
+    var f = e.target, retour = $(".retour", f);
+    if (!lireDemande().length) { retour.textContent = "Ajoutez d’abord un appareil depuis sa fiche."; return; }
+    var manque = $$("[required]", f).filter(function (c) { return !c.value.trim() || !c.checkValidity(); })[0];
+    if (manque) { retour.textContent = "Renseignez le champ «\u00a0" + $("label[for=" + manque.id + "]", f).textContent + "\u00a0»."; manque.focus(); return; }
+    var r = secteurDe($("#d-dep", f).value);
+    retour.textContent = "Demande prête" + (r ? ", elle sera transmise à " + r.s.nom + " (" + r.s.zone + ")" : "") + ". Sur cette maquette, l’envoi n’est pas encore branché.";
+  });
+  majBadge();
   $$("[data-annee]").forEach(function (el) { el.textContent = new Date().getFullYear(); });
 
   /* Aller à un élément de la page (ancre), sous l'en-tête fixe */
@@ -409,7 +474,7 @@
   }
 
   /* ---------- Sous-navigation de la fiche ---------- */
-  var sousNav = $$(".sous-nav a[href^='#']");
+  var sousNav = $$(".sous-nav a[href^='#'], .onglets a[href^='#']");
   if (sousNav.length && "IntersectionObserver" in win) {
     var parId = {}; sousNav.forEach(function (a) { parId[a.getAttribute("href").slice(1)] = a; });
     var ioNav = new IntersectionObserver(function (en) {
@@ -422,13 +487,43 @@
   }
 
   /* ---------- Demande de devis ---------- */
-  var voile = $(".voile");
+  var voile = $(".voile:not(.voile-demande)");
   etat.fermerDevis = fermerDevis;
   function fermerDevis() { if (voile && voile.classList.contains("ouvert")) { voile.classList.remove("ouvert"); if (dernierFocus) dernierFocus.focus(); } }
   var dernierFocus = null;
+  var composeur = $(".composeur");
+  if (composeur) {
+    var qte = $("#c-qte", composeur), retourC = $(".composeur-retour", composeur);
+    $$("[data-qte]", composeur).forEach(function (b) {
+      b.addEventListener("click", function () { qte.value = Math.max(1, (parseInt(qte.value, 10) || 1) + (+b.getAttribute("data-qte"))); });
+    });
+    composeur.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var vide = $$("select", composeur).filter(function (s) { return !s.value; })[0];
+      if (vide) { retourC.textContent = "Choisissez : " + $("label[for=" + vide.id + "]", composeur).textContent.toLowerCase() + "."; vide.focus(); return; }
+      var details = $$("select", composeur).map(function (s) { return s.value; });
+      $$("input[type=checkbox]:checked", composeur).forEach(function (c) { details.push(c.value); });
+      var l = lireDemande();
+      l.push({ produit: composeur.getAttribute("data-produit"), details: details, qte: Math.max(1, parseInt(qte.value, 10) || 1) });
+      ecrireDemande(l);
+      retourC.textContent = "Ajouté à votre demande.";
+      setTimeout(function () { retourC.textContent = ""; }, 2600);
+    });
+    majBadge();
+    var barre = $(".barre-devis"), panneauD = doc.getElementById("devis");
+    if (barre && panneauD && "IntersectionObserver" in win) {
+      var ioB = new IntersectionObserver(function (en) { barre.classList.toggle("cachee", en[0].isIntersecting); }, { threshold: .15 });
+      ioB.observe(panneauD); finir(function () { ioB.disconnect(); });
+    }
+  }
   $$("[data-devis]").forEach(function (b) {
     b.addEventListener("click", function (e) {
-      e.preventDefault(); if (!voile) return;
+      e.preventDefault();
+      if (!voile) {
+        var panneau = doc.getElementById("devis");
+        if (panneau) { panneau.scrollIntoView({ behavior: calme ? "auto" : "smooth", block: "start" }); var c = $("select, input", panneau); if (c) setTimeout(function () { c.focus({ preventScroll: true }); }, 400); }
+        return;
+      }
       dernierFocus = b; voile.classList.add("ouvert");
       setTimeout(function () { var c = $("input,select", voile); if (c) c.focus(); }, 60);
     });

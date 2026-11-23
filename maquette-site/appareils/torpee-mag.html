@@ -38,7 +38,7 @@
 ]}
 </script>
 </head>
-<body data-racine="../">
+<body data-racine="../" class="page-fiche">
 <a class="saut" href="#contenu">Aller au contenu</a>
 
 <header class="entete">
@@ -56,7 +56,7 @@
     </nav>
     <div class="entete-actions">
       <a class="tel num" href="tel:+33148904079">01 48 90 40 79</a>
-      <a class="btn btn-plein" href="#interlocuteur">Votre interlocuteur</a>
+      <a class="btn btn-plein" href="../index.html#contact">Votre interlocuteur</a>
     </div>
     <button class="burger" type="button" aria-expanded="false" aria-controls="tiroir">Menu</button>
   </div>
@@ -84,27 +84,11 @@
       <li><span aria-current="page">TORPEE-MAG</span></li>
     </ol>
   </nav>
-
-  <section class="produit-heros" aria-labelledby="titre-produit">
-    <div>
-      <h1 id="titre-produit"><span class="t-xl nom-produit">TORPEE-MAG</span><span class="type">Débitmètre électromagnétique à insertion</span></h1>
-      <p class="chapo">Pour les conduites d’eau potable en charge, du DN 100 au DN 2500. La sonde mesure la vitesse en plusieurs points de la section et se pose par un simple piquage, sans vidanger ni découper la conduite.</p>
-      <div class="ideal">
-        <p>Idéal pour</p>
-        <ul>
-          <li>Comptage d’eau potable</li>
-          <li>Pose sans coupure d’eau</li>
-          <li>Remplacement d’une manchette</li>
-          <li>Gros diamètres</li>
-          <li>Certifié ACS</li>
-        </ul>
-      </div>
-      <div class="actions">
-        <a class="btn btn-rouge" href="#" data-devis>Demander un devis</a>
-        <a class="btn btn-trait" href="#documentation">Fiche technique PDF</a>
-      </div>
-    </div>
-    <figure class="vitrine" id="vitrine">
+</div>
+<div class="conteneur fiche">
+  <div class="fiche-principal">
+    <section class="fiche-tete" aria-labelledby="titre-produit">
+      <figure class="vitrine" id="vitrine">
       <img src="../assets/img/appareils/torpee-mag.webp" alt="Sonde électromagnétique TORPEE-MAG avec sa vanne à boule" onerror="this.parentNode.classList.add('sans-photo')">
       <svg class="repli" viewBox="0 0 560 360" aria-hidden="true">
         <rect x="16" y="122" width="528" height="196" fill="#E3ECEC"/>
@@ -117,26 +101,29 @@
       </svg>
       <figcaption>Sonde TORPEE-MAG et vanne à boule</figcaption>
     </figure>
-  </section>
-</div>
-
-<nav class="sous-nav" aria-label="Sections de la fiche">
-  <div class="conteneur">
-    <ul>
-      <li><a href="#points-forts">Points forts</a></li>
-      <li><a href="#principe">Principe</a></li>
-      <li><a href="#dimension">Votre conduite</a></li>
-      <li><a href="#pose">Pose</a></li>
-      <li><a href="#caracteristiques">Caractéristiques</a></li>
-      <li><a href="#documentation">Documentation</a></li>
-      <li><a href="#questions">Questions</a></li>
-      <li class="devis"><a class="btn btn-rouge" href="#" data-devis>Demander un devis</a></li>
-    </ul>
-  </div>
-</nav>
-
-<section class="rubrique" id="points-forts" aria-labelledby="t-forts">
-  <div class="conteneur">
+      <div class="resume">
+        <p class="sur-titre">Débitmètres · Conduite en charge</p>
+        <h1 id="titre-produit">TORPEE-MAG<span>Débitmètre électromagnétique à insertion</span></h1>
+        <p class="chapo">Pour les conduites d’eau potable en charge, du DN 100 au DN 2500. La sonde mesure la vitesse en plusieurs points de la section et se pose par un simple piquage, sans vidanger ni découper la conduite.</p>
+        <dl class="cles"><div><dt>Diamètres</dt><dd>DN 100 à DN 2500</dd></div><div><dt>Précision</dt><dd>± 0,5 % de 0,25 à 6 m/s</dd></div><div><dt>Pression</dt><dd>Jusqu’à 17 bar</dd></div><div><dt>Pose</dt><dd>En charge, sans coupure</dd></div></dl>
+        <div class="ideal">
+        <p>Idéal pour</p>
+        <ul>
+          <li>Comptage d’eau potable</li>
+          <li>Pose sans coupure d’eau</li>
+          <li>Remplacement d’une manchette</li>
+          <li>Gros diamètres</li>
+          <li>Certifié ACS</li>
+        </ul>
+      </div>
+        <div class="actions">
+          <a class="btn btn-rouge" href="#devis" data-devis>Composer mon devis</a>
+          <a class="btn btn-trait" href="#telechargements">Fiche technique PDF</a>
+        </div>
+      </div>
+    </section>
+    <nav class="onglets sous-nav-fiche" aria-label="Sections de la fiche"><ul><li><a href="#points-forts">Points forts</a></li><li><a href="#principe">Principe</a></li><li><a href="#dimension">Votre conduite</a></li><li><a href="#pose">Pose</a></li><li><a href="#caracteristiques">Caractéristiques</a></li><li><a href="#telechargements">Téléchargements</a></li><li><a href="#questions">Questions</a></li></ul></nav>
+    <section class="rubrique" id="points-forts" aria-labelledby="t-forts">
     <div class="rubrique-tete" style="margin-bottom:clamp(28px,4vw,48px)">
       <h2 id="t-forts">Points forts</h2>
       <p class="chapo">Une sonde, un piquage, et la mesure du débit sur les conduites où une manchette demanderait des travaux lourds.</p>
@@ -149,11 +136,7 @@
       <li class="leve"><b>Sur piles</b><span>Avec le convertisseur TMC-15 : environ un an sur 6 piles D, une mesure toutes les 2 s.</span></li>
       <li class="leve"><b>Certifié ACS</b><span>Attestation de conformité sanitaire pour le contact avec l’eau potable.</span></li>
     </ul>
-  </div>
-</section>
-
-<section class="rubrique" id="principe" aria-labelledby="t-principe">
-  <div class="conteneur principe">
+</section><section class="rubrique" id="principe" aria-labelledby="t-principe"><div class="principe">
     <div>
       <h2 id="t-principe" class="t-m" style="font-size:clamp(1.9rem,3vw,2.8rem);font-weight:320;font-stretch:86%;letter-spacing:-.02em;margin-bottom:22px">Principe de mesure</h2>
       <p>La sonde porte de 2 à 7 paires d’électrodes en graphite, réparties sur le diamètre de la conduite. Chaque paire mesure la vitesse locale du liquide.</p>
@@ -189,10 +172,7 @@
       <figcaption>Schéma de principe, sans échelle.</figcaption>
     </figure>
   </div>
-</section>
-
-<section class="rubrique" id="dimension" aria-labelledby="t-dim">
-  <div class="conteneur">
+</section><section class="rubrique" id="dimension" aria-labelledby="t-dim">
     <div class="rubrique-tete">
       <h2 id="t-dim">Votre conduite</h2>
       <p class="chapo">Choisissez le diamètre de la conduite : la taille de sonde et le nombre de paires d’électrodes s’affichent.</p>
@@ -219,11 +199,7 @@
         <p class="dn-note">Chaque référence couvre une plage de diamètre intérieur : le DN 100 accepte de 90 à 125 mm. Le diamètre intérieur exact n’est pas nécessaire pour engager une commande.</p>
       </div>
     </div>
-  </div>
-</section>
-
-<section class="rubrique" id="pose" aria-labelledby="t-pose">
-  <div class="conteneur">
+</section><section class="rubrique" id="pose" aria-labelledby="t-pose">
     <div class="rubrique-tete">
       <h2 id="t-pose">Pose en charge, sans coupure d’eau</h2>
       <p class="chapo">Ni vidange, ni découpe : c’est ce qui permet aussi de remplacer un débitmètre à manchette défectueux sans le déposer.</p>
@@ -247,11 +223,7 @@
       </li>
     </ol>
     <p style="margin-top:22px;color:var(--encre-2);font-size:15px">La pose près d’un coude est possible, avec une précision réduite.</p>
-  </div>
-</section>
-
-<section class="rubrique" id="caracteristiques" aria-labelledby="t-carac">
-  <div class="conteneur">
+</section><section class="rubrique" id="caracteristiques" aria-labelledby="t-carac">
     <div class="rubrique-tete" style="margin-bottom:clamp(28px,4vw,48px)">
       <h2 id="t-carac">Caractéristiques</h2>
       <p class="chapo">Deux convertisseurs au choix : le TMC-20 pour un poste alimenté, le TMC-15 pour un point de mesure autonome.</p>
@@ -295,40 +267,7 @@
         </table>
       </div>
     </div>
-  </div>
-</section>
-
-<section class="rubrique" id="documentation" aria-labelledby="t-doc">
-  <div class="conteneur">
-    <div class="rubrique-tete" style="margin-bottom:clamp(28px,4vw,48px)">
-      <h2 id="t-doc">Documentation</h2>
-      <p class="chapo">Fiche technique en téléchargement libre. La notice est remise avec l’appareil et envoyée sur simple demande.</p>
-    </div>
-    <div class="docs">
-      <a class="doc" href="https://www.cometec.fr/wp-content/uploads/2024/10/FLOW-TRONIC-TORPEE-MAG-2024.pdf" target="_blank" rel="noopener">
-        <span class="type-doc">Fiche technique <em>PDF</em></span>
-        <b>TORPEE-MAG, sonde et convertisseurs</b>
-        <span>Caractéristiques, dimensions, références.</span>
-        <span class="dl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3v13M6 11l6 6 6-6M4 21h16"/></svg>Télécharger</span>
-      </a>
-      <a class="doc" href="#" data-devis>
-        <span class="type-doc">Notice <em>Sur demande</em></span>
-        <b>Installation et utilisation</b>
-        <span>Insertion de la sonde, câblage, configuration du convertisseur.</span>
-        <span class="dl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 6h16v12H4z"/><path d="M4 7l8 6 8-6"/></svg>Demander la notice</span>
-      </a>
-      <div class="doc" style="border-style:dashed">
-        <span class="type-doc">Prescription <em>Bientôt</em></span>
-        <b>Texte descriptif pour CCTP</b>
-        <span>Un texte adapté au diamètre, à copier dans vos pièces de marché.</span>
-        <span class="dl" style="color:var(--encre-2)">En préparation</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="rubrique" aria-labelledby="t-cas">
-  <div class="conteneur">
+</section><section class="rubrique" aria-labelledby="t-cas">
     <div class="rubrique-tete" style="margin-bottom:clamp(28px,4vw,48px)">
       <h2 id="t-cas">Cas d’installation</h2>
       <p class="chapo">Des installations commentées : le contexte, la contrainte du site et la raison du choix.</p>
@@ -337,11 +276,10 @@
       <svg viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="9" width="38" height="28" rx="3"/><circle cx="22" cy="23" r="7"/><path d="M15 9l3-5h8l3 5"/></svg>
       <p><b style="color:var(--encre)">Emplacement des photos de terrain.</b><br>Chaque cas présentera une photo de l’installation, le diamètre, le convertisseur retenu et la raison de ce montage.</p>
     </div>
-  </div>
-</section>
-
-<section class="rubrique" id="questions" aria-labelledby="t-faq">
-  <div class="conteneur">
+</section><section class="rubrique" id="telechargements" aria-labelledby="t-telech">
+    <div class="rubrique-tete"><h2 id="t-telech">Téléchargements</h2></div>
+    <div class="telechargements"><div class="tel-ligne"><span class="ico" aria-hidden="true">PDF</span><div><b>Fiche technique TORPEE-MAG</b><span>Sonde et convertisseurs, dimensions, références · PDF · 2 pages · 0,4 Mo</span></div><a class="btn btn-plein" href="../assets/docs/torpee-mag-fiche-technique.pdf" download>Télécharger</a></div><div class="tel-ligne"><span class="ico" aria-hidden="true">PDF</span><div><b>Notice d’installation et d’utilisation</b><span>Insertion de la sonde, câblage, configuration du convertisseur</span></div><a class="btn btn-trait" href="#devis" data-devis>Sur demande</a></div><div class="tel-ligne attente"><span class="ico" aria-hidden="true">PDF</span><div><b>Texte descriptif pour CCTP</b><span>Adapté au diamètre, à copier dans vos pièces de marché</span></div><span class="etat">Bientôt</span></div></div>
+  </section><section class="rubrique" id="questions" aria-labelledby="t-faq">
     <div class="rubrique-tete" style="margin-bottom:clamp(28px,4vw,48px)">
       <h2 id="t-faq">Questions fréquentes</h2>
       <p class="chapo">Les questions que nous posent le plus souvent les exploitants et les bureaux d’études.</p>
@@ -355,11 +293,7 @@
       <details><summary>Faut-il connaître le diamètre intérieur exact pour commander ?<i aria-hidden="true"></i></summary><p>Non. Les sondes sont proposées par pas de DN 50, et chaque DN couvre une plage de diamètre intérieur : de 90 à 125 mm pour le DN 100.</p></details>
       <details><summary>Pourquoi indiquer la longueur de câble à la commande ?<i aria-hidden="true"></i></summary><p>La longueur du câble entre la sonde et le convertisseur entre dans l’étalonnage de l’appareil. Elle est donc fixée à la commande : 10 m en standard, jusqu’à 100 m.</p></details>
     </div>
-  </div>
-</section>
-
-<section class="rubrique" aria-labelledby="t-proches" style="border-bottom:0">
-  <div class="conteneur">
+</section><section class="rubrique" aria-labelledby="t-proches" style="border-bottom:0">
     <div class="rubrique-tete" style="margin-bottom:clamp(28px,4vw,48px)">
       <h2 id="t-proches">Autres débitmètres en charge</h2>
       <p class="chapo">Pour d’autres diamètres, une mesure ponctuelle ou un contrôle sans intervention sur la conduite.</p>
@@ -370,27 +304,29 @@
       <a class="proche" href="index.html#a-kf200"><b>KF200</b><span>Ultrasons à temps de transit, portable</span></a>
       <a class="proche avec-photo" href="index.html#a-kf210"><img src="../assets/img/appareils/kf210.webp" alt="" loading="lazy"><div><b>KF210</b><span>Ultrasons à temps de transit, en mallette</span></div></a>
     </div>
-  </div>
 </section>
-
-<section class="bloc" id="interlocuteur" aria-labelledby="t-interloc" style="padding-top:0">
-  <div class="conteneur">
-    <div class="interloc">
-      <div>
-        <h2 id="t-interloc" class="t-l" style="font-size:clamp(2rem,3.6vw,3.2rem)">Votre interlocuteur pour le TORPEE-MAG</h2>
-        <p class="chapo" style="margin-top:16px">Le technico-commercial de votre secteur étudie la conduite avec vous et met l’appareil en service.</p>
+  </div>
+  <aside class="fiche-devis" id="devis" aria-labelledby="t-devis">
+  <div class="devis-carte">
+    <div class="devis-entete"><p>Composer votre devis</p><h2 id="t-devis">TORPEE-MAG</h2></div>
+    <form class="composeur" data-produit="TORPEE-MAG">
+      <div class="ch"><label for="c-diametre-de-la-conduite">Diamètre de la conduite</label><select id="c-diametre-de-la-conduite" name="Diamètre de la conduite"><option value="">Choisir</option><option>DN 100</option><option>DN 150</option><option>DN 200</option><option>DN 250</option><option>DN 300</option><option>DN 350</option><option>DN 400</option><option>DN 450</option><option>DN 500</option><option>DN 550</option><option>DN 600</option><option>DN 650</option><option>DN 700</option><option>DN 750</option><option>DN 800</option><option>DN 850</option><option>DN 900</option><option>DN 950</option><option>DN 1000</option><option>DN 1050</option><option>DN 1100</option><option>DN 1150</option><option>DN 1200</option><option>DN 1250</option><option>DN 1300</option><option>DN 1350</option><option>DN 1400</option><option>DN 1450</option><option>DN 1500</option><option>DN 1550</option><option>DN 1600</option><option>DN 1650</option><option>DN 1700</option><option>DN 1750</option><option>DN 1800</option><option>DN 1850</option><option>DN 1900</option><option>DN 1950</option><option>DN 2000</option><option>DN 2050</option><option>DN 2100</option><option>DN 2150</option><option>DN 2200</option><option>DN 2250</option><option>DN 2300</option><option>DN 2350</option><option>DN 2400</option><option>DN 2450</option><option>DN 2500</option><option>Au-delà du DN 2500</option></select></div><div class="ch"><label for="c-convertisseur">Convertisseur</label><select id="c-convertisseur" name="Convertisseur"><option>TMC-20, poste alimenté</option><option>TMC-15 autonome sur piles, IP67</option><option>TMC-15 autonome sur piles, IP68</option><option>À définir avec mon interlocuteur</option></select></div><div class="ch"><label for="c-sens-de-mesure">Sens de mesure</label><select id="c-sens-de-mesure" name="Sens de mesure"><option>Monodirectionnel</option><option>Bidirectionnel</option></select></div><div class="ch"><label for="c-longueur-de-c-ble">Longueur de câble</label><select id="c-longueur-de-c-ble" name="Longueur de câble"><option>10 m (standard)</option><option>Autre longueur, jusqu’à 100 m</option></select></div>
+      <fieldset><legend>Options</legend><div class="coches"><label><input type="checkbox" name="Options" value="Sortie RS485 Modbus RTU (TMC-20)">Sortie RS485 Modbus RTU (TMC-20)</label><label><input type="checkbox" name="Options" value="Enregistrement sur carte microSD (TMC-20)">Enregistrement sur carte microSD (TMC-20)</label><label><input type="checkbox" name="Options" value="Filetage NPT">Filetage NPT</label></div></fieldset>
+      <div class="ligne-qte">
+        <div class="ch"><label for="c-qte">Quantité</label><div class="qte"><button type="button" data-qte="-1" aria-label="Moins">−</button><input id="c-qte" name="Quantité" type="number" min="1" value="1" inputmode="numeric"><button type="button" data-qte="1" aria-label="Plus">+</button></div></div>
+        <button class="btn btn-rouge" type="submit">Ajouter au devis</button>
       </div>
-      <div>
-        <div class="dep-recherche">
-          <label for="dep-fiche">Département du site</label>
-          <input id="dep-fiche" inputmode="text" maxlength="3" placeholder="38" data-dep-champ="fiche" autocomplete="off">
-        </div>
-        <div class="interloc-res" id="interloc-res" aria-live="polite"><span>Saisissez le numéro de département de votre site.</span></div>
-        <div class="actions"><a class="btn btn-rouge" href="#" data-devis>Demander un devis</a></div>
-      </div>
+      <p class="composeur-retour" aria-live="polite"></p>
+    </form>
+    <div class="devis-panier" hidden><span>Ma demande : <b class="nb-demande">0</b> ligne(s)</span><button type="button" data-ouvrir-demande>Voir et envoyer</button></div>
+    <div class="devis-interloc">
+      <label for="dep-fiche">Votre interlocuteur</label>
+      <div class="ligne"><input id="dep-fiche" inputmode="text" maxlength="3" placeholder="Dép." data-dep-champ="fiche" autocomplete="off" aria-label="Département du site"><div class="interloc-res" id="interloc-res" aria-live="polite"><span>Saisissez le département de votre site.</span></div></div>
     </div>
   </div>
-</section>
+</aside>
+</div>
+<a class="btn btn-rouge barre-devis" href="#devis">Composer mon devis</a>
 </main>
 
 <footer class="pied">
@@ -424,26 +360,6 @@
   </div>
 </footer>
 
-<div class="voile" role="dialog" aria-modal="true" aria-labelledby="t-devis">
-  <div class="fenetre">
-    <div class="fenetre-tete">
-      <div><h2 id="t-devis">Demande de devis</h2><p style="color:var(--encre-2);margin-top:6px">TORPEE-MAG. La demande est transmise au technico-commercial de votre secteur.</p></div>
-      <button class="fermer" type="button" aria-label="Fermer">×</button>
-    </div>
-    <form class="formulaire" novalidate>
-      <div class="champ"><label for="f-nom">Nom</label><input id="f-nom" autocomplete="name" required></div>
-      <div class="champ"><label for="f-org">Société ou collectivité</label><input id="f-org" autocomplete="organization" required></div>
-      <div class="champ"><label for="f-mail">E-mail</label><input id="f-mail" type="email" autocomplete="email" required></div>
-      <div class="champ"><label for="f-tel">Téléphone</label><input id="f-tel" type="tel" autocomplete="tel"></div>
-      <div class="champ"><label for="f-dep">Département du site</label><input id="f-dep" maxlength="3" required></div>
-      <div class="champ"><label for="f-dn">Diamètre de la conduite</label><select id="f-dn"><option value="">Je ne sais pas encore</option></select></div>
-      <div class="champ large"><label for="f-conv">Convertisseur</label><select id="f-conv"><option>À définir avec mon interlocuteur</option><option>TMC-20, poste alimenté</option><option>TMC-15, autonome sur piles</option></select></div>
-      <div class="champ large"><label for="f-msg">Votre projet</label><textarea id="f-msg" placeholder="Nature de l’eau, accès à la conduite, remplacement d’un appareil existant…"></textarea></div>
-      <p class="retour" aria-live="polite"></p>
-      <button class="btn btn-rouge" type="submit">Envoyer la demande</button>
-    </form>
-  </div>
-</div>
 
 <script src="../assets/js/donnees.js"></script>
 <script src="../assets/js/site.js"></script>

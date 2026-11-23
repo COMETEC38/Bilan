@@ -733,3 +733,195 @@ main [id]{scroll-margin-top:calc(var(--entete) + 16px)}
 .cat-famille,.app-carte{scroll-margin-top:calc(var(--entete) + 76px)}
 .vitrine img{width:82%;height:80%;margin-bottom:5%;filter:drop-shadow(0 22px 22px rgba(11,37,38,.22)) drop-shadow(0 3px 5px rgba(11,37,38,.16));mix-blend-mode:normal}
 .tiroir a.btn{display:flex;justify-content:center;padding:0 24px;margin-top:22px;border-bottom:0;color:#fff}
+
+/* =========================================================
+   FICHE APPAREIL COMPACTE (body.page-fiche)
+   Tout l'essentiel visible à l'ouverture : photo, type,
+   description, chiffres clés ; volet « Composer votre devis »
+   à droite, collant.
+   ========================================================= */
+body.page-fiche{font-size:16px;line-height:1.55}
+.page-fiche .ariane{padding:14px 0 0;font-size:13px}
+.fiche{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:clamp(24px,2.6vw,40px);align-items:start;padding-top:14px;padding-bottom:70px}
+.fiche-principal{min-width:0}
+
+/* En-tête produit : galerie + résumé côte à côte */
+.fiche-tete{display:grid;grid-template-columns:minmax(0,42fr) minmax(0,58fr);gap:clamp(20px,2.4vw,34px);align-items:start;padding-bottom:26px}
+.fiche-tete .galerie{gap:8px}
+.fiche-tete .galerie-scene{aspect-ratio:1/1}
+.fiche-tete .galerie-vignettes{gap:6px}
+.fiche-tete .galerie-vignettes button{border-radius:6px}
+.fiche-tete .vitrine{aspect-ratio:1/1}
+.fiche-tete .vitrine img{width:84%;height:84%;margin:0}
+.resume .sur-titre{display:flex;align-items:center;gap:10px;font-size:12.5px;font-weight:650;letter-spacing:.07em;text-transform:uppercase;color:var(--ardoise)}
+.resume .sur-titre::before{content:"";width:18px;height:2px;background:var(--rouge)}
+.resume h1{font-size:clamp(2rem,2.9vw,2.75rem);font-weight:340;font-stretch:86%;letter-spacing:-.022em;line-height:1;margin-top:10px}
+.resume h1 span{display:block;font-size:.5em;font-weight:460;font-stretch:96%;letter-spacing:-.005em;line-height:1.25;color:var(--ardoise);margin-top:8px}
+.resume .chapo{font-size:15.5px;line-height:1.55;margin-top:14px;max-width:none}
+.cles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;margin-top:16px;background:var(--trait);border:1px solid var(--trait);border-radius:8px;overflow:hidden}
+.cles div{background:#fff;padding:10px 14px}
+.cles dt{font-size:12px;color:var(--encre-2);font-weight:520}
+.cles dd{margin:2px 0 0;font-size:15.5px;font-weight:600;color:var(--abysse);line-height:1.3}
+.resume .ideal{margin-top:16px}
+.resume .ideal p{font-size:12.5px;margin-bottom:8px}
+.resume .ideal li{min-height:28px;padding:0 11px;font-size:13px}
+.resume .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.resume .actions .btn{min-height:42px;padding:0 18px;font-size:14.5px}
+
+/* Onglets (ancres) collants sous l'en-tête */
+.onglets{position:sticky;top:var(--entete);z-index:20;background:rgba(246,248,248,.96);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--trait);margin-bottom:6px}
+.onglets ul{display:flex;overflow-x:auto;scrollbar-width:none}
+.onglets ul::-webkit-scrollbar{display:none}
+.onglets a{display:block;padding:12px 13px;font-size:14px;font-weight:560;text-decoration:none;white-space:nowrap;color:var(--encre-2);position:relative;border-top:2px solid transparent}
+.onglets li:first-child a{padding-left:2px}
+.onglets a::after{content:"";position:absolute;left:13px;right:13px;bottom:-1px;height:2px;background:var(--rouge);transform:scaleX(0);transition:transform .35s var(--doux)}
+.onglets li:first-child a::after{left:2px}
+.onglets a:hover{color:var(--encre)}
+.onglets a.actif{color:var(--encre)}
+.onglets a.actif::after{transform:scaleX(1)}
+
+/* Rubriques resserrées */
+.page-fiche .rubrique{padding:38px 0 40px}
+.page-fiche .rubrique-tete{display:block;margin-bottom:22px}
+.page-fiche .rubrique-tete h2,.page-fiche .principe h2{font-size:clamp(1.45rem,1.9vw,1.85rem)!important;font-weight:400!important;font-stretch:88%;letter-spacing:-.015em;margin-bottom:0!important}
+.page-fiche .rubrique-tete .chapo{font-size:15px;margin-top:6px;max-width:70ch}
+.page-fiche .rubrique-tete[style]{margin-bottom:22px!important}
+.page-fiche .forts li{padding:18px 18px 20px}
+.page-fiche .forts b{font-size:1.25rem}
+.page-fiche .forts span{font-size:14px;margin-top:6px}
+.page-fiche .principe{gap:28px;align-items:start}
+.page-fiche .principe p,.page-fiche .principe li{font-size:15px}
+.page-fiche .principe h2{margin-bottom:12px!important}
+.page-fiche .section-outil,.page-fiche .dn-outil{margin-top:28px;padding:clamp(20px,2.4vw,32px);gap:clamp(20px,3vw,40px)}
+.page-fiche .dn-valeur{font-size:clamp(2.6rem,4.4vw,4.2rem)}
+.page-fiche .montages{grid-template-columns:1fr;gap:18px;margin-top:0}
+.page-fiche .montages-onglets{grid-template-columns:repeat(4,minmax(0,1fr))}
+.page-fiche .montages-onglets button{padding:11px 12px;gap:10px}
+.page-fiche .montages-onglets button b{font-size:14.5px}
+.page-fiche .montages-onglets button span{font-size:12.5px}
+.page-fiche .montage-panneau{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.page-fiche .usages{gap:12px}
+.page-fiche .usage div{padding:12px 14px 16px}
+.page-fiche .usage p{font-size:13.5px}
+.page-fiche .raccord{padding:18px}
+.page-fiche .raccord p{font-size:14px}
+.page-fiche .tableaux{grid-template-columns:1fr;gap:22px}
+.page-fiche .tableau{font-size:14px}
+.page-fiche .tableau th,.page-fiche .tableau td{padding:8px 12px}
+.page-fiche .tableau tbody th{width:34%}
+.page-fiche .controle{padding:24px 26px}
+.page-fiche .controle h2{font-size:1.6rem}
+.page-fiche .controle p{font-size:15px}
+.page-fiche .faq summary{font-size:15.5px}
+.page-fiche .etapes-pose{gap:12px}
+.page-fiche .etapes-pose li{padding:18px 16px 18px}
+.page-fiche .etapes-pose svg{width:42px;height:42px;margin-bottom:10px}
+.page-fiche .a-venir{padding:22px}
+@media (max-width:1200px){.page-fiche .usages{grid-template-columns:1fr 1fr}.page-fiche .forts{grid-template-columns:1fr 1fr}}
+
+/* Téléchargements */
+.telechargements{border:1px solid var(--trait);border-radius:10px;background:#fff;overflow:hidden}
+.tel-ligne{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:14px;align-items:center;padding:14px 16px;border-top:1px solid var(--trait)}
+.tel-ligne:first-child{border-top:0}
+.tel-ligne .ico{width:44px;height:52px;border-radius:5px;background:var(--brume);display:grid;place-items:center;font-size:11px;font-weight:700;color:var(--rouge);letter-spacing:.04em;position:relative}
+.tel-ligne .ico::before{content:"";position:absolute;right:0;top:0;border-style:solid;border-width:0 12px 12px 0;border-color:transparent #fff transparent transparent;filter:drop-shadow(-1px 1px 0 var(--trait))}
+.tel-ligne b{display:block;font-size:15px;font-weight:600}
+.tel-ligne span{display:block;font-size:13px;color:var(--encre-2)}
+.tel-ligne .btn{min-height:38px;padding:0 16px;font-size:14px}
+.tel-ligne.attente{background:repeating-linear-gradient(135deg,#FBFCFC 0 10px,#F6F8F8 10px 20px)}
+.tel-ligne.attente .ico{color:var(--encre-2)}
+.tel-ligne .etat{font-size:13px;font-weight:600;color:var(--encre-2);padding:0 6px}
+
+/* Volet « Composer votre devis » */
+.fiche-devis{position:sticky;top:calc(var(--entete) + 14px);align-self:start}
+.devis-carte{border:1px solid var(--trait);border-radius:12px;background:#fff;box-shadow:0 26px 50px -38px rgba(11,37,38,.5);overflow:hidden}
+.devis-entete{padding:16px 18px 14px;background:var(--abysse);color:#fff;position:relative}
+.devis-entete p{font-size:12px;font-weight:650;letter-spacing:.07em;text-transform:uppercase;color:#8EC3BF}
+.devis-entete h2{font-size:1.35rem;font-weight:500;font-stretch:90%;margin-top:3px;letter-spacing:-.005em}
+.devis-entete::after{content:"";position:absolute;left:18px;bottom:0;width:34px;height:3px;background:var(--rouge)}
+.composeur{padding:14px 18px 16px;display:grid;gap:11px}
+.composeur .ch label,.composeur legend{display:block;font-size:12.5px;font-weight:600;color:var(--encre-2);margin-bottom:4px}
+.composeur select,.composeur input[type=number]{width:100%;height:38px;border:1px solid var(--trait);border-radius:7px;background:#fff;font:inherit;font-size:14.5px;color:var(--encre);padding:0 10px}
+.composeur select{appearance:none;-webkit-appearance:none;padding-right:30px;background:#fff url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 10 10%27%3E%3Cpath d=%27M1 3.5l4 3.5 4-3.5%27 fill=%27none%27 stroke=%27%231A4D4D%27 stroke-width=%271.4%27/%3E%3C/svg%3E") no-repeat right 11px center/10px}
+.composeur select:focus,.composeur input:focus{outline:2px solid var(--ardoise);outline-offset:1px}
+.composeur fieldset{border:0;margin:0;padding:0}
+.composeur .coches{display:grid;gap:5px}
+.composeur .coches label{display:flex;gap:8px;align-items:flex-start;font-size:13.5px;line-height:1.35;color:var(--encre);font-weight:450;margin:0;cursor:pointer}
+.composeur .coches input{margin-top:2px;accent-color:var(--ardoise)}
+.ligne-qte{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:end;margin-top:4px}
+.qte{display:flex;align-items:center;border:1px solid var(--trait);border-radius:7px;height:42px;overflow:hidden}
+.qte button{width:34px;height:100%;border:0;background:var(--brume);font-size:18px;cursor:pointer;color:var(--abysse)}
+.qte input{width:44px!important;height:100%!important;border:0!important;text-align:center;font-weight:600;padding:0!important;-moz-appearance:textfield}
+.qte input::-webkit-inner-spin-button{-webkit-appearance:none}
+.composeur .btn{min-height:42px;font-size:14.5px;padding:0 14px}
+.composeur-retour{font-size:13px;color:var(--ardoise);font-weight:560;min-height:1px}
+.devis-panier{border-top:1px solid var(--trait);padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--brume)}
+.devis-panier[hidden]{display:none}
+.devis-panier span{font-size:13.5px}
+.devis-panier b{color:var(--rouge)}
+.devis-panier button{font:inherit;font-size:13.5px;font-weight:600;color:var(--abysse);background:none;border:0;text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:0}
+.devis-interloc{border-top:1px solid var(--trait);padding:12px 18px 16px}
+.devis-interloc label{display:block;font-size:12.5px;font-weight:600;color:var(--encre-2);margin-bottom:4px}
+.devis-interloc .ligne{display:grid;grid-template-columns:70px 1fr;gap:10px;align-items:center}
+.devis-interloc input{height:38px;border:1px solid var(--trait);border-radius:7px;font:inherit;font-size:15px;text-align:center;width:100%}
+.devis-interloc .interloc-res{font-size:13px;line-height:1.35;color:var(--encre-2)}
+.devis-interloc .interloc-res b{display:block;color:var(--encre);font-size:14px}
+.devis-interloc .interloc-res .actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.devis-interloc .interloc-res .btn{min-height:32px;padding:0 12px;font-size:13px}
+.devis-interloc .interloc-res .btn-clair{background:var(--abysse);color:#fff}
+.devis-interloc .interloc-res .btn-trait{color:var(--encre);border-color:var(--trait)}
+.devis-note{padding:0 18px 14px;font-size:12px;color:var(--encre-2)}
+
+/* « Ma demande » dans l'en-tête et fenêtre récapitulative */
+.ma-demande{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 14px;border-radius:999px;border:1px solid var(--trait);font-size:14px;font-weight:560;text-decoration:none;color:var(--encre);background:#fff;cursor:pointer;font-family:inherit}
+.ma-demande b{min-width:22px;height:22px;border-radius:11px;background:var(--rouge);color:#fff;font-size:12.5px;display:grid;place-items:center;padding:0 6px}
+.ma-demande[hidden]{display:none}
+.recap-lignes{display:grid;gap:8px;margin:4px 0 18px}
+.recap-ligne{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:12px;align-items:start;padding:12px 14px;border:1px solid var(--trait);border-radius:9px;background:var(--brume)}
+.recap-ligne b{display:block;font-size:15px}
+.recap-ligne span{display:block;font-size:13px;color:var(--encre-2);line-height:1.4}
+.recap-ligne em{font-style:normal;font-weight:600;font-size:14px;white-space:nowrap}
+.recap-ligne button{border:0;background:none;color:var(--encre-2);cursor:pointer;font-size:18px;line-height:1;padding:0 2px}
+.recap-vide{color:var(--encre-2);font-size:14.5px;padding:10px 0 16px}
+
+/* Téléphone : volet sous le contenu + barre d'accès */
+.barre-devis{display:none}
+@media (max-width:1000px){
+  .fiche{grid-template-columns:1fr}
+  .fiche-devis{position:static}
+  .barre-devis{display:flex;position:fixed;left:12px;right:12px;bottom:12px;z-index:40;justify-content:center;box-shadow:0 14px 30px -12px rgba(11,37,38,.5)}
+  .page-fiche .pied{padding-bottom:80px}
+}
+@media (max-width:700px){
+  .fiche-tete{grid-template-columns:1fr}
+  .cles{grid-template-columns:1fr 1fr}
+  .page-fiche .montages-onglets{grid-template-columns:1fr 1fr}
+  .page-fiche .montage-panneau{grid-template-columns:1fr}
+  .tel-ligne{grid-template-columns:40px minmax(0,1fr)}
+  .tel-ligne .btn,.tel-ligne .etat{grid-column:2;justify-self:start}
+  .page-fiche .usages,.page-fiche .forts{grid-template-columns:1fr}
+}
+/* ajustements de la fiche compacte */
+.fiche-tete figure{margin:0}
+.fiche-devis{max-height:calc(100vh - var(--entete) - 28px);overflow-y:auto;scrollbar-width:thin;border-radius:12px}
+.devis-entete{padding:13px 18px 12px}
+.devis-entete h2{font-size:1.25rem}
+.composeur{gap:8px;padding:12px 18px 14px}
+.composeur .ch label,.composeur legend{margin-bottom:3px;font-size:12px}
+.composeur select{height:35px;font-size:14px}
+.composeur .coches label{font-size:13px}
+.ligne-qte{grid-template-columns:auto minmax(0,1fr)}
+.ligne-qte .btn{white-space:nowrap;padding:0 12px}
+.qte{height:40px}
+.composeur-retour:empty{display:none}
+.devis-interloc{padding:11px 18px 14px}
+.devis-interloc .interloc-res,.devis-interloc .interloc-res span{color:var(--encre-2);margin:0;padding:0;background:none;border:0}
+.devis-interloc .interloc-res b{color:var(--encre)}
+.onglets a{padding:12px 11px;font-size:13.8px}
+.onglets a::after{left:11px;right:11px}
+@media (max-width:1000px){.fiche-devis{max-height:none;overflow:visible}.barre-devis.cachee{opacity:0;pointer-events:none;transform:translateY(20px)}.barre-devis{transition:opacity .3s,transform .3s}}
+.nav>li>a,.nav>li>button{white-space:nowrap}
+@media (max-width:1500px){.entete-actions:has(.ma-demande:not([hidden])) .tel{display:none}}
+@media (max-width:1180px){.entete-actions:has(.ma-demande:not([hidden])) .btn-plein{display:none}}
+@media (max-width:760px){.ma-demande{min-height:36px;padding:0 10px;font-size:13px}}
+@media (max-width:760px){.ma-demande{padding:0 8px;gap:0}.ma-demande .lib{display:none}}

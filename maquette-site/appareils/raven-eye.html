@@ -35,7 +35,7 @@
 ]}
 </script>
 </head>
-<body data-racine="../">
+<body data-racine="../" class="page-fiche">
 <a class="saut" href="#contenu">Aller au contenu</a>
 
 <header class="entete">
@@ -53,7 +53,7 @@
     </nav>
     <div class="entete-actions">
       <a class="tel num" href="tel:+33148904079">01 48 90 40 79</a>
-      <a class="btn btn-plein" href="#interlocuteur">Votre interlocuteur</a>
+      <a class="btn btn-plein" href="../index.html#contact">Votre interlocuteur</a>
     </div>
     <button class="burger" type="button" aria-expanded="false" aria-controls="tiroir">Menu</button>
   </div>
@@ -81,27 +81,11 @@
       <li><span aria-current="page">RAVEN-EYE</span></li>
     </ol>
   </nav>
-
-  <section class="produit-heros" aria-labelledby="titre-produit">
-    <div>
-      <h1 id="titre-produit"><span class="t-xl nom-produit">RAVEN-EYE</span><span class="type">Débitmètre hauteur-vitesse radar sans contact</span></h1>
-      <p class="chapo">Pour les réseaux d’assainissement, les rejets et les cours d’eau canalisés. Le radar mesure la vitesse de surface depuis le dessus de l’écoulement ; le débit est calculé avec la hauteur d’eau et la forme du conduit.</p>
-      <div class="ideal">
-        <p>Idéal pour</p>
-        <ul>
-          <li>Réseaux d’assainissement</li>
-          <li>Déversoirs d’orage</li>
-          <li>Effluents chargés ou corrosifs</li>
-          <li>Pose depuis un regard</li>
-          <li>Raccordement sur automate</li>
-        </ul>
-      </div>
-      <div class="actions">
-        <a class="btn btn-rouge" href="#" data-devis>Demander un devis</a>
-        <a class="btn btn-trait" href="#documentation">Fiche technique PDF</a>
-      </div>
-    </div>
-    <div class="galerie">
+</div>
+<div class="conteneur fiche">
+  <div class="fiche-principal">
+    <section class="fiche-tete" aria-labelledby="titre-produit">
+      <div class="galerie">
       <figure class="galerie-scene" style="margin:0">
         <img class="detoure vu" src="../assets/img/appareils/raven-eye/avec-niveau.webp" alt="RAVEN-EYE avec son kit de fixation et un capteur de niveau à ultrasons">
         <img class="detoure" src="../assets/img/appareils/raven-eye.webp" alt="Capteur radar RAVEN-EYE" loading="lazy">
@@ -118,27 +102,29 @@
         <button type="button" aria-pressed="false" data-legende="Sous un pont, cours d’eau canalisé"><img src="../assets/img/appareils/raven-eye/cours-eau.webp" alt="Vue 5 : sous un pont" loading="lazy"></button>
       </div>
     </div>
-  </section>
-</div>
-
-<nav class="sous-nav" aria-label="Sections de la fiche">
-  <div class="conteneur">
-    <ul>
-      <li><a href="#points-forts">Points forts</a></li>
-      <li><a href="#principe">Principe</a></li>
-      <li><a href="#montage">Montage</a></li>
-      <li><a href="#applications">Applications</a></li>
-      <li><a href="#raccordement">Raccordement</a></li>
-      <li><a href="#caracteristiques">Caractéristiques</a></li>
-      <li><a href="#controle">Contrôle</a></li>
-      <li><a href="#questions">Questions</a></li>
-      <li class="devis"><a class="btn btn-rouge" href="#" data-devis>Demander un devis</a></li>
-    </ul>
-  </div>
-</nav>
-
-<section class="rubrique" id="points-forts" aria-labelledby="t-forts">
-  <div class="conteneur">
+      <div class="resume">
+        <p class="sur-titre">Débitmètres · Hauteur-vitesse</p>
+        <h1 id="titre-produit">RAVEN-EYE<span>Débitmètre hauteur-vitesse radar sans contact</span></h1>
+        <p class="chapo">Pour les réseaux d’assainissement, les rejets et les cours d’eau canalisés. Le radar mesure la vitesse de surface depuis le dessus de l’écoulement ; le débit est calculé avec la hauteur d’eau et la forme du conduit.</p>
+        <dl class="cles"><div><dt>Vitesse</dt><dd>± 0,08 à ± 9 m/s</dd></div><div><dt>Précision</dt><dd>± 0,5 % + zéro ± 0,02 m/s</dd></div><div><dt>Communication</dt><dd>RS485 Modbus · 4-20 mA</dd></div><div><dt>Protection</dt><dd>IP68, sans contact</dd></div></dl>
+        <div class="ideal">
+        <p>Idéal pour</p>
+        <ul>
+          <li>Réseaux d’assainissement</li>
+          <li>Déversoirs d’orage</li>
+          <li>Effluents chargés ou corrosifs</li>
+          <li>Pose depuis un regard</li>
+          <li>Raccordement sur automate</li>
+        </ul>
+      </div>
+        <div class="actions">
+          <a class="btn btn-rouge" href="#devis" data-devis>Composer mon devis</a>
+          <a class="btn btn-trait" href="#telechargements">Fiche technique PDF</a>
+        </div>
+      </div>
+    </section>
+    <nav class="onglets sous-nav-fiche" aria-label="Sections de la fiche"><ul><li><a href="#points-forts">Points forts</a></li><li><a href="#principe">Principe</a></li><li><a href="#montage">Montage</a></li><li><a href="#applications">Applications</a></li><li><a href="#raccordement">Raccordement</a></li><li><a href="#caracteristiques">Caractéristiques</a></li><li><a href="#controle">Contrôle</a></li><li><a href="#telechargements">Téléchargements</a></li><li><a href="#questions">Questions</a></li></ul></nav>
+    <section class="rubrique" id="points-forts" aria-labelledby="t-forts">
     <div class="rubrique-tete" style="margin-bottom:clamp(28px,4vw,48px)">
       <h2 id="t-forts">Points forts</h2>
       <p class="chapo">Un capteur posé au-dessus de l’eau : rien dans l’effluent, rien à nettoyer, et un débit calculé par l’appareil lui-même.</p>
@@ -151,11 +137,7 @@
       <li class="leve"><b>Débit calculé par le capteur</b><span>Raccordé en RS485 Modbus, il reçoit le niveau de l’automate et lui renvoie le débit.</span></li>
       <li class="leve"><b>Contrôle sur site</b><span>COMETEC vérifie les RAVEN-EYE en place avec son banc RAV-TRACK et délivre un constat de vérification.</span></li>
     </ul>
-  </div>
-</section>
-
-<section class="rubrique" id="principe" aria-labelledby="t-principe">
-  <div class="conteneur">
+</section><section class="rubrique" id="principe" aria-labelledby="t-principe">
     <div class="principe">
       <div>
         <h2 id="t-principe" class="t-m" style="font-size:clamp(1.9rem,3vw,2.8rem);font-weight:320;font-stretch:86%;letter-spacing:-.02em;margin-bottom:22px">Principe de mesure</h2>
@@ -213,11 +195,7 @@
         <p class="outil-note">Calcul géométrique pour une conduite circulaire, à titre d’illustration.</p>
       </div>
     </div>
-  </div>
-</section>
-
-<section class="rubrique" id="montage" aria-labelledby="t-montage">
-  <div class="conteneur">
+</section><section class="rubrique" id="montage" aria-labelledby="t-montage">
     <div class="rubrique-tete">
       <h2 id="t-montage">Quatre façons de le poser</h2>
       <p class="chapo">Le montage dépend de l’accès à l’écoulement. Votre interlocuteur le choisit avec vous lors de la visite du site.</p>
@@ -252,11 +230,7 @@
         </div>
       </div>
     </div>
-  </div>
-</section>
-
-<section class="rubrique" id="applications" aria-labelledby="t-applis">
-  <div class="conteneur">
+</section><section class="rubrique" id="applications" aria-labelledby="t-applis">
     <div class="rubrique-tete" style="margin-bottom:clamp(28px,4vw,48px)">
       <h2 id="t-applis">Applications</h2>
       <p class="chapo">Des petits collecteurs aux canaux à ciel ouvert, dès quelques millimètres d’écoulement.</p>
@@ -267,11 +241,7 @@
       <article class="usage leve"><img src="../assets/img/appareils/raven-eye/cours-eau.webp" alt="RAVEN-EYE sous un pont, au-dessus d’un cours d’eau" loading="lazy"><div><b>Cours d’eau canalisés</b><p>Capteurs de hauteur et de vitesse posés sous un pont. Surveillance de crue.</p></div></article>
       <article class="usage leve"><img src="../assets/img/appareils/raven-eye/industrie.webp" alt="RAVEN-EYE au-dessus d’un canal industriel" loading="lazy"><div><b>Industrie</b><p>Eaux de process, convoyage par eau, bains. Utilisable en simple mesure de vitesse.</p></div></article>
     </div>
-  </div>
-</section>
-
-<section class="rubrique" id="raccordement" aria-labelledby="t-raccord">
-  <div class="conteneur">
+</section><section class="rubrique" id="raccordement" aria-labelledby="t-raccord">
     <div class="rubrique-tete" style="margin-bottom:clamp(28px,4vw,48px)">
       <h2 id="t-raccord">Raccordement</h2>
       <p class="chapo">Sur l’automate du poste, sur un enregistreur autonome ou sur un transmetteur dédié.</p>
@@ -293,11 +263,7 @@
         <p>En poste fixe, le transmetteur IFQ Monitor affiche et enregistre niveau, vitesse et débit, et les retransmet en 4-20 mA. En mesure ponctuelle, l’enregistreur portable IFQ-Logger.</p>
       </div>
     </div>
-  </div>
-</section>
-
-<section class="rubrique" id="caracteristiques" aria-labelledby="t-carac">
-  <div class="conteneur">
+</section><section class="rubrique" id="caracteristiques" aria-labelledby="t-carac">
     <div class="rubrique-tete" style="margin-bottom:clamp(28px,4vw,48px)">
       <h2 id="t-carac">Caractéristiques</h2>
       <p class="chapo">Capteur RAVEN-EYE 2, puis le transmetteur et l’enregistreur associés.</p>
@@ -354,11 +320,7 @@
         </table>
       </div>
     </div>
-  </div>
-</section>
-
-<section class="rubrique" id="controle" aria-labelledby="t-controle">
-  <div class="conteneur">
+</section><section class="rubrique" id="controle" aria-labelledby="t-controle">
     <div class="controle">
       <div>
         <h2 id="t-controle">Contrôle sur site au banc RAV-TRACK</h2>
@@ -372,40 +334,10 @@
         <div><dt>Document remis</dt><dd>Constat de vérification</dd></div>
       </dl>
     </div>
-  </div>
-</section>
-
-<section class="rubrique" id="documentation" aria-labelledby="t-doc">
-  <div class="conteneur">
-    <div class="rubrique-tete" style="margin-bottom:clamp(28px,4vw,48px)">
-      <h2 id="t-doc">Documentation</h2>
-      <p class="chapo">Fiche technique en téléchargement libre. Les notes de terrain arrivent au fil des installations.</p>
-    </div>
-    <div class="docs">
-      <a class="doc" href="#">
-        <span class="type-doc">Fiche technique <em>PDF</em></span>
-        <b>RAVEN-EYE 2, capteur et transmetteurs</b>
-        <span>Principe, montages, raccordement, caractéristiques.</span>
-        <span class="dl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3v13M6 11l6 6 6-6M4 21h16"/></svg>Télécharger</span>
-      </a>
-      <div class="doc" style="border-style:dashed">
-        <span class="type-doc">Note applicative <em>Bientôt</em></span>
-        <b>Raccordement sur automate SOFREL S500 / S4W</b>
-        <span>En 4-20 mA ou en Modbus RS485 : câblage, alimentation, table d’échange.</span>
-        <span class="dl" style="color:var(--encre-2)">En préparation</span>
-      </div>
-      <div class="doc" style="border-style:dashed">
-        <span class="type-doc">Guide <em>Bientôt</em></span>
-        <b>Reconnaître un bon signal radar</b>
-        <span>Lire le spectre dans le logiciel, régler l’inclinaison et le sens de montage.</span>
-        <span class="dl" style="color:var(--encre-2)">En préparation</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="rubrique" id="questions" aria-labelledby="t-faq">
-  <div class="conteneur">
+</section><section class="rubrique" id="telechargements" aria-labelledby="t-telech">
+    <div class="rubrique-tete"><h2 id="t-telech">Téléchargements</h2></div>
+    <div class="telechargements"><div class="tel-ligne"><span class="ico" aria-hidden="true">PDF</span><div><b>Fiche technique RAVEN-EYE 2</b><span>Principe, montages, raccordement, caractéristiques · PDF · 4 pages · 0,8 Mo</span></div><a class="btn btn-plein" href="../assets/docs/raven-eye-fiche-technique.pdf" download>Télécharger</a></div><div class="tel-ligne"><span class="ico" aria-hidden="true">PDF</span><div><b>Notice d’installation et d’utilisation</b><span>Remise avec l’appareil</span></div><a class="btn btn-trait" href="#devis" data-devis>Sur demande</a></div><div class="tel-ligne attente"><span class="ico" aria-hidden="true">PDF</span><div><b>Note applicative : raccordement sur SOFREL S500 / S4W</b><span>4-20 mA ou Modbus RS485 : câblage, alimentation, table d’échange</span></div><span class="etat">Bientôt</span></div><div class="tel-ligne attente"><span class="ico" aria-hidden="true">PDF</span><div><b>Guide : reconnaître un bon signal radar</b><span>Lecture du spectre, inclinaison, sens de montage</span></div><span class="etat">Bientôt</span></div></div>
+  </section><section class="rubrique" id="questions" aria-labelledby="t-faq">
     <div class="rubrique-tete" style="margin-bottom:clamp(28px,4vw,48px)">
       <h2 id="t-faq">Questions fréquentes</h2>
       <p class="chapo">Les questions que nous posent le plus souvent les exploitants et les bureaux d’études.</p>
@@ -419,11 +351,7 @@
       <details><summary>Comment vérifier un RAVEN-EYE installé sur un point réglementaire ?<i aria-hidden="true"></i></summary><p>COMETEC le contrôle sur site avec le banc RAV-TRACK : trois réglages de vitesse, trois lectures chacun, tolérance de ± 10 % par réglage. Un constat de vérification vous est remis.</p></details>
       <details><summary>Existe-t-il une version ATEX ?<i aria-hidden="true"></i></summary><p>Oui, en option : le RAVEN-EYE AZ1, pour la zone 2, avec barrière.</p></details>
     </div>
-  </div>
-</section>
-
-<section class="rubrique" aria-labelledby="t-proches" style="border-bottom:0">
-  <div class="conteneur">
+</section><section class="rubrique" aria-labelledby="t-proches" style="border-bottom:0">
     <div class="rubrique-tete" style="margin-bottom:clamp(28px,4vw,48px)">
       <h2 id="t-proches">Autres débitmètres hauteur-vitesse</h2>
       <p class="chapo">Quand une mesure immergée convient mieux, ou pour une campagne de mesure ponctuelle.</p>
@@ -434,27 +362,29 @@
       <a class="proche avec-photo" href="index.html#a-log-r"><img src="../assets/img/appareils/logr.webp" alt="" loading="lazy"><div><b>LOG’R</b><span>Hauteur-vitesse portable autonome</span></div></a>
       <a class="proche" href="index.html#a-solutions-autonomes"><b>Solutions autonomes</b><span>Hauteur-vitesse sur enregistreur autonome</span></a>
     </div>
-  </div>
 </section>
-
-<section class="bloc" id="interlocuteur" aria-labelledby="t-interloc" style="padding-top:0">
-  <div class="conteneur">
-    <div class="interloc">
-      <div>
-        <h2 id="t-interloc" class="t-l" style="font-size:clamp(2rem,3.6vw,3.2rem)">Votre interlocuteur pour le RAVEN-EYE</h2>
-        <p class="chapo" style="margin-top:16px">Le technico-commercial de votre secteur visite le point de mesure, choisit le montage avec vous et met l’appareil en service.</p>
+  </div>
+  <aside class="fiche-devis" id="devis" aria-labelledby="t-devis">
+  <div class="devis-carte">
+    <div class="devis-entete"><p>Composer votre devis</p><h2 id="t-devis">RAVEN-EYE</h2></div>
+    <form class="composeur" data-produit="RAVEN-EYE">
+      <div class="ch"><label for="c-installation">Installation</label><select id="c-installation" name="Installation"><option>Poste fixe</option><option>Mesure ponctuelle</option></select></div><div class="ch"><label for="c-raccordement">Raccordement</label><select id="c-raccordement" name="Raccordement"><option>Sur automate (RS485 Modbus)</option><option>Sur enregistreur autonome</option><option>Avec transmetteur IFQ Monitor</option><option>Avec enregistreur portable IFQ-Logger</option><option>À définir avec mon interlocuteur</option></select></div><div class="ch"><label for="c-capteur-de-niveau">Capteur de niveau</label><select id="c-capteur-de-niveau" name="Capteur de niveau"><option>Ultrasons</option><option>Radar</option><option>Bulle à bulle</option><option>Capteur déjà en place</option><option>À définir</option></select></div><div class="ch"><label for="c-longueur-de-c-ble">Longueur de câble</label><select id="c-longueur-de-c-ble" name="Longueur de câble"><option>10 m (standard)</option><option>20 m</option><option>30 m</option><option>Autre longueur, jusqu’à 300 m</option></select></div>
+      <fieldset><legend>Options</legend><div class="coches"><label><input type="checkbox" name="Options" value="Kit de fixation à rotule">Kit de fixation à rotule</label><label><input type="checkbox" name="Options" value="Version ATEX zone 2 (RAVEN-EYE AZ1)">Version ATEX zone 2 (RAVEN-EYE AZ1)</label><label><input type="checkbox" name="Options" value="Capteur de vitesse pour les mises en charge">Capteur de vitesse pour les mises en charge</label></div></fieldset>
+      <div class="ligne-qte">
+        <div class="ch"><label for="c-qte">Quantité</label><div class="qte"><button type="button" data-qte="-1" aria-label="Moins">−</button><input id="c-qte" name="Quantité" type="number" min="1" value="1" inputmode="numeric"><button type="button" data-qte="1" aria-label="Plus">+</button></div></div>
+        <button class="btn btn-rouge" type="submit">Ajouter au devis</button>
       </div>
-      <div>
-        <div class="dep-recherche">
-          <label for="dep-fiche">Département du site</label>
-          <input id="dep-fiche" inputmode="text" maxlength="3" placeholder="38" data-dep-champ="fiche" autocomplete="off">
-        </div>
-        <div class="interloc-res" id="interloc-res" aria-live="polite"><span>Saisissez le numéro de département de votre site.</span></div>
-        <div class="actions"><a class="btn btn-rouge" href="#" data-devis>Demander un devis</a></div>
-      </div>
+      <p class="composeur-retour" aria-live="polite"></p>
+    </form>
+    <div class="devis-panier" hidden><span>Ma demande : <b class="nb-demande">0</b> ligne(s)</span><button type="button" data-ouvrir-demande>Voir et envoyer</button></div>
+    <div class="devis-interloc">
+      <label for="dep-fiche">Votre interlocuteur</label>
+      <div class="ligne"><input id="dep-fiche" inputmode="text" maxlength="3" placeholder="Dép." data-dep-champ="fiche" autocomplete="off" aria-label="Département du site"><div class="interloc-res" id="interloc-res" aria-live="polite"><span>Saisissez le département de votre site.</span></div></div>
     </div>
   </div>
-</section>
+</aside>
+</div>
+<a class="btn btn-rouge barre-devis" href="#devis">Composer mon devis</a>
 </main>
 
 
@@ -488,26 +418,6 @@
     </div>
   </div>
 </footer>
-<div class="voile" role="dialog" aria-modal="true" aria-labelledby="t-devis">
-  <div class="fenetre">
-    <div class="fenetre-tete">
-      <div><h2 id="t-devis">Demande de devis</h2><p style="color:var(--encre-2);margin-top:6px">RAVEN-EYE. La demande est transmise au technico-commercial de votre secteur.</p></div>
-      <button class="fermer" type="button" aria-label="Fermer">×</button>
-    </div>
-    <form class="formulaire" novalidate>
-      <div class="champ"><label for="f-nom">Nom</label><input id="f-nom" autocomplete="name" required></div>
-      <div class="champ"><label for="f-org">Société ou collectivité</label><input id="f-org" autocomplete="organization" required></div>
-      <div class="champ"><label for="f-mail">E-mail</label><input id="f-mail" type="email" autocomplete="email" required></div>
-      <div class="champ"><label for="f-tel">Téléphone</label><input id="f-tel" type="tel" autocomplete="tel"></div>
-      <div class="champ"><label for="f-dep">Département du site</label><input id="f-dep" maxlength="3" required></div>
-      <div class="champ"><label for="f-conduit">Conduit</label><input id="f-conduit" placeholder="Ø 600, ovoïde, canal…"></div>
-      <div class="champ large"><label for="f-raccord">Raccordement</label><select id="f-raccord"><option>À définir avec mon interlocuteur</option><option>Sur automate (RS485 Modbus)</option><option>Sur enregistreur autonome</option><option>Avec transmetteur IFQ Monitor</option><option>Contrôle d’un RAVEN-EYE existant au banc RAV-TRACK</option></select></div>
-      <div class="champ large"><label for="f-msg">Votre projet</label><textarea id="f-msg" placeholder="Type de point de mesure (A2, déversoir d’orage…), accès, alimentation disponible…"></textarea></div>
-      <p class="retour" aria-live="polite"></p>
-      <button class="btn btn-rouge" type="submit">Envoyer la demande</button>
-    </form>
-  </div>
-</div>
 
 <script src="../assets/js/donnees.js"></script>
 <script src="../assets/js/site.js"></script>
