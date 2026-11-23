@@ -111,6 +111,7 @@
       var h = a.href.split("#")[0].replace(/index\.html$/, "");
       if (a.getAttribute("href").charAt(0) !== "#" && h === ici && ici.replace(/\/$/, "") !== racineAbs()) a.setAttribute("aria-current", "page");
       if (/\/appareils\//.test(ici) && /\/appareils\/$/.test(h)) a.setAttribute("aria-current", "page");
+      if (/\/services\//.test(ici) && /#service$/.test(a.getAttribute("href"))) a.setAttribute("aria-current", "page");
     });
   }
   function racineAbs() { var r = doc.createElement("a"); r.href = racine || "./"; return r.href.replace(/\/$/, ""); }
@@ -131,7 +132,7 @@
   /* ---------- « Ma demande » : lignes de devis gardées d'une fiche à l'autre ---------- */
   var CLE = "cometec-demande";
   function lireDemande() { try { return JSON.parse(win.localStorage.getItem(CLE)) || []; } catch (e) { return etat.demande || []; } }
-  function ecrireDemande(l) { etat.demande = l; try { win.localStorage.setItem(CLE, JSON.stringify(l)); } catch (e) {} majBadge(); }
+  function ecrireDemande(l) { etat.demande = l; try { win.localStorage.setItem(CLE, JSON.stringify(l)); } catch (e) {} majBadge(); majFin(); }
   var badge = null;
   if (entete) {
     var zone = $(".entete-actions");
@@ -145,10 +146,77 @@
     if (badge) { badge.hidden = n === 0; $("b", badge).textContent = n; }
     $$(".devis-panier").forEach(function (p) { p.hidden = n === 0; $(".nb-demande", p).textContent = n; });
   }
+  /* ---------- Financement : achat, leasing ou les deux (un seul choix pour toute la demande) ---------- */
+  var CLE_FIN = "cometec-financement";
+  var LEASING = win.LEASING || { durees: [3, 4, 5], page: "services/leasing.html", partenaire: "notre partenaire financier" };
+  var MODES = [["Achat", "Achat"], ["Leasing", "Leasing"], ["Achat et leasing", "Les deux"]];
+  function lireFin() {
+    var f = null; try { f = JSON.parse(win.localStorage.getItem(CLE_FIN)); } catch (e) {}
+    f = f || etat.fin || {};
+    var d = LEASING.durees.indexOf(+f.duree) > -1 ? +f.duree : LEASING.durees[0];
+    return { mode: f.mode || "Achat", duree: d };
+  }
+  function ecrireFin(f) { etat.fin = f; try { win.localStorage.setItem(CLE_FIN, JSON.stringify(f)); } catch (e) {} majFin(); }
+  function texteFin(f) { return f.mode === "Achat" ? "achat" : (f.mode === "Leasing" ? "leasing" : "achat et leasing") + " sur " + f.duree + "\u00a0ans"; }
+  var nFin = 0;
+  function htmlFin(lieu) {
+    var k = ++nFin, idB = "bulle-leasing-" + k;
+    return '<fieldset class="financement" data-lieu="' + lieu + '">' +
+      '<legend>Financement<button type="button" class="info-leasing" aria-expanded="false" aria-controls="' + idB + '" title="Le leasing, en bref"><span aria-hidden="true">?</span><span class="sr">Le leasing, en bref</span></button></legend>' +
+      '<div class="segment" role="radiogroup" aria-label="Mode de financement">' +
+      MODES.map(function (m) { return '<label><input type="radio" name="fin-' + k + '" value="' + m[0] + '"><span>' + m[1] + "</span></label>"; }).join("") + "</div>" +
+      '<div class="duree" hidden><span class="duree-lib" id="lib-duree-' + k + '">Durée souhaitée</span><div class="segment petit" role="radiogroup" aria-labelledby="lib-duree-' + k + '">' +
+      LEASING.durees.map(function (a) { return '<label><input type="radio" name="duree-' + k + '" value="' + a + '"><span>' + a + "\u00a0ans</span></label>"; }).join("") + "</div></div>" +
+      '<p class="financement-note" aria-live="polite"></p>' +
+      '<div class="bulle-leasing" id="' + idB + '" hidden>' +
+        '<p class="bulle-titre">Le leasing, en bref</p>' +
+        "<p>Vous utilisez l’appareil dès sa livraison et le réglez par mensualités, avec notre partenaire financier " + echap(LEASING.partenaire) + ".</p>" +
+        "<ul><li>Trésorerie préservée : pas de gros décaissement à la commande</li><li>Mensualité connue dès le devis</li><li>Pour une entreprise, des loyers en charges</li></ul>" +
+        "<p>Au terme du contrat : du matériel neuf en gardant votre mensualité, ou le rachat de l’appareil pour 1\u00a0% de son prix neuf.</p>" +
+        '<a class="lien" href="' + url(LEASING.page) + '">Tout savoir sur le leasing</a>' +
+      "</div></fieldset>";
+  }
+  function noteFin(f) {
+    if (f.mode === "Achat") return "Votre devis indiquera le prix d’achat.";
+    if (f.mode === "Leasing") return "Votre devis indiquera la mensualité sur " + f.duree + "\u00a0ans.";
+    return "Votre devis indiquera le prix d’achat et la mensualité sur " + f.duree + "\u00a0ans, pour comparer.";
+  }
+  function majFin() {
+    var f = lireFin();
+    $$(".financement").forEach(function (fs) {
+      $$(".segment:not(.petit) input", fs).forEach(function (i) { i.checked = i.value === f.mode; });
+      $$(".petit input", fs).forEach(function (i) { i.checked = +i.value === f.duree; });
+      $(".duree", fs).hidden = f.mode === "Achat";
+      $(".financement-note", fs).textContent = noteFin(f) + (lireDemande().length && fs.getAttribute("data-lieu") === "composeur" ? " Ce choix vaut pour toute votre demande." : "");
+      fs.classList.toggle("en-leasing", f.mode !== "Achat");
+    });
+  }
+  function basculerBulle(b, ouvrir) {
+    var bulle = doc.getElementById(b.getAttribute("aria-controls"));
+    if (!bulle) return;
+    b.setAttribute("aria-expanded", ouvrir ? "true" : "false"); bulle.hidden = !ouvrir;
+  }
+  doc.addEventListener("change", function (e) {
+    var fs = e.target.closest && e.target.closest(".financement");
+    if (!fs || e.target.type !== "radio") return;
+    var f = lireFin(), avant = f.mode;
+    if (e.target.closest(".petit")) f.duree = +e.target.value; else f.mode = e.target.value;
+    ecrireFin(f);
+    /* Premier passage au leasing : la bulle d'explication s'ouvre d'elle-même */
+    if (avant === "Achat" && f.mode !== "Achat" && !fs.getAttribute("data-bulle-vue")) {
+      fs.setAttribute("data-bulle-vue", "1"); basculerBulle($(".info-leasing", fs), true);
+    }
+  });
+  doc.addEventListener("click", function (e) {
+    var b = e.target.closest && e.target.closest(".info-leasing");
+    if (b) { e.preventDefault(); b.closest(".financement").setAttribute("data-bulle-vue", "1"); basculerBulle(b, b.getAttribute("aria-expanded") !== "true"); }
+  });
+
   doc.body.insertAdjacentHTML("beforeend",
     '<div class="voile voile-demande" role="dialog" aria-modal="true" aria-labelledby="t-demande"><div class="fenetre">' +
     '<div class="fenetre-tete"><div><h2 id="t-demande">Ma demande de devis</h2><p style="color:var(--encre-2);margin-top:6px">Elle est transmise au technico-commercial du département de votre site.</p></div><button class="fermer" type="button" aria-label="Fermer">×</button></div>' +
     '<div class="recap-lignes"></div>' +
+    '<div class="recap-fin">' + htmlFin("recap") + '</div>' +
     '<form class="formulaire" novalidate>' +
     '<div class="champ"><label for="d-nom">Nom</label><input id="d-nom" autocomplete="name" required></div>' +
     '<div class="champ"><label for="d-org">Société ou collectivité</label><input id="d-org" autocomplete="organization" required></div>' +
@@ -167,7 +235,7 @@
     }).join("") : '<p class="recap-vide">Votre demande est vide. Composez-la depuis la fiche d’un appareil.</p>';
   }
   function ouvrirDemande(dep) {
-    dessinerRecap(); dernierD = doc.activeElement; voileD.classList.add("ouvert");
+    dessinerRecap(); majFin(); dernierD = doc.activeElement; voileD.classList.add("ouvert");
     var dd = $("#d-dep", voileD); if (dep && !dd.value) dd.value = dep;
     setTimeout(function () { var c = $("#d-nom", voileD); if (c) c.focus(); }, 60);
   }
@@ -189,7 +257,7 @@
     var manque = $$("[required]", f).filter(function (c) { return !c.value.trim() || !c.checkValidity(); })[0];
     if (manque) { retour.textContent = "Renseignez le champ «\u00a0" + $("label[for=" + manque.id + "]", f).textContent + "\u00a0»."; manque.focus(); return; }
     var r = secteurDe($("#d-dep", f).value);
-    retour.textContent = "Demande prête" + (r ? ", elle sera transmise à " + r.s.nom + " (" + r.s.zone + ")" : "") + ". Sur cette maquette, l’envoi n’est pas encore branché.";
+    retour.textContent = "Demande prête (" + texteFin(lireFin()) + ")" + (r ? ", elle sera transmise à " + r.s.nom + " (" + r.s.zone + ")" : "") + ". Sur cette maquette, l’envoi n’est pas encore branché.";
   });
   majBadge();
   $$("[data-annee]").forEach(function (el) { el.textContent = new Date().getFullYear(); });
@@ -252,18 +320,16 @@
     doc.addEventListener("click", function (e) { if (!bloc.contains(e.target)) liste.classList.remove("ouvert"); }, O);
   });
 
-  /* ---------- Familles (accueil) ---------- */
-  var conteneurFamilles = $("#familles");
-  if (conteneurFamilles) {
-    conteneurFamilles.innerHTML = win.FAMILLES.map(function (f) {
-      var n = 0; f.groupes.forEach(function (g) { n += g.items.length; });
-      var puces = [];
-      f.groupes.forEach(function (g) { g.items.forEach(function (it) { puces.push('<a class="puce" href="' + lienApp(it) + '">' + echap(it[0]) + "</a>"); }); });
-      return '<article class="famille leve">' +
-        '<div><a class="famille-nom" href="' + url(CATALOGUE, f.id) + '"><h3>' + echap(f.nom) + "</h3></a><p class=\"famille-desc\">" + echap(f.desc) + "</p></div>" +
-        '<div class="famille-liste">' + puces.join("") + "</div>" +
-        '<p class="famille-compte"><b class="num">' + n + "</b>appareil" + (n > 1 ? "s" : "") + "</p></article>";
-    }).join("");
+  /* ---------- Familles (accueil) : schémas de principe animés quand ils sont à l'écran ---------- */
+  var listesTech = $$(".techs");
+  if (listesTech.length) {
+    if ("IntersectionObserver" in win && !calme) {
+      var ioT = new IntersectionObserver(function (en) {
+        en.forEach(function (x) { x.target.classList.toggle("anim", x.isIntersecting); });
+      }, { rootMargin: "60px 0px" });
+      listesTech.forEach(function (l) { ioT.observe(l); });
+      finir(function () { ioT.disconnect(); });
+    }
   }
 
   /* ---------- Le parcours de l'eau (accueil) ---------- */
@@ -503,6 +569,8 @@
   function fermerDevis() { if (voile && voile.classList.contains("ouvert")) { voile.classList.remove("ouvert"); if (dernierFocus) dernierFocus.focus(); } }
   var dernierFocus = null;
   var composeur = $(".composeur");
+  $$("[data-financement]").forEach(function (z) { if (!z.firstChild) z.innerHTML = htmlFin(z.getAttribute("data-financement")); });
+  majFin();
   if (composeur) {
     var qte = $("#c-qte", composeur), retourC = $(".composeur-retour", composeur);
     $$("[data-qte]", composeur).forEach(function (b) {
@@ -547,7 +615,7 @@
       var retour = $(".retour", form), manque = $$("[required]", form).filter(function (c) { return !c.value.trim() || !c.checkValidity(); })[0];
       if (manque) { retour.textContent = "Renseignez le champ « " + $("label[for=" + manque.id + "]", form).textContent + " »."; manque.focus(); return; }
       var r = secteurDe($("#f-dep", form).value);
-      retour.textContent = "Demande prête" + (r ? ", elle sera transmise à " + r.s.nom + " (" + r.s.zone + ")" : "") + ". Sur cette maquette, l’envoi n’est pas encore branché.";
+      retour.textContent = "Demande prête (" + texteFin(lireFin()) + ")" + (r ? ", elle sera transmise à " + r.s.nom + " (" + r.s.zone + ")" : "") + ". Sur cette maquette, l’envoi n’est pas encore branché.";
     });
   }
 
@@ -609,13 +677,29 @@
                 ? '<div class="app-visuel"><img class="produit" src="' + img(v[0]) + '" alt="' + echap(it[0]) + '" loading="lazy">' +
                   (v[1] ? '<img class="situ" src="' + img(v[0] + "-situ") + '" alt="" loading="lazy"><span class="situ-etiquette">Sur le terrain</span>' : "") + "</div>"
                 : '<div class="app-visuel attente"><div>' + picto + "Photo à venir</div></div>";
-              return '<a class="app-carte' + (v && !v[1] ? " sans-situ" : "") + '" id="a-' + slug + '" href="' + (it[2] ? url(it[2]) : "#a-" + slug) + '" data-nom="' + echap(norm(it[0] + " " + it[1] + " " + g.nom + " " + f.nom)) + '" data-terrains="' + (parTerrain[it[0]] || []).join(" ") + '">' +
+              return '<a class="app-carte' + (v && !v[1] ? " sans-situ" : "") + '" id="a-' + slug + '" href="' + (it[2] ? url(it[2]) : "#a-" + slug) + '" data-app="' + echap(it[0]) + '" data-nom="' + echap(norm(it[0] + " " + it[1] + " " + g.nom + " " + f.nom)) + '" data-terrains="' + (parTerrain[it[0]] || []).join(" ") + '">' +
                 visuel + '<div class="app-texte"><b>' + echap(it[0]) + "</b><span>" + echap(it[1]) + "</span>" + (it[2] ? "<em>Voir la fiche</em>" : "") + '<i aria-hidden="true">→</i></div></a>';
             }).join("") + "</div></div>";
         }).join("") + "</div></section>";
     }).join("") + '<div class="conteneur"><p class="cat-vide" hidden>Aucun appareil ne correspond. Votre interlocuteur peut vous orienter\u00a0: ' + echap(win.CONTACT.tel) + ".</p></div>";
 
-    var filtreFam = "tous", filtreTer = "", texte = "";
+    var filtreFam = "tous", filtreTer = "", texte = "", principe = null;
+    /* Arrivée depuis l'accueil par un principe de mesure : appareils/index.html?principe=radar */
+    try {
+      var pid = new URLSearchParams(win.location.search).get("principe");
+      if (pid && win.PRINCIPES && win.PRINCIPES[pid]) { principe = win.PRINCIPES[pid]; filtreFam = principe.famille; }
+    } catch (e) {}
+    var bandeauP = null;
+    function majBandeauPrincipe() {
+      if (bandeauP) { bandeauP.remove(); bandeauP = null; }
+      if (!principe) return;
+      catalogue.insertAdjacentHTML("beforebegin", '<div class="conteneur principe-actif-cont"><div class="principe-actif" role="status"><span>Principe de mesure</span><b>' + echap(principe.nom) + '</b><button type="button">Voir toute la famille</button></div></div>');
+      bandeauP = catalogue.previousElementSibling;
+      $("button", bandeauP).addEventListener("click", function () {
+        principe = null; majBandeauPrincipe(); appliquer();
+        try { win.history.replaceState(null, "", win.location.pathname + win.location.hash); } catch (e) {}
+      });
+    }
     var champCat = $("#q-cat"), compte = $(".filtre-compte");
     function appliquer() {
       var mots = norm(texte).split(" ").filter(Boolean), total = 0;
@@ -624,7 +708,7 @@
         $$(".cat-groupe", sec).forEach(function (gr) {
           var nGr = 0;
           $$(".app-carte", gr).forEach(function (c) {
-            var ok = visFam && (!filtreTer || (" " + c.getAttribute("data-terrains") + " ").indexOf(" " + filtreTer + " ") > -1) &&
+            var ok = visFam && (!principe || principe.appareils.indexOf(c.getAttribute("data-app")) > -1) && (!filtreTer || (" " + c.getAttribute("data-terrains") + " ").indexOf(" " + filtreTer + " ") > -1) &&
               mots.every(function (m) { return c.getAttribute("data-nom").indexOf(m) > -1; });
             c.hidden = !ok; if (ok) nGr++;
           });
@@ -639,6 +723,7 @@
       b.addEventListener("click", function () {
         filtreFam = b.getAttribute("data-famille");
         $$(".filtre[data-famille]").forEach(function (x) { x.setAttribute("aria-pressed", x === b); });
+        if (principe) { principe = null; majBandeauPrincipe(); }
         appliquer();
       });
     });
@@ -647,12 +732,36 @@
     if (champCat) champCat.addEventListener("input", function () { texte = champCat.value; appliquer(); });
     var formCat = champCat && champCat.closest("form");
     if (formCat) formCat.addEventListener("submit", function (e) { e.preventDefault(); });
+    if (principe) {
+      $$(".filtre[data-famille]").forEach(function (x) { x.setAttribute("aria-pressed", x.getAttribute("data-famille") === filtreFam); });
+      majBandeauPrincipe();
+    }
     appliquer();
     /* Arrivée par une ancre (site en fichiers séparés) : famille ou appareil */
     if (!win.ROUTEUR) {
       var ancre = decodeURIComponent((win.location.hash || "").slice(1));
       if (ancre) setTimeout(function () { allerA(ancre); }, 60);
     }
+  }
+
+  /* ---------- Page Leasing : schéma achat / leasing selon la durée ---------- */
+  var schemaFin = $(".fin-schema");
+  if (schemaFin) {
+    var zoneD = $("[data-fin-durees]", schemaFin), barresL = $(".fin-leasing", schemaFin);
+    zoneD.innerHTML = LEASING.durees.map(function (a, i) {
+      return '<label><input type="radio" name="fin-schema" value="' + a + '"' + (i === 0 ? " checked" : "") + "><span>" + a + "\u00a0ans</span></label>";
+    }).join("");
+    var dessinerFin = function (ans) {
+      var n = ans * 12, h = Math.round(36 / n * 30 * 10) / 10, barres = "";
+      for (var i = 0; i < n; i++) barres += '<i style="--i:' + i + '"></i>';
+      barresL.style.setProperty("--h", h + "%");
+      barresL.innerHTML = barres;
+      $(".fin-n", schemaFin).textContent = n + "\u00a0mensualités";
+      $(".fin-terme", schemaFin).textContent = "Fin du contrat · " + ans + "\u00a0ans";
+      schemaFin.classList.remove("trace"); void schemaFin.offsetWidth; schemaFin.classList.add("trace");
+    };
+    zoneD.addEventListener("change", function (e) { dessinerFin(+e.target.value); }, O);
+    dessinerFin(LEASING.durees[0]);
   }
 
   /* ---------- Fiche : galerie ---------- */

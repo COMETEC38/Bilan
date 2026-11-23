@@ -149,6 +149,14 @@ window.CONTACT = {
   rdv: "https://bookings.cloud.microsoft/book/COMETEC1@cometec.fr/"
 };
 
+/* Leasing de matériel (partenaire financier : All In Finance).
+   Durées proposées dans « Composer votre devis », en années : provisoires, durée maximale à confirmer par COMETEC. */
+window.LEASING = {
+  partenaire: "All In Finance",
+  durees: [3, 4, 5],
+  page: "services/leasing.html"
+};
+
 /* Visuels du catalogue : photo détourée (assets/img/appareils/<nom>.webp)
    et, quand elle existe, une photo de terrain affichée au survol (<nom>-situ.webp).
    Source : documentations des appareils. À remplacer par les photos HD quand elles arrivent. */
@@ -163,3 +171,206 @@ window.VISUELS = {
   "LDI ROW": ["ldi-row", 1], "EnviroFlu": ["enviroflu", 1],
   "Pluviomètre professionnel": ["pluvio-pro", 1], "Pluviomètre météo": ["pluvio-meteo", 1]
 };
+
+/* principes:debut (généré par principes.py) */
+window.PRINCIPES = {
+ "radar": {
+  "nom": "Radar sans contact",
+  "famille": "debitmetres",
+  "appareils": [
+   "RAVEN-EYE",
+   "PHOENIX",
+   "RADAR-MATE 2"
+  ]
+ },
+ "doppler": {
+  "nom": "Doppler immergé",
+  "famille": "debitmetres",
+  "appareils": [
+   "BELUGA",
+   "BELUGA A/V",
+   "LOG’R",
+   "Solutions autonomes"
+  ]
+ },
+ "bulle": {
+  "nom": "Bulle à bulle",
+  "famille": "debitmetres",
+  "appareils": [
+   "DEBULLE",
+   "BUL’R2"
+  ]
+ },
+ "canal": {
+  "nom": "Canal jaugeur",
+  "famille": "debitmetres",
+  "appareils": [
+   "Canal Venturi AMV",
+   "Canal Palmer-Bowlus",
+   "OC90"
+  ]
+ },
+ "em-insertion": {
+  "nom": "Électromagnétique à insertion",
+  "famille": "debitmetres",
+  "appareils": [
+   "TORPEE-MAG",
+   "TORPEE-Z"
+  ]
+ },
+ "transit": {
+  "nom": "Ultrasons à temps de transit",
+  "famille": "debitmetres",
+  "appareils": [
+   "KF100",
+   "KF200",
+   "KF210"
+  ]
+ },
+ "courantometre": {
+  "nom": "Courantomètre électromagnétique",
+  "famille": "debitmetres",
+  "appareils": [
+   "FLUVIA",
+   "FloStick"
+  ]
+ },
+ "tracage": {
+  "nom": "Traçage au sel",
+  "famille": "debitmetres",
+  "appareils": [
+   "EASYFLOW"
+  ]
+ },
+ "vide": {
+  "nom": "Pompe à vide",
+  "famille": "preleveurs",
+  "appareils": [
+   "SP5C",
+   "TP5 P",
+   "MAXX P6"
+  ]
+ },
+ "peristaltique": {
+  "nom": "Pompe péristaltique",
+  "famille": "preleveurs",
+  "appareils": [
+   "SP5B",
+   "TP5 C",
+   "TP5 W",
+   "MAXX P6"
+  ]
+ },
+ "charge": {
+  "nom": "Sur conduite en charge",
+  "famille": "preleveurs",
+  "appareils": [
+   "SP5 DK"
+  ]
+ },
+ "asservi": {
+  "nom": "Asservi au débit",
+  "famille": "preleveurs",
+  "appareils": [
+   "SP5C",
+   "SP5B",
+   "SP5 DK",
+   "TP5 P",
+   "TP5 C",
+   "TP5 W",
+   "MAXX P6"
+  ]
+ },
+ "electrochimie": {
+  "nom": "pH, redox, conductivité",
+  "famille": "qualite",
+  "appareils": [
+   "Sondes et transmetteurs",
+   "R812"
+  ]
+ },
+ "oxygene": {
+  "nom": "Oxygène dissous",
+  "famille": "qualite",
+  "appareils": [
+   "Sondes et transmetteurs",
+   "R812"
+  ]
+ },
+ "optique": {
+  "nom": "Turbidité, MES, voile de boue",
+  "famille": "qualite",
+  "appareils": [
+   "Sondes et transmetteurs",
+   "R812",
+   "DTR01",
+   "DTR02"
+  ]
+ },
+ "chlore": {
+  "nom": "Chlore et désinfectants",
+  "famille": "qualite",
+  "appareils": [
+   "Sondes et transmetteurs"
+  ]
+ },
+ "ultrasons": {
+  "nom": "Ultrasons",
+  "famille": "niveau",
+  "appareils": [
+   "ULS02",
+   "ULS06"
+  ]
+ },
+ "radar-niveau": {
+  "nom": "Radar",
+  "famille": "niveau",
+  "appareils": [
+   "R60"
+  ]
+ },
+ "surverse": {
+  "nom": "Détection de surverse",
+  "famille": "niveau",
+  "appareils": [
+   "DTS01"
+  ]
+ },
+ "piezo": {
+  "nom": "Piézométrie",
+  "famille": "niveau",
+  "appareils": [
+   "Sondes lumineuses BF"
+  ]
+ },
+ "film": {
+  "nom": "Film en surface",
+  "famille": "hydrocarbures",
+  "appareils": [
+   "LDI ROW"
+  ]
+ },
+ "hap": {
+  "nom": "HAP dissous",
+  "famille": "hydrocarbures",
+  "appareils": [
+   "EnviroFlu"
+  ]
+ },
+ "interface": {
+  "nom": "Interface hydrocarbure / eau",
+  "famille": "hydrocarbures",
+  "appareils": [
+   "SOLINST 122"
+  ]
+ },
+ "auget": {
+  "nom": "Auget basculant",
+  "famille": "pluviometrie",
+  "appareils": [
+   "Pluviomètre professionnel",
+   "Pluviomètre météo"
+  ]
+ }
+};
+/* principes:fin */
