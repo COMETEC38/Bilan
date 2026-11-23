@@ -925,3 +925,127 @@ body.page-fiche{font-size:16px;line-height:1.55}
 @media (max-width:1180px){.entete-actions:has(.ma-demande:not([hidden])) .btn-plein{display:none}}
 @media (max-width:760px){.ma-demande{min-height:36px;padding:0 10px;font-size:13px}}
 @media (max-width:760px){.ma-demande{padding:0 8px;gap:0}.ma-demande .lib{display:none}}
+
+/* =========================================================
+   PAGE APPLICATION COMETEC
+   ========================================================= */
+.appli-heros{position:relative;background:var(--abysse);color:#fff;overflow:hidden;isolation:isolate}
+.appli-heros::before{content:"";position:absolute;inset:-20% -10% auto 35%;height:120%;background:radial-gradient(closest-side,rgba(142,195,191,.18),transparent 70%);z-index:-1}
+.appli-heros::after{content:"";position:absolute;left:0;right:0;bottom:0;height:120px;background:linear-gradient(transparent,rgba(0,0,0,.18));z-index:-1}
+.appli-heros .ariane{color:rgba(255,255,255,.6)}
+.appli-heros .ariane [aria-current]{color:#fff}
+.appli-heros .ariane li:not(:last-child)::after{color:rgba(255,255,255,.3)}
+.appli-heros-grille{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(24px,4vw,60px);align-items:center;padding:clamp(26px,3.4vw,48px) 0 clamp(40px,5vw,72px)}
+.appli-identite{display:flex;align-items:center;gap:16px}
+.appli-identite img{width:72px;height:72px;border-radius:18px;box-shadow:0 18px 36px -14px rgba(0,0,0,.55);background:#fff}
+.appli-identite p{font-size:12.5px;font-weight:650;letter-spacing:.08em;text-transform:uppercase;color:#8EC3BF;line-height:1.4}
+.appli-identite p b{display:block;font-size:15px;letter-spacing:0;text-transform:none;color:#fff;font-weight:560}
+.appli-heros h1{font-size:clamp(2.4rem,4.4vw,4.2rem);font-weight:300;font-stretch:82%;letter-spacing:-.03em;line-height:.98;margin-top:22px}
+.appli-heros h1 em{font-style:normal;color:#8EC3BF}
+.appli-heros .chapo{color:rgba(255,255,255,.78);margin-top:18px;font-size:clamp(1rem,1.2vw,1.12rem)}
+.magasins{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.magasin{display:inline-flex;align-items:center;gap:11px;min-height:54px;padding:0 18px 0 14px;border-radius:12px;background:#000;color:#fff;border:1px solid rgba(255,255,255,.22);text-decoration:none;cursor:pointer;font:inherit;transition:transform .3s var(--doux),border-color .3s,background .3s}
+.magasin:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.55)}
+.magasin svg{width:26px;height:26px;flex:none}
+.magasin span{display:block;text-align:left;line-height:1.15}
+.magasin small{display:block;font-size:11px;opacity:.75;letter-spacing:.02em}
+.magasin b{display:block;font-size:16.5px;font-weight:600;letter-spacing:.005em}
+.magasin.pc{background:var(--rouge);border-color:var(--rouge)}
+.magasin.pc:hover{background:#c4000a}
+.appli-lien-web{margin-top:16px;font-size:14.5px;color:rgba(255,255,255,.75)}
+.appli-lien-web a{color:#fff;text-underline-offset:3px}
+.garanties{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:24px;font-size:13.5px;color:rgba(255,255,255,.72)}
+.garanties li{display:flex;align-items:center;gap:8px}
+.garanties svg{width:16px;height:16px;color:#8EC3BF}
+
+/* Composition d'appareils */
+.scene-appareils{position:relative;aspect-ratio:16/11;min-height:300px}
+.portable{position:absolute;left:0;top:4%;width:86%}
+.portable .ecran-pc{position:relative;border-radius:14px 14px 4px 4px;background:#0B0F10;padding:2.2% 2.2% 3.2%;box-shadow:0 40px 80px -40px rgba(0,0,0,.7)}
+.portable .ecran-pc::before{content:"";position:absolute;left:50%;top:.9%;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:#2a3233}
+.portable .ecran-pc img{display:block;width:100%;aspect-ratio:16/10;object-fit:cover;object-position:top;border-radius:3px}
+.portable .socle{height:12px;margin:0 -6%;border-radius:0 0 14px 14px;background:linear-gradient(#C9D2D3,#8E9A9B);position:relative}
+.portable .socle::before{content:"";position:absolute;left:42%;right:42%;top:0;height:5px;border-radius:0 0 6px 6px;background:#76807f}
+.telephone{position:absolute;width:27%;border-radius:12%/5.8%;background:#0B0F10;padding:2.2%;box-shadow:0 40px 70px -26px rgba(0,0,0,.75),0 0 0 1px rgba(255,255,255,.08)}
+.telephone img{display:block;width:100%;aspect-ratio:390/844;object-fit:cover;object-position:top;border-radius:9%/4.3%}
+.telephone::before{content:"";position:absolute;left:50%;top:2.6%;width:26%;height:2.6%;margin-left:-13%;border-radius:999px;background:#0B0F10;z-index:1}
+.scene-appareils .telephone{right:0;bottom:-6%}
+.flotte{animation:flotte 7s ease-in-out infinite}
+@keyframes flotte{50%{transform:translateY(-8px)}}
+@media (prefers-reduced-motion:reduce){.flotte{animation:none}}
+@media (max-width:900px){.appli-heros-grille{grid-template-columns:1fr}.scene-appareils{max-width:620px;margin-top:10px}}
+
+/* Bandeau de chiffres */
+.appli-faits{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-bottom:1px solid var(--trait);background:#fff}
+.appli-faits div{padding:22px 24px;border-left:1px solid var(--trait)}
+.appli-faits div:first-child{border-left:0}
+.appli-faits b{display:block;font-size:clamp(1.3rem,1.9vw,1.7rem);font-weight:340;font-stretch:84%;letter-spacing:-.01em;color:var(--ardoise)}
+.appli-faits span{display:block;font-size:14px;color:var(--encre-2);margin-top:2px}
+@media (max-width:760px){.appli-faits{grid-template-columns:1fr 1fr}.appli-faits div:nth-child(3){border-left:0}.appli-faits div{border-top:1px solid var(--trait)}}
+
+/* Modules */
+.modules-appli{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.module{position:relative;display:flex;flex-direction:column;gap:8px;padding:22px 22px 24px;border-radius:12px;background:#fff;border:1px solid var(--trait)}
+.module i{width:44px;height:44px;border-radius:11px;display:grid;place-items:center;background:var(--brume);color:var(--ardoise);font-style:normal}
+.module i svg{width:24px;height:24px}
+.module b{font-size:1.15rem;font-weight:600;margin-top:6px}
+.module b em{font-style:normal;color:var(--rouge)}
+.module b em.jaune{color:#C99700}
+.module p{font-size:14.5px;color:var(--encre-2)}
+.module .pour{font-size:12.5px;font-weight:600;color:var(--ardoise);letter-spacing:.02em}
+.module.bientot{background:repeating-linear-gradient(135deg,#FBFCFC 0 12px,#F5F8F8 12px 24px);border-style:dashed}
+.module.bientot .pastille{position:absolute;right:16px;top:18px;padding:3px 9px;border-radius:999px;background:var(--abysse);color:#fff;font-size:11.5px;font-weight:600;letter-spacing:.03em}
+@media (max-width:1000px){.modules-appli{grid-template-columns:1fr 1fr}}
+@media (max-width:620px){.modules-appli{grid-template-columns:1fr}}
+
+/* Aperçu des écrans */
+.ecrans{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(18px,3vw,48px);align-items:end;max-width:980px;margin:0 auto}
+.ecrans figure{margin:0;text-align:center}
+.ecrans .telephone{position:relative;width:100%;max-width:250px;margin:0 auto}
+.ecrans figure:nth-child(2) .telephone{transform:translateY(-26px)}
+.ecrans figcaption{margin-top:18px;font-size:14px;color:var(--encre-2)}
+.ecrans figcaption b{display:block;color:var(--encre);font-size:15px}
+@media (max-width:700px){.ecrans{grid-template-columns:1fr 1fr}.ecrans figure:nth-child(3){display:none}.ecrans figure:nth-child(2) .telephone{transform:none}}
+
+/* Sur tous vos appareils */
+.plateformes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.plateforme{padding:24px;border-radius:12px;border:1px solid var(--trait);background:#fff;display:flex;flex-direction:column;gap:10px}
+.plateforme svg.ico{width:34px;height:34px;color:var(--ardoise)}
+.plateforme b{font-size:1.2rem;font-weight:600}
+.plateforme p{font-size:14.5px;color:var(--encre-2)}
+.plateforme ul{font-size:14px;margin-top:2px}
+.plateforme li{padding:7px 0;border-top:1px solid var(--trait);display:flex;justify-content:space-between;gap:12px}
+.plateforme li span{color:var(--encre-2)}
+.plateforme .btn{margin-top:auto;align-self:flex-start;min-height:42px;font-size:14.5px}
+@media (max-width:900px){.plateformes{grid-template-columns:1fr}}
+
+/* Données */
+.donnees{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(24px,4vw,60px);align-items:center;padding:clamp(26px,3.6vw,46px);border-radius:14px;background:var(--abysse);color:#fff}
+.donnees h2{font-size:clamp(1.7rem,2.8vw,2.5rem);font-weight:320;font-stretch:86%;letter-spacing:-.02em}
+.donnees p{color:rgba(255,255,255,.75);margin-top:12px}
+.donnees ul{display:grid;gap:10px}
+.donnees li{display:grid;grid-template-columns:36px 1fr;gap:12px;align-items:start;padding:14px 16px;border-radius:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)}
+.donnees li svg{width:24px;height:24px;color:#8EC3BF;margin-top:2px}
+.donnees li b{display:block;font-weight:600}
+.donnees li span{display:block;font-size:14px;color:rgba(255,255,255,.7)}
+@media (max-width:900px){.donnees{grid-template-columns:1fr}}
+
+/* Fenêtre d'accès */
+.acces-etape[hidden]{display:none}
+.acces-plateforme{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;background:var(--brume);font-size:13.5px;font-weight:600;color:var(--abysse);margin-top:10px}
+.formulaire .accord{grid-column:1/-1;display:flex;gap:10px;align-items:flex-start;font-size:13.5px;line-height:1.45;color:var(--encre-2)}
+.formulaire .accord input{margin-top:3px;accent-color:var(--ardoise);flex:none}
+.acces-liens{display:grid;gap:10px;margin:18px 0 6px}
+.acces-liens .magasin{background:var(--abysse);border-color:var(--abysse);justify-content:flex-start}
+.acces-liens .magasin.pc{background:var(--rouge);border-color:var(--rouge)}
+.page-appli .bloc{padding:clamp(56px,6vw,90px) 0}
+.page-appli .bloc-tete{margin-bottom:clamp(26px,3vw,40px)}
+.appli-faits{display:block}
+.appli-faits-in{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+.appli-faits-in div:first-child{padding-left:0}
+@media (max-width:760px){.appli-faits-in{grid-template-columns:1fr 1fr}.appli-faits-in div:nth-child(3){border-left:0;padding-left:0}}
+.telephone{padding:6.5% 2.6% 2.6%}
+.telephone::before{top:2.4%;height:2%;width:22%;margin-left:-11%;background:#1f2627}
+@media (max-width:900px){.appli-heros-grille{grid-template-columns:minmax(0,1fr)}.appli-heros-grille>*{min-width:0}}
+.appli-lien-web a{word-break:break-word}
+@media (max-width:900px){.scene-appareils{min-height:0;width:100%}}

@@ -104,6 +104,17 @@
   var yMega = 0;
   win.addEventListener("scroll", function () { if (Math.abs(win.scrollY - yMega) > 60) { yMega = win.scrollY; if ($(".mega.ouvert")) fermerMegas(); } }, { passive: true });
 
+  /* Entrée de menu de la page courante (site en fichiers séparés) */
+  if (!win.ROUTEUR) {
+    var ici = win.location.href.split("#")[0].replace(/index\.html$/, "");
+    $$(".nav a, .tiroir a").forEach(function (a) {
+      var h = a.href.split("#")[0].replace(/index\.html$/, "");
+      if (a.getAttribute("href").charAt(0) !== "#" && h === ici && ici.replace(/\/$/, "") !== racineAbs()) a.setAttribute("aria-current", "page");
+      if (/\/appareils\//.test(ici) && /\/appareils\/$/.test(h)) a.setAttribute("aria-current", "page");
+    });
+  }
+  function racineAbs() { var r = doc.createElement("a"); r.href = racine || "./"; return r.href.replace(/\/$/, ""); }
+
   /* Menu mobile */
   var burger = $(".burger"), tiroir = $(".tiroir");
   function fermerTiroir() { if (tiroir) { tiroir.classList.remove("ouvert"); burger.setAttribute("aria-expanded", "false"); burger.textContent = "Menu"; } }
@@ -487,7 +498,7 @@
   }
 
   /* ---------- Demande de devis ---------- */
-  var voile = $(".voile:not(.voile-demande)");
+  var voile = $(".voile:not(.voile-demande):not(.voile-acces)");
   etat.fermerDevis = fermerDevis;
   function fermerDevis() { if (voile && voile.classList.contains("ouvert")) { voile.classList.remove("ouvert"); if (dernierFocus) dernierFocus.focus(); } }
   var dernierFocus = null;
@@ -706,6 +717,41 @@
     });
   });
 
+
+  /* ---------- Page Application : accès au téléchargement ---------- */
+  var voileA = $(".voile-acces");
+  if (voileA) {
+    var formA = $("#acces-form", voileA), liensA = $("#acces-liens", voileA), etiquette = $(".acces-plateforme", voileA), dernierA = null;
+    var dejaInscrit = false;
+    try { dejaInscrit = !!win.localStorage.getItem("cometec-appli-acces"); } catch (e) {}
+    function ouvrirA(plateforme) {
+      dernierA = doc.activeElement;
+      etiquette.textContent = plateforme ? "Version choisie : " + plateforme : "";
+      etiquette.hidden = !plateforme;
+      formA.hidden = dejaInscrit; liensA.hidden = !dejaInscrit;
+      voileA.classList.add("ouvert");
+      setTimeout(function () { var c = dejaInscrit ? $("a", liensA) : $("input", formA); if (c) c.focus(); }, 60);
+    }
+    function fermerA() { if (voileA.classList.contains("ouvert")) { voileA.classList.remove("ouvert"); if (dernierA) dernierA.focus(); } }
+    $$("[data-acces]").forEach(function (b) {
+      b.addEventListener("click", function (e) { e.preventDefault(); ouvrirA(b.getAttribute("data-acces")); });
+    });
+    voileA.addEventListener("click", function (e) { if (e.target === voileA || e.target.closest(".fermer")) fermerA(); });
+    doc.addEventListener("keydown", function (e) { if (e.key === "Escape") fermerA(); }, O);
+    formA.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var retour = $(".retour", formA);
+      var manque = $$("input[required]", formA).filter(function (c) { return c.type === "checkbox" ? !c.checked : (!c.value.trim() || !c.checkValidity()); })[0];
+      if (manque) {
+        retour.textContent = manque.type === "checkbox" ? "Cochez l’accord pour accéder au téléchargement." : "Renseignez le champ « " + $("label[for=" + manque.id + "]", formA).textContent + " ».";
+        manque.focus(); return;
+      }
+      try { win.localStorage.setItem("cometec-appli-acces", "1"); } catch (e2) {}
+      dejaInscrit = true;
+      formA.hidden = true; liensA.hidden = false;
+      var l = $("a", liensA); if (l) l.focus();
+    });
+  }
   } /* fin initPage */
 
   if (win.ROUTEUR) win.ROUTEUR.demarrer(function (signal) { fermerMegas(); fermerTiroir(); initPage(signal); }, allerA);
