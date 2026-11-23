@@ -1370,3 +1370,28 @@ body.page-fiche{font-size:16px;line-height:1.55}
 .service-leasing .lien{font-weight:600;color:var(--ardoise)}
 .fin-barres.fin-leasing{height:58px}
 @media (max-width:600px){.fin-barres.fin-leasing{height:48px}}
+
+/* ---------- Fiches générées (gabarit commun) ---------- */
+.titre-rubrique{font-size:clamp(1.9rem,3vw,2.8rem);font-weight:320;font-stretch:86%;letter-spacing:-.02em;margin-bottom:22px}
+.principe p+p{margin-top:12px}
+.principe ul{margin-top:16px}
+.schema-carte .sch{border-radius:6px;background-color:var(--brume);background-image:linear-gradient(rgba(26,77,77,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(26,77,77,.055) 1px,transparent 1px);background-size:10px 10px}
+.vitrine-schema{background:var(--brume)}
+.vitrine-schema .sch{width:92%;background:transparent}
+.usages-fiche{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-top:1px solid var(--trait)}
+.usages-fiche li{padding:18px 22px 20px 0;border-bottom:1px solid var(--trait)}
+.usages-fiche li:nth-child(2n){padding-left:22px;border-left:1px solid var(--trait)}
+.usages-fiche b{display:block;font-size:1.05rem;font-weight:600}
+.usages-fiche span{display:block;margin-top:5px;font-size:15px;line-height:1.5;color:var(--encre-2)}
+@media (max-width:700px){.usages-fiche{grid-template-columns:1fr}.usages-fiche li:nth-child(2n){padding-left:0;border-left:0}}
+.fourniture{margin-top:clamp(22px,3vw,34px);padding:18px 22px;border-radius:10px;background:var(--brume)}
+.fourniture h3{font-size:1rem;font-weight:600}
+.fourniture ul{margin:10px 0 0;padding-left:18px;display:grid;gap:5px;font-size:15px;color:var(--encre-2)}
+.fiche-appli{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:16px;align-items:center;margin-top:clamp(24px,3vw,36px);padding:16px 20px;border:1px solid var(--trait);border-radius:12px;background:var(--blanc)}
+.fiche-appli img{width:52px;height:52px;border-radius:13px}
+.fiche-appli .sur-titre{margin:0 0 2px}
+.fiche-appli b{display:block;font-size:1.05rem}
+.fiche-appli span{display:block;font-size:14.5px;color:var(--encre-2);line-height:1.45}
+@media (max-width:640px){.fiche-appli{grid-template-columns:44px minmax(0,1fr)}.fiche-appli img{width:44px;height:44px}.fiche-appli .btn{grid-column:1/-1}}
+.fiche-principal .proches{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:560px){.fiche-principal .proches{grid-template-columns:1fr}}

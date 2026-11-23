@@ -17,28 +17,28 @@ window.FAMILLES = [
     groupes: [
       { nom: "Hauteur-vitesse", items: [
         ["RAVEN-EYE", "Débitmètre hauteur-vitesse radar sans contact", "appareils/raven-eye.html"],
-        ["BELUGA", "Débitmètre Doppler hauteur-vitesse"],
-        ["BELUGA A/V", "Débitmètre Doppler hauteur-vitesse"],
-        ["LOG’R", "Débitmètre hauteur-vitesse portable autonome"],
-        ["Solutions autonomes", "Hauteur-vitesse sur enregistreur autonome"] ] },
+        ["BELUGA", "Débitmètre Doppler hauteur-vitesse", "appareils/beluga.html"],
+        ["BELUGA A/V", "Débitmètre Doppler hauteur-vitesse", "appareils/beluga-av.html"],
+        ["LOG’R", "Débitmètre hauteur-vitesse portable autonome", "appareils/logr.html"],
+        ["Solutions autonomes", "Hauteur-vitesse sur enregistreur autonome", "appareils/solutions-autonomes.html"] ] },
       { nom: "Canal de comptage", items: [
-        ["DEBULLE", "Débitmètre bulle à bulle, poste fixe"],
-        ["BUL’R2", "Débitmètre bulle à bulle portable"],
-        ["OC90", "Afficheur-transmetteur de débit pour canal"],
-        ["Canal Venturi AMV", "Canal de mesure ISO 4359"],
-        ["Canal Palmer-Bowlus", "Canal de mesure"] ] },
+        ["DEBULLE", "Débitmètre bulle à bulle, poste fixe", "appareils/debulle.html"],
+        ["BUL’R2", "Débitmètre bulle à bulle portable", "appareils/bulr2.html"],
+        ["OC90", "Afficheur-transmetteur de débit pour canal", "appareils/oc90.html"],
+        ["Canal Venturi AMV", "Canal de mesure ISO 4359", "appareils/canal-venturi-amv.html"],
+        ["Canal Palmer-Bowlus", "Canal de mesure", "appareils/canal-palmer-bowlus.html"] ] },
       { nom: "Conduite en charge", items: [
         ["TORPEE-MAG", "Débitmètre électromagnétique à insertion, DN 100 à 2500", "appareils/torpee-mag.html"],
         ["TORPEE-Z", "Débitmètre électromagnétique à insertion, DN 100 à 300"],
-        ["KF100", "Débitmètre à ultrasons à temps de transit, poste fixe"],
-        ["KF200", "Débitmètre à ultrasons à temps de transit, portable"],
-        ["KF210", "Débitmètre à ultrasons à temps de transit, en mallette"] ] },
+        ["KF100", "Débitmètre à ultrasons à temps de transit, poste fixe", "appareils/kf100.html"],
+        ["KF200", "Débitmètre à ultrasons à temps de transit, portable", "appareils/kf200.html"],
+        ["KF210", "Débitmètre à ultrasons à temps de transit, en mallette", "appareils/kf210.html"] ] },
       { nom: "Rivière et jaugeage", items: [
-        ["FLUVIA", "Courantomètre électromagnétique"],
-        ["FloStick", "Courantomètre compact"],
-        ["RADAR-MATE 2", "Radar de vitesse portable"],
-        ["PHOENIX", "Débitmètre radar pour rivière"],
-        ["EASYFLOW", "Débitmètre par traçage au sel"] ] }
+        ["FLUVIA", "Courantomètre électromagnétique", "appareils/fluvia.html"],
+        ["FloStick", "Courantomètre compact", "appareils/flostick.html"],
+        ["RADAR-MATE 2", "Radar de vitesse portable", "appareils/radar-mate-2.html"],
+        ["PHOENIX", "Débitmètre radar pour rivière", "appareils/phoenix.html"],
+        ["EASYFLOW", "Débitmètre par traçage au sel", "appareils/easyflow.html"] ] }
     ]
   },
   {
@@ -46,16 +46,16 @@ window.FAMILLES = [
     photo: "photo-1674578745937-c73f81bdda07",
     groupes: [
       { nom: "Fixes", items: [
-        ["SP5 DK", "Préleveur pour conduites en charge"],
+        ["SP5 DK", "Préleveur pour conduites en charge", "appareils/sp5-dk.html"],
         ["SP5 ATEX", "Préleveur fixe réfrigéré ATEX"],
-        ["SP5C", "Préleveur fixe réfrigéré compact"],
-        ["SP5B", "Préleveur fixe réfrigéré péristaltique"],
-        ["TP5 W", "Préleveur mural monoflacon"] ] },
+        ["SP5C", "Préleveur fixe réfrigéré compact", "appareils/sp5c.html"],
+        ["SP5B", "Préleveur fixe réfrigéré péristaltique", "appareils/sp5b.html"],
+        ["TP5 W", "Préleveur mural monoflacon", "appareils/tp5-w.html"] ] },
       { nom: "Portables", items: [
         ["MicroMAXX", "Pompe de prélèvement"],
-        ["MAXX P6", "Préleveur portable compact"],
-        ["TP5 P", "Préleveur portable réfrigéré"],
-        ["TP5 C", "Préleveur portable réfrigéré péristaltique"] ] }
+        ["MAXX P6", "Préleveur portable compact", "appareils/maxx-p6.html"],
+        ["TP5 P", "Préleveur portable réfrigéré", "appareils/tp5-p.html"],
+        ["TP5 C", "Préleveur portable réfrigéré péristaltique", "appareils/tp5-c.html"] ] }
     ]
   },
   {
@@ -63,11 +63,11 @@ window.FAMILLES = [
     photo: "photo-1671250973481-252cca9c9c51",
     groupes: [
       { nom: "Physico-chimie", items: [
-        ["Sondes et transmetteurs", "pH, oxygène dissous, redox, température, conductivité, MES, turbidité, chlore"] ] },
+        ["Sondes et transmetteurs", "pH, oxygène dissous, redox, température, conductivité, MES, turbidité, chlore", "appareils/sondes-transmetteurs.html"] ] },
       { nom: "Boues et MES", items: [
-        ["DTR01", "Détecteur de niveau de boue"],
+        ["DTR01", "Détecteur de niveau de boue", "appareils/dtr01.html"],
         ["DTR02", "Détecteur de niveau de boue"],
-        ["R812", "MESmètre portable"] ] }
+        ["R812", "MESmètre portable", "appareils/r812.html"] ] }
     ]
   },
   {
@@ -78,8 +78,8 @@ window.FAMILLES = [
         ["ULS02", "Capteur de niveau à ultrasons 4-20 mA"],
         ["ULS06", "Capteur de niveau à ultrasons 4-20 mA"],
         ["R60", "Capteur de niveau radar"],
-        ["DTS01", "Détecteur de surverse"],
-        ["Sondes lumineuses BF", "Sondes piézométriques"] ] }
+        ["DTS01", "Détecteur de surverse", "appareils/dts01.html"],
+        ["Sondes lumineuses BF", "Sondes piézométriques", "appareils/sondes-lumineuses-bf.html"] ] }
     ]
   },
   {
@@ -87,8 +87,8 @@ window.FAMILLES = [
     photo: "photo-1767274714714-dda4c25c6376",
     groupes: [
       { nom: "Hydrocarbures", items: [
-        ["LDI ROW", "Détecteur d’hydrocarbures sans contact"],
-        ["EnviroFlu", "Sonde HAP dissous"],
+        ["LDI ROW", "Détecteur d’hydrocarbures sans contact", "appareils/ldi-row.html"],
+        ["EnviroFlu", "Sonde HAP dissous", "appareils/enviroflu.html"],
         ["SOLINST 122", "Détecteur manuel d’interface"] ] }
     ]
   },
@@ -97,8 +97,8 @@ window.FAMILLES = [
     photo: "photo-1776837048959-b7439cd9fdf7",
     groupes: [
       { nom: "Pluviomètres", items: [
-        ["Pluviomètre professionnel", "Pluviomètre sans alimentation, sortie contact"],
-        ["Pluviomètre météo", "Pluviomètre"] ] }
+        ["Pluviomètre professionnel", "Pluviomètre sans alimentation, sortie contact", "appareils/pluviometre-professionnel.html"],
+        ["Pluviomètre météo", "Pluviomètre", "appareils/pluviometre-meteo.html"] ] }
     ]
   }
 ];
@@ -308,7 +308,7 @@ window.PRINCIPES = {
   ]
  },
  "chlore": {
-  "nom": "Chlore et désinfectants",
+  "nom": "Chlore",
   "famille": "qualite",
   "appareils": [
    "Sondes et transmetteurs"
