@@ -68,7 +68,8 @@
   }
   var megaTer = $("#mega-applications .mega-in");
   if (megaTer) {
-    megaTer.innerHTML = win.TERRAINS.map(function (t) {
+    var ordreMenu = win.TERRAINS_MENU || [];
+    megaTer.innerHTML = win.TERRAINS.slice().sort(function (a, b) { return ordreMenu.indexOf(a.id) - ordreMenu.indexOf(b.id); }).map(function (t) {
       return '<a class="mega-app" href="' + url("", "parcours") + '"><span style="background-image:url(' + win.PHOTO(t.photo, 300) + ')"></span><div><b>' + echap(t.nom) + "</b><em>" + echap(t.texte.split(".")[0]) + ".</em></div></a>";
     }).join("");
   }
@@ -339,12 +340,13 @@
     piste.innerHTML = win.TERRAINS.map(function (t, i) {
       return '<article class="terrain" id="t-' + t.id + '">' +
         '<div class="terrain-photo"><img src="' + win.PHOTO(t.photo, 1400) + '" alt="" loading="' + (i < 2 ? "eager" : "lazy") + '"></div>' +
-        '<div class="terrain-texte"><h3>' + echap(t.nom) + "</h3><p>" + echap(t.texte) + "</p><ul>" +
+        '<div class="terrain-texte">' + (t.badge ? '<p class="terrain-badge">' + echap(t.badge) + "</p>" : "") + "<h3>" + echap(t.nom) + "</h3><p>" + echap(t.texte) + "</p><ul>" +
         t.appareils.map(function (n) { var a = parNom[n]; return '<li><a href="' + (a ? a.url : "#") + '">' + echap(n) + "</a></li>"; }).join("") +
         '</ul><a class="lien" href="' + url(CATALOGUE) + '">Tous les appareils</a></div></article>';
     }).join("") + '<div class="piste-fin" aria-hidden="true"></div>';
     var etapes = $(".etapes-eau", parcours);
-    etapes.innerHTML = win.TERRAINS.map(function (t, i) { return '<button type="button" data-i="' + i + '">' + echap(t.court) + "</button>"; }).join("");
+    etapes.innerHTML = win.TERRAINS.map(function (t, i) { return '<button type="button" data-i="' + i + '">' + echap(t.court) + "</button>"; }).join("") +
+      '<span class="boucle" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M15 6.5A6.5 6.5 0 1 0 16.5 11"/><path d="M15.5 2.5v4h-4"/></svg>Retour au réseau</span>';
     var cheminFond = $(".ligne-eau .fond", parcours), cheminPlein = $(".ligne-eau .plein", parcours), bouee = $(".ligne-eau .bouee", parcours), svgLigne = $(".ligne-eau svg", parcours);
     var terrains = $$(".terrain", piste), boutons = $$("button", etapes);
     var decalageMax = 0, longueur = 0, actifPrec = -1, horizontal = false;
@@ -645,11 +647,11 @@
       }
       groupe.innerHTML = html;
       if (dn <= 1000) {
-        lignes += "<div><dt>Sonde</dt><dd>1½″</dd></div><div><dt>Paires d’électrodes</dt><dd>" + p15 + "</dd></div><div><dt>Piquage</dt><dd>1½″ avec vanne à boule</dd></div>";
+        lignes += "<div><dt>Sonde</dt><dd>1½″</dd></div><div><dt>Paires d’électrodes</dt><dd>" + p15 + "</dd></div><div><dt>Vanne</dt><dd>1½″, sur piquage</dd></div>";
       } else if (dn <= 1500) {
-        lignes += "<div><dt>Sonde</dt><dd>1½″<em>2″ si les vitesses sont élevées</em></dd></div><div><dt>Paires d’électrodes</dt><dd>" + p15 + " en 1½″<em>" + p2 + " en 2″</em></dd></div><div><dt>Piquage</dt><dd>1½″ ou 2″ avec vanne à boule</dd></div>";
+        lignes += "<div><dt>Sonde</dt><dd>1½″<em>2″ si les vitesses sont élevées</em></dd></div><div><dt>Paires d’électrodes</dt><dd>" + p15 + " en 1½″<em>" + p2 + " en 2″</em></dd></div><div><dt>Vanne</dt><dd>1½″ ou 2″ selon la sonde, sur piquage</dd></div>";
       } else {
-        lignes += "<div><dt>Sonde</dt><dd>2″</dd></div><div><dt>Paires d’électrodes</dt><dd>" + p2 + "</dd></div><div><dt>Piquage</dt><dd>2″ avec vanne à boule</dd></div>";
+        lignes += "<div><dt>Sonde</dt><dd>2″</dd></div><div><dt>Paires d’électrodes</dt><dd>" + p2 + "</dd></div><div><dt>Vanne</dt><dd>2″, sur piquage</dd></div>";
       }
       res.innerHTML = lignes;
     }

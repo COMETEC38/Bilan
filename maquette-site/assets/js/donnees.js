@@ -28,8 +28,8 @@ window.FAMILLES = [
         ["Canal Venturi AMV", "Canal de mesure ISO 4359", "appareils/canal-venturi-amv.html"],
         ["Canal Palmer-Bowlus", "Canal de mesure", "appareils/canal-palmer-bowlus.html"] ] },
       { nom: "Conduite en charge", items: [
-        ["TORPEE-MAG", "Débitmètre électromagnétique à insertion, DN 100 à 2500", "appareils/torpee-mag.html"],
-        ["TORPEE-Z", "Débitmètre électromagnétique à insertion, DN 100 à 300"],
+        ["TORPEE-MAG", "Débitmètre électromagnétique multipoint à insertion, DN 100 à 2500", "appareils/torpee-mag.html"],
+        ["TORPEE-Z", "Débitmètre électromagnétique multipoint à insertion, DN 100 à 300"],
         ["KF100", "Débitmètre à ultrasons à temps de transit, poste fixe", "appareils/kf100.html"],
         ["KF200", "Débitmètre à ultrasons à temps de transit, portable", "appareils/kf200.html"],
         ["KF210", "Débitmètre à ultrasons à temps de transit, en mallette", "appareils/kf210.html"] ] },
@@ -103,8 +103,17 @@ window.FAMILLES = [
   }
 ];
 
-/* Le parcours de l'eau : les pages Applications */
+/* Le cycle de l'eau : les pages Applications. Ordre de la frise = trajet de l'eau, à partir du réseau (choix de Hugo, 24/11/2026).
+   Le menu Applications suit, lui, l'ordre de priorité : window.TERRAINS_MENU. */
 window.TERRAINS = [
+  { id: "reseaux", nom: "Réseaux d’assainissement", court: "Réseaux", badge: "Cœur de métier",
+    photo: "photo-1551516116-27394c95a55f",
+    texte: "Points d’autosurveillance, déversoirs d’orage, diagnostic permanent : mesurer le débit là où il n’y a ni place ni alimentation.",
+    appareils: ["RAVEN-EYE", "BELUGA", "LOG’R", "Solutions autonomes", "DTS01", "TP5 P"] },
+  { id: "step", nom: "Station d’épuration", court: "Station",
+    photo: "photo-1622322977767-2c71d1787205",
+    texte: "Comptage en entrée et en sortie, bilans 24 h asservis au débit, voile de boue et paramètres de traitement.",
+    appareils: ["DEBULLE", "OC90", "Canal Venturi AMV", "SP5B", "DTR02", "Sondes et transmetteurs"] },
   { id: "rivieres", nom: "Rivières et milieu naturel", court: "Rivières",
     photo: "photo-1543503484-ba590cb1f903",
     texte: "Jaugeage, hauteur d’eau et débit en cours d’eau, pluie sur le bassin versant. Des appareils portables pour les campagnes, fixes pour les stations.",
@@ -117,19 +126,12 @@ window.TERRAINS = [
     photo: "photo-1495647688236-ed6ef40cb28b",
     texte: "Comptage sur les conduites en charge, du DN 100 au DN 2500, posé sans coupure d’eau.",
     appareils: ["TORPEE-MAG", "TORPEE-Z", "KF100", "KF200", "KF210", "Sondes et transmetteurs"] },
-  { id: "reseaux", nom: "Réseaux d’assainissement", court: "Réseaux",
-    photo: "photo-1551516116-27394c95a55f",
-    texte: "Points d’autosurveillance, déversoirs d’orage, diagnostic permanent : mesurer le débit là où il n’y a ni place ni alimentation.",
-    appareils: ["RAVEN-EYE", "BELUGA", "LOG’R", "Solutions autonomes", "DTS01", "TP5 P"] },
-  { id: "step", nom: "Station d’épuration", court: "Station",
-    photo: "photo-1622322977767-2c71d1787205",
-    texte: "Comptage en entrée et en sortie, bilans 24 h asservis au débit, voile de boue et paramètres de traitement.",
-    appareils: ["DEBULLE", "OC90", "Canal Venturi AMV", "SP5B", "DTR02", "Sondes et transmetteurs"] },
   { id: "industrie", nom: "Industrie et process", court: "Industrie",
     photo: "photo-1765218933298-dc55fdfb517a",
     texte: "Détection d’hydrocarbures avant rejet, débit en conduite de process, contrôle des effluents.",
     appareils: ["LDI ROW", "EnviroFlu", "KF200", "TORPEE-MAG", "SP5 ATEX"] }
 ];
+window.TERRAINS_MENU = ["reseaux", "step", "eau-potable", "rivieres", "souterraines", "industrie"];
 
 /* Secteurs commerciaux (carte des secteurs COMETEC, octobre 2026) */
 window.SECTEURS = [
@@ -211,7 +213,7 @@ window.PRINCIPES = {
   ]
  },
  "em-insertion": {
-  "nom": "Électromagnétique à insertion",
+  "nom": "Électromagnétique multipoint à insertion",
   "famille": "debitmetres",
   "appareils": [
    "TORPEE-MAG",
