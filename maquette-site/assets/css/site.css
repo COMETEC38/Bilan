@@ -1442,3 +1442,52 @@ body.page-fiche{font-size:16px;line-height:1.55}
   .prop-b .heros-faits ul{max-width:none}
 }
 @media (prefers-reduced-motion:reduce){.heros-logo-img{clip-path:none;animation:none}.heros-logo-trait{animation:none;stroke-dashoffset:0}}
+
+/* ===== Propositions C et D : logo au centre à l'ouverture (25/11/2026) =====
+   Un seul logo : celui de l'en-tête. Il s'ouvre en grand au centre de la « surface » claire,
+   puis rejoint sa place en haut à gauche au défilement (site.js). */
+.prop-centre{--zone:clamp(250px,40vh,380px)}
+@media (max-width:760px){.prop-centre{--zone:236px}}
+.prop-centre .entete{background:#fff}
+.prop-centre .logo{position:relative;transform-origin:0 0;will-change:transform}
+.prop-centre .logo img{height:64px}
+.prop-centre .entete.pose .logo img{transform:none}
+@media (max-width:760px){.prop-centre .logo img{height:50px}}
+.prop-centre:not(.logo-range) .entete.pose{border-bottom-color:transparent;box-shadow:none}
+.prop-centre:not(.logo-range):has(.mega.ouvert,.tiroir.ouvert) .entete .logo{opacity:0;transition:opacity .15s}
+.prop-centre .heros{min-height:max(calc(100svh - var(--entete)),640px)}
+.prop-centre .surface{position:relative;z-index:2;flex:none;height:calc(var(--zone) - var(--entete));background:#fff}
+.prop-centre .surface svg{position:absolute;left:0;top:100%;width:100%;height:clamp(26px,4vw,60px);margin-top:-1px;overflow:visible}
+.prop-centre .surface-fond{fill:#fff}
+.prop-centre .surface-reflet{fill:none;stroke:var(--eau);stroke-width:1.4;opacity:.55;vector-effect:non-scaling-stroke}
+.prop-centre .heros-marque{display:none}
+.prop-centre .heros-corps{align-items:center;text-align:center;justify-content:flex-start;padding-top:clamp(64px,9vh,110px)}
+.prop-centre .heros .chapo{margin-left:auto;margin-right:auto}
+.prop-centre .recherche{width:100%;max-width:640px}
+.prop-centre .heros-actions{justify-content:center}
+.prop-centre .heros-faits ul{margin:0 auto}
+.prop-centre .heros::before{background:linear-gradient(0deg,rgba(11,37,38,.8) 0%,rgba(11,37,38,.55) 60%,rgba(11,37,38,.7) 100%),linear-gradient(rgba(26,77,77,.3),rgba(26,77,77,.3))}
+/* Ouverture : le logo se révèle comme une onde qui part du C, deux ondes s'élargissent puis s'effacent */
+.prop-centre .logo img{clip-path:circle(0% at 16% 44%);animation:goutte 1.5s .15s cubic-bezier(.3,.6,.2,1) forwards}
+@keyframes goutte{to{clip-path:circle(150% at 16% 44%)}}
+.prop-centre .logo::before,.prop-centre .logo::after{content:"";position:absolute;left:16%;top:44%;width:0;height:0;border-radius:50%;border:1px solid rgba(85,99,100,.55);transform:translate(-50%,-50%);opacity:0;pointer-events:none;animation:onde 1.9s .15s ease-out forwards}
+.prop-centre .logo::after{border-color:rgba(223,14,35,.45);animation-delay:.5s}
+@keyframes onde{0%{width:0;height:0;opacity:1}100%{width:420px;height:420px;opacity:0}}
+.prop-centre .heros h1 .l>span{animation-delay:.75s}
+.prop-centre .heros h1 .l:nth-child(2)>span{animation-delay:.85s}
+.prop-centre .apparait{animation-delay:1.05s}
+.prop-centre .surface-reflet{stroke-dasharray:1600;stroke-dashoffset:1600;animation:reflet 2.4s .4s ease forwards}
+@keyframes reflet{to{stroke-dashoffset:0}}
+@media (prefers-reduced-motion:reduce){.prop-centre .logo img{clip-path:none;animation:none}.prop-centre .logo::before,.prop-centre .logo::after{display:none}.prop-centre .surface-reflet{stroke-dashoffset:0;animation:none}}
+/* D : même principe, la surface est une brume qui se fond dans l'eau, sans ligne marquée */
+.prop-d .entete{background:#F4F8F8}
+.prop-d .surface{background:#F4F8F8}
+.prop-d .surface svg{display:none}
+.prop-d .surface::after{content:"";position:absolute;left:0;right:0;top:100%;height:clamp(90px,14vh,160px);background:linear-gradient(#F4F8F8 0%,rgba(233,240,240,.82) 28%,rgba(142,195,191,.28) 62%,rgba(18,53,54,0) 100%)}
+.prop-d .heros-corps{padding-top:clamp(110px,15vh,170px)}
+.prop-centre .heros h1{font-size:clamp(2.4rem,4.5vw,4.5rem)}
+.prop-centre .heros-corps{padding-top:clamp(52px,7vh,96px)}
+.prop-d .surface::after{height:clamp(150px,22vh,240px);background:linear-gradient(#F4F8F8 0%,#E2EEED 18%,#A9D1CD 42%,#4F8A87 68%,rgba(26,77,77,.55) 86%,rgba(18,53,54,0) 100%)}
+.prop-d .heros-corps{padding-top:clamp(150px,21vh,230px)}
+.prop-d .surface::after{height:clamp(130px,19vh,210px)}
+.prop-d .heros-corps{padding-top:clamp(120px,17vh,190px)}

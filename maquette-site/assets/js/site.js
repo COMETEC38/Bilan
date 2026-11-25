@@ -55,6 +55,34 @@
   function surDefile() { if (entete) entete.classList.toggle("pose", win.scrollY > 4); doc.body.classList.toggle("en-haut", win.scrollY <= 4); }
   win.addEventListener("scroll", surDefile, { passive: true }); surDefile();
 
+  /* Accueil, propositions C et D : le logo d'en-tête s'ouvre au centre de la « surface »,
+     puis glisse vers sa place en haut à gauche au fil du défilement (un seul logo, toujours le même) */
+  var logoA = $(".entete .logo"), surface = $(".surface");
+  if (logoA && surface && /prop-[cd]/.test(doc.body.className)) {
+    var geo = null, attente = false;
+    var mesurerLogo = function () {
+      logoA.style.transform = "none";
+      var r = logoA.getBoundingClientRect(), hh = entete.getBoundingClientRect().height;
+      var sh = surface.offsetHeight, vw = doc.documentElement.clientWidth;
+      var h0 = Math.min(sh * 0.66, vw * 0.84 * r.height / r.width, 210);
+      var s0 = Math.max(1, h0 / r.height), w0 = r.width * s0;
+      geo = { s0: s0, tx: vw / 2 - w0 / 2 - r.left, ty: hh + sh / 2 - h0 / 2 - r.top - win.scrollY * 0, d: Math.max(120, sh * 0.95) };
+      placerLogo();
+    };
+    var placerLogo = function () {
+      attente = false;
+      if (!geo) return;
+      var p = Math.min(1, Math.max(0, win.scrollY / geo.d)), e = 1 - Math.pow(1 - p, 2.2);
+      var s = Math.pow(geo.s0, 1 - e);
+      logoA.style.transform = p >= 1 ? "none" : "translate(" + (geo.tx * (1 - e)).toFixed(1) + "px," + (geo.ty * (1 - e) - win.scrollY * (1 - e) * 0).toFixed(1) + "px) scale(" + s.toFixed(4) + ")";
+      doc.body.classList.toggle("logo-range", p >= 1);
+    };
+    win.addEventListener("scroll", function () { if (!attente) { attente = true; win.requestAnimationFrame(placerLogo); } }, { passive: true });
+    win.addEventListener("resize", mesurerLogo);
+    if (doc.fonts && doc.fonts.ready) doc.fonts.ready.then(mesurerLogo);
+    mesurerLogo();
+  }
+
   /* Méga-menus générés depuis les données */
   var megaApp = $("#mega-appareils .mega-in");
   if (megaApp) {
