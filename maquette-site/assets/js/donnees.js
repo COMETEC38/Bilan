@@ -379,3 +379,6 @@ window.PRINCIPES = {
 
 /* Méga-menu « Appareils » : familles par colonne (débitmètres sur deux sous-colonnes, petites familles empilées) */
 window.MEGA_COLONNES = [["debitmetres"], ["preleveurs"], ["qualite", "pluviometrie"], ["niveau", "hydrocarbures"]];
+
+/* Page LinkedIn COMETEC : adresse à fournir par Hugo (un seul endroit pour tout le site) */
+window.LINKEDIN = "";

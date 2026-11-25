@@ -55,6 +55,9 @@
   function surDefile() { if (entete) entete.classList.toggle("pose", win.scrollY > 4); }
   win.addEventListener("scroll", surDefile, { passive: true }); surDefile();
 
+  /* Liens LinkedIn : adresse unique, définie dans donnees.js */
+  if (win.LINKEDIN) $$("[data-linkedin]").forEach(function (l) { l.href = win.LINKEDIN; l.target = "_blank"; l.rel = "noopener"; });
+
   /* Méga-menus générés depuis les données */
   var megaApp = $("#mega-appareils .mega-in");
   if (megaApp) {
