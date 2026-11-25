@@ -1491,3 +1491,34 @@ body.page-fiche{font-size:16px;line-height:1.55}
 .prop-d .heros-corps{padding-top:clamp(150px,21vh,230px)}
 .prop-d .surface::after{height:clamp(130px,19vh,210px)}
 .prop-d .heros-corps{padding-top:clamp(120px,17vh,190px)}
+
+/* ===== Propositions E, F, G : logo blanc et rouge (fourni par Hugo, vectorisé) sur le fond sombre (25/11/2026) =====
+   Apparition sobre : « mise au point » (le logo passe du flou au net), puis le rouge arrive. */
+.prop-blanc .heros h1{font-size:clamp(2.4rem,4.6vw,4.6rem);font-weight:300;font-stretch:82%;line-height:.98;letter-spacing:-.03em}
+.logo-blanc{display:block;width:100%;height:auto;overflow:visible}
+.heros-signature{position:relative;z-index:1;line-height:0}
+.heros-signature .logo-blanc{animation:mise-au-point 1.1s .15s cubic-bezier(.25,.6,.2,1) both}
+.heros-signature .lb-o,.heros-signature .lb-virgule{animation:rouge-arrive .7s .85s ease both}
+@keyframes mise-au-point{from{opacity:0;filter:blur(9px);transform:scale(.985)}to{opacity:1;filter:blur(0);transform:none}}
+@keyframes rouge-arrive{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.heros-signature .logo-blanc,.heros-signature .lb-o,.heros-signature .lb-virgule{animation:none}}
+/* E : le logo complet remplace le grand C, posé sur le fond à droite */
+.prop-e .heros-marque{display:none}
+.prop-e .heros-signature{position:absolute;right:var(--marge);top:50%;width:clamp(300px,36vw,560px);transform:translateY(-62%)}
+.prop-e .heros::before{background:linear-gradient(90deg,rgba(11,37,38,.92) 0%,rgba(11,37,38,.74) 40%,rgba(11,37,38,.55) 70%,rgba(11,37,38,.62) 100%),linear-gradient(0deg,rgba(11,37,38,.75) 0%,rgba(11,37,38,0) 38%),linear-gradient(rgba(26,77,77,.35),rgba(26,77,77,.35))}
+@media (max-width:1100px){.prop-e .heros-signature{position:relative;right:auto;top:auto;transform:none;width:clamp(230px,52vw,380px);margin:0 0 26px var(--marge);order:-1;margin-top:clamp(40px,6vh,70px)}.prop-e .heros-corps{padding-top:26px}}
+/* F : le logo signe la colonne de texte, au-dessus du titre */
+.prop-f .heros-signature,.prop-g .heros-signature{width:clamp(240px,30vw,430px);margin-bottom:clamp(26px,4vh,40px)}
+.prop-f .heros-marque{opacity:.35}
+.prop-f .heros h1 .l>span,.prop-g .heros h1 .l>span{animation-delay:.55s}
+.prop-f .heros h1 .l:nth-child(2)>span,.prop-g .heros h1 .l:nth-child(2)>span{animation-delay:.65s}
+.prop-f .apparait,.prop-g .apparait{animation-delay:.95s}
+/* G : tout est centré, le logo en tête */
+.prop-g .heros-marque{display:none}
+.prop-g .heros-signature{width:clamp(260px,40vw,600px);margin-left:auto;margin-right:auto}
+.prop-g .heros-corps{align-items:center;text-align:center}
+.prop-g .heros .chapo{margin-left:auto;margin-right:auto}
+.prop-g .recherche{width:100%;max-width:640px}
+.prop-g .heros-actions{justify-content:center}
+.prop-g .heros-faits ul{margin:0 auto}
+.prop-g .heros::before{background:radial-gradient(120% 90% at 50% 40%,rgba(11,37,38,.62) 0%,rgba(11,37,38,.86) 100%),linear-gradient(rgba(26,77,77,.3),rgba(26,77,77,.3))}
