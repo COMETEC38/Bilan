@@ -1449,3 +1449,14 @@ body.page-fiche{font-size:16px;line-height:1.55}
 .btn-trait-sombre{border-color:var(--ardoise);color:var(--ardoise);background:transparent;min-height:44px;flex:none}
 .btn-trait-sombre:hover{background:var(--ardoise);color:#fff}
 @media (max-width:760px){.bande-linkedin-in{flex-direction:column;align-items:flex-start}.bande-linkedin p{font-size:15.5px}}
+
+/* Schémas sur mesure (25/11/2026) : visée du RAVEN-EYE, Doppler vers l'avant, niveau par pression, dérive vers la gauche */
+.sch .a-visee,.sch .a-diag-d,.sch .a-derive-g,.sch .a-pression{opacity:0}
+.anim .a-visee{animation:s-visee 1.8s cubic-bezier(.3,.6,.5,1) infinite}
+.anim .a-diag-d{animation:s-diag-d 1.8s cubic-bezier(.3,.6,.5,1) infinite}
+.anim .a-derive-g{animation:s-derive-g 3s linear infinite}
+.anim .a-pression{animation:s-pression 2.1s ease-out infinite}
+@keyframes s-visee{0%{transform:translate(0,0) scale(1);opacity:0}12%{opacity:.9}100%{transform:translate(29px,20px) scale(1.8);opacity:0}}
+@keyframes s-diag-d{0%{transform:translate(0,0) scale(1);opacity:0}15%{opacity:.9}100%{transform:translate(20px,-27px) scale(1.6);opacity:0}}
+@keyframes s-derive-g{0%{transform:translateX(10px);opacity:0}20%,80%{opacity:.8}100%{transform:translateX(-26px);opacity:0}}
+@keyframes s-pression{0%{transform:translateY(0);opacity:0}15%{opacity:.85}100%{transform:translateY(-40px);opacity:0}}
