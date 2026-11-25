@@ -1502,3 +1502,48 @@ body.page-fiche{font-size:16px;line-height:1.55}
 .sch .a-visee2{opacity:0}
 @keyframes s-perche2{0%,22%{transform:translateX(-20px)}33%,55%{transform:translateX(0)}66%,88%{transform:translateX(20px)}100%{transform:translateX(-20px)}}
 @keyframes s-visee2{0%{transform:translate(0,0) scale(.8);opacity:0}12%{opacity:.9}100%{transform:translate(48px,33px) scale(2.2);opacity:0}}
+
+/* =========================================================
+   Variante d'accueil plus dense (accueil-variante.html, à comparer, 25/11/2026)
+   Tout est sous .dense : aucun effet sur l'accueil actuel ni sur les autres pages.
+   ========================================================= */
+.dense .heros{min-height:0}
+.dense .heros-corps{padding-top:clamp(22px,3.6vh,42px);padding-bottom:0}
+.dense .heros-signature{width:clamp(210px,min(24vw,30vh),360px);margin-bottom:clamp(10px,1.8vh,18px)}
+.dense .heros h1{font-size:clamp(1.8rem,min(2.8vw,4.6vh),2.8rem)}
+.dense .heros .chapo{margin-top:clamp(8px,1.2vh,12px);font-size:clamp(15px,1.1vw,17px)}
+.dense .heros .recherche{margin-top:clamp(14px,2.2vh,22px)}
+.dense .heros-lien{display:none}
+.dense .heros-faits{position:relative;bottom:auto;margin:clamp(16px,2.6vh,26px) 0 clamp(118px,15vh,138px)}
+.dense .heros-faits li{padding-top:12px;font-size:13.5px}
+.dense .heros-faits b{font-size:15px}
+@media (max-width:760px){.dense .heros-corps{padding-bottom:0}.dense .heros-faits{display:block;margin-bottom:96px}.dense .heros-faits ul{grid-template-columns:1fr;gap:4px;border-top:0}.dense .heros-faits li::before{display:none}.dense .heros-faits li{padding-top:2px}}
+
+/* Rangée des familles, à cheval sur le bas du héros */
+.raccourcis{position:relative;z-index:4;margin-top:clamp(-112px,-12vh,-92px)}
+.raccourcis-liste{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:clamp(8px,1vw,14px)}
+.raccourci{height:100%;display:flex;flex-direction:column;text-decoration:none;color:var(--encre);background:#fff;border:1px solid var(--trait);border-radius:12px;overflow:hidden;box-shadow:0 26px 44px -32px rgba(11,37,38,.55);transition:border-color .3s,box-shadow .45s var(--doux),transform .45s var(--doux)}
+.raccourci:hover,.raccourci:focus-visible{border-color:rgba(26,77,77,.4);transform:translateY(-3px);box-shadow:0 30px 50px -30px rgba(11,37,38,.6)}
+.raccourci-photo{position:relative;display:block;aspect-ratio:16/10;background:radial-gradient(120% 90% at 50% 38%,#fff 0%,#EEF3F3 55%,#E1E9E9 100%)}
+.raccourci-photo img{position:absolute;inset:9% 14% 8%;width:72%;height:83%;object-fit:contain;filter:drop-shadow(0 12px 12px rgba(11,37,38,.2)) drop-shadow(0 2px 3px rgba(11,37,38,.16));transition:transform .6s var(--doux)}
+.raccourci:hover .raccourci-photo img{transform:scale(1.05)}
+.raccourci-texte{display:flex;flex-direction:column;gap:2px;padding:10px 13px 12px;flex:1}
+.raccourci-texte b{font-size:15.5px;font-weight:640;letter-spacing:-.005em}
+.raccourci-texte span{font-size:12.6px;line-height:1.35;color:var(--encre-2)}
+.raccourci-texte small{margin-top:auto;padding-top:6px;font-size:12px;font-weight:600;color:var(--rouge)}
+.raccourcis-tout{margin-top:14px;text-align:right;font-size:14.5px}
+.raccourcis-tout a{color:var(--ardoise);font-weight:600;text-decoration:none;border-bottom:1px solid currentColor;padding-bottom:2px}
+.raccourcis-tout a:hover{color:var(--rouge)}
+@media (max-width:1100px){.raccourcis-liste{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:620px){.raccourcis-liste{grid-template-columns:repeat(2,minmax(0,1fr))}.raccourcis{margin-top:-72px}.raccourcis-tout{text-align:left}}
+
+/* Sections resserrées */
+.dense .bloc{padding:clamp(56px,6.5vw,96px) 0}
+.dense #appareils{padding-top:clamp(44px,5vw,72px)}
+.dense .bloc-tete{margin-bottom:clamp(26px,3vw,44px)}
+/* Frise : cartes de terrain plus étroites, donc moins de défilement */
+@media (min-width:901px) and (min-height:561px){.dense .terrain{width:min(46vw,640px)}}
+
+/* Pastille de comparaison */
+.pastille-variante{position:fixed;left:16px;bottom:16px;z-index:60;display:flex;flex-direction:column;padding:9px 14px;border-radius:12px;background:var(--rouge);color:#fff;font-size:13px;font-weight:650;text-decoration:none;box-shadow:0 14px 30px -14px rgba(0,0,0,.45)}
+.pastille-variante span{font-weight:500;font-size:12px;opacity:.9;text-decoration:underline}
