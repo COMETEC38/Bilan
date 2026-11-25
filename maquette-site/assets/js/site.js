@@ -733,7 +733,7 @@
     function majBandeauPrincipe() {
       if (bandeauP) { bandeauP.remove(); bandeauP = null; }
       if (!principe) return;
-      catalogue.insertAdjacentHTML("beforebegin", '<div class="conteneur principe-actif-cont"><div class="principe-actif" role="status"><span>Principe de mesure</span><b>' + echap(principe.nom) + '</b><button type="button">Voir toute la famille</button></div></div>');
+      catalogue.insertAdjacentHTML("beforebegin", '<div class="conteneur principe-actif-cont"><div class="principe-actif" role="status"><span>' + (principe.famille === "preleveurs" ? "Type de préleveur" : "Principe de mesure") + '</span><b>' + echap(principe.nom) + '</b><button type="button">Voir toute la famille</button></div></div>');
       bandeauP = catalogue.previousElementSibling;
       $("button", bandeauP).addEventListener("click", function () {
         principe = null; majBandeauPrincipe(); appliquer();

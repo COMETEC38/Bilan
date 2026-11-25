@@ -244,23 +244,24 @@ window.PRINCIPES = {
    "EASYFLOW"
   ]
  },
- "vide": {
-  "nom": "Pompe à vide",
+ "fixe": {
+  "nom": "Préleveur fixe",
   "famille": "preleveurs",
   "appareils": [
    "SP5C",
-   "TP5 P",
-   "MAXX P6"
+   "SP5B",
+   "SP5 ATEX",
+   "TP5 W"
   ]
  },
- "peristaltique": {
-  "nom": "Pompe péristaltique",
+ "portable": {
+  "nom": "Préleveur portable",
   "famille": "preleveurs",
   "appareils": [
-   "SP5B",
+   "TP5 P",
    "TP5 C",
-   "TP5 W",
-   "MAXX P6"
+   "MAXX P6",
+   "MicroMAXX"
   ]
  },
  "charge": {
