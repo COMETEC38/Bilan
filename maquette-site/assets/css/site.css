@@ -1467,3 +1467,10 @@ body.page-fiche{font-size:16px;line-height:1.55}
 .anim .a-elec-on{animation:s-elec-on 1.6s ease-in-out infinite}
 @keyframes s-halo{0%,100%{opacity:0}18%,42%{opacity:.5}60%{opacity:0}}
 @keyframes s-elec-on{0%,100%{fill:#B8000A}18%,42%{fill:#FF2A35}60%{fill:#B8000A}}
+/* Embase réfrigérée du préleveur portable : flocon qui tourne lentement, givre qui tombe, 5 °C affiché */
+.sch .froid{fill:none;stroke:#BFE3F5;stroke-width:.85;stroke-linecap:round}
+.sch .givre-p{fill:#7FB9D9;opacity:0}
+.anim .a-flocon{animation:s-flocon 9s linear infinite}
+.anim .a-givre{animation:s-givre 3.2s ease-in infinite}
+@keyframes s-flocon{to{transform:rotate(360deg)}}
+@keyframes s-givre{0%{transform:translateY(0);opacity:0}20%{opacity:.85}100%{transform:translateY(14px);opacity:0}}
