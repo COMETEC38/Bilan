@@ -1541,6 +1541,29 @@ body.page-fiche{font-size:16px;line-height:1.55}
 .dense .bloc{padding:clamp(56px,6.5vw,96px) 0}
 .dense #appareils{padding-top:clamp(44px,5vw,72px)}
 .dense .bloc-tete{margin-bottom:clamp(26px,3vw,44px)}
+/* Onglets : la carte choisie ouvre ses principes de mesure juste dessous */
+.raccourcis-liste li{position:relative}
+.raccourci[aria-selected=true]{border-color:var(--ardoise);box-shadow:0 0 0 1.5px var(--ardoise),0 26px 44px -32px rgba(11,37,38,.55)}
+.raccourci[aria-selected=true] .raccourci-texte b{color:var(--ardoise)}
+.raccourcis.en-onglets .raccourcis-liste li:has(.raccourci[aria-selected=true])::after{content:"";position:absolute;left:50%;bottom:-13px;margin-left:-8px;border:8px solid transparent;border-top-color:var(--ardoise)}
+.panneaux{margin-top:clamp(18px,2.4vw,30px);border-top:1px solid var(--encre)}
+.raccourcis.en-onglets .panneaux .famille{display:none;border-bottom:0}
+.raccourcis.en-onglets .panneaux .famille.ouvert{display:grid;animation:panneau-entre .45s var(--doux)}
+@keyframes panneau-entre{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.raccourcis.en-onglets .panneaux .famille.ouvert{animation:none}}
+@media (min-width:1181px){
+  .panneaux .famille{grid-template-columns:minmax(0,1fr) auto;row-gap:16px;padding:clamp(20px,2vw,28px) 0 clamp(6px,1vw,12px)}
+  .panneaux .famille-tete{grid-column:1;grid-row:1;display:flex;align-items:baseline;gap:26px}
+  .panneaux .famille-nom h3{font-size:clamp(1.6rem,2.2vw,2.1rem)}
+  .panneaux .famille-desc{margin-top:0;max-width:64ch;font-size:14.5px}
+  .panneaux .famille-compte{grid-column:2;grid-row:1;display:flex;align-items:baseline;gap:8px;padding-top:0}
+  .panneaux .famille-compte b{display:inline;font-size:1.5rem}
+  .panneaux .famille-compte span{display:inline;margin:0 0 0 8px}
+  .panneaux .techs{grid-column:1/-1;grid-row:2;grid-template-columns:repeat(5,minmax(0,1fr));gap:18px 14px}
+  .panneaux .techs>li.large{grid-column:1/span 3}
+}
+.dense .raccourcis{padding-bottom:clamp(40px,5vw,72px)}
+
 /* Frise : cartes de terrain plus étroites, donc moins de défilement */
 @media (min-width:901px) and (min-height:561px){.dense .terrain{width:min(46vw,640px)}}
 

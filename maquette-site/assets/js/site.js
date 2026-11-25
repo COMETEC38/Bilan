@@ -358,6 +358,31 @@
     }
   }
 
+  /* ---------- Variante d'accueil : la rangée des familles sert d'onglets aux principes de mesure ---------- */
+  var racc = $(".raccourcis");
+  if (racc && $(".panneaux", racc)) {
+    var ongletsFam = $$('[role="tab"]', racc), panneauxFam = $$(".panneaux .famille", racc);
+    racc.classList.add("en-onglets");
+    var ouvrirFam = function (id) {
+      ongletsFam.forEach(function (o) { var on = o.getAttribute("data-fam") === id; o.setAttribute("aria-selected", on ? "true" : "false"); o.tabIndex = on ? 0 : -1; });
+      panneauxFam.forEach(function (p) { p.classList.toggle("ouvert", p.id === "f-" + id); });
+    };
+    ongletsFam.forEach(function (o, i) {
+      o.addEventListener("click", function (e) {
+        e.preventDefault(); ouvrirFam(o.getAttribute("data-fam"));
+        if (win.innerWidth < 760) { var p = $("#f-" + o.getAttribute("data-fam")); if (p) p.scrollIntoView({ behavior: calme ? "auto" : "smooth", block: "start" }); }
+      });
+      o.addEventListener("keydown", function (e) {
+        var d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+        if (!d) return;
+        e.preventDefault(); var s = ongletsFam[(i + d + ongletsFam.length) % ongletsFam.length];
+        ouvrirFam(s.getAttribute("data-fam")); s.focus();
+      });
+    });
+    var demandeFam = (location.hash || "").replace("#f-", "");
+    ouvrirFam(ongletsFam.some(function (o) { return o.getAttribute("data-fam") === demandeFam; }) ? demandeFam : ongletsFam[0].getAttribute("data-fam"));
+  }
+
   /* ---------- Le parcours de l'eau (accueil) ---------- */
   var parcours = $(".parcours");
   if (parcours) {
