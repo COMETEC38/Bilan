@@ -1474,3 +1474,22 @@ body.page-fiche{font-size:16px;line-height:1.55}
 .anim .a-givre{animation:s-givre 3.2s ease-in infinite}
 @keyframes s-flocon{to{transform:rotate(360deg)}}
 @keyframes s-givre{0%{transform:translateY(0);opacity:0}20%{opacity:.85}100%{transform:translateY(14px);opacity:0}}
+/* Préleveur sur conduite en charge : cycle double vanne à boule (8 s) */
+.sch .a-chambre{transform-origin:50% 100%}
+.sch .voyant,.sch .a-vidange,.sch .a-cmd1,.sch .a-cmd2{opacity:0}
+.anim .a-v1{animation:s-v1 8s ease-in-out infinite}
+.anim .a-v2{animation:s-v2 8s ease-in-out infinite}
+.anim .a-led1{animation:s-led1 8s linear infinite}
+.anim .a-led2{animation:s-led2 8s linear infinite}
+.anim .a-chambre{animation:s-chambre 8s linear infinite}
+.anim .a-vidange{animation:s-vidange 8s linear infinite}
+.anim .a-cmd1{animation:s-cmd1 8s linear infinite}
+.anim .a-cmd2{animation:s-cmd2 8s linear infinite}
+@keyframes s-v1{0%,9%{transform:rotate(0)}13%,31%{transform:rotate(90deg)}35%,100%{transform:rotate(0)}}
+@keyframes s-v2{0%,45%{transform:rotate(0)}49%,67%{transform:rotate(90deg)}71%,100%{transform:rotate(0)}}
+@keyframes s-led1{0%,10%{opacity:0}12%,33%{opacity:1}35%,100%{opacity:0}}
+@keyframes s-led2{0%,46%{opacity:0}48%,69%{opacity:1}71%,100%{opacity:0}}
+@keyframes s-chambre{0%,12%{transform:scaleY(0)}29%,49%{transform:scaleY(1)}66%,100%{transform:scaleY(0)}}
+@keyframes s-vidange{0%,48%{opacity:0}51%,64%{opacity:1}68%,100%{opacity:0}}
+@keyframes s-cmd1{0%,7%{opacity:0}9%,13%{opacity:1}15%,29%{opacity:0}31%,35%{opacity:1}37%,100%{opacity:0}}
+@keyframes s-cmd2{0%,43%{opacity:0}45%,49%{opacity:1}51%,65%{opacity:0}67%,71%{opacity:1}73%,100%{opacity:0}}
