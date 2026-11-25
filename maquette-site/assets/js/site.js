@@ -370,7 +370,12 @@
     ongletsFam.forEach(function (o, i) {
       o.addEventListener("click", function (e) {
         e.preventDefault(); ouvrirFam(o.getAttribute("data-fam"));
-        if (win.innerWidth < 760) { var p = $("#f-" + o.getAttribute("data-fam")); if (p) p.scrollIntoView({ behavior: calme ? "auto" : "smooth", block: "start" }); }
+        /* la page descend : le titre de la famille vient se placer juste sous l'en-tête */
+        var p = $("#f-" + o.getAttribute("data-fam"));
+        if (p) {
+          var haut = p.getBoundingClientRect().top + win.scrollY - (entete ? entete.offsetHeight : 0) - 14;
+          win.scrollTo({ top: Math.max(0, haut), behavior: calme ? "auto" : "smooth" });
+        }
       });
       o.addEventListener("keydown", function (e) {
         var d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
