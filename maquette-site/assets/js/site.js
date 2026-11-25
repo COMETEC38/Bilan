@@ -52,7 +52,7 @@
 
   /* ---------- En-tête ---------- */
   var entete = $(".entete");
-  function surDefile() { if (entete) entete.classList.toggle("pose", win.scrollY > 4); }
+  function surDefile() { if (entete) entete.classList.toggle("pose", win.scrollY > 4); doc.body.classList.toggle("en-haut", win.scrollY <= 4); }
   win.addEventListener("scroll", surDefile, { passive: true }); surDefile();
 
   /* Méga-menus générés depuis les données */

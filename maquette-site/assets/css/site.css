@@ -1414,3 +1414,31 @@ body.page-fiche{font-size:16px;line-height:1.55}
 .terrain-badge + h3{margin-top:12px}
 .etapes-eau .boucle{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:rgba(255,255,255,.45);white-space:nowrap}
 .etapes-eau .boucle svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+
+/* ===== Propositions « logo » de l'accueil (25/11/2026), pages proposition-logo-a et -b ===== */
+.prop-logo .heros h1{font-size:clamp(2.6rem,5.4vw,5.4rem);font-weight:300;font-stretch:82%;line-height:.96;letter-spacing:-.03em}
+/* A : le logo ouvre la page, en grand dans l'en-tête blanc, puis reprend sa taille au défilement */
+.prop-a .entete-in{transition:height .45s var(--doux)}
+.prop-a .logo img{height:62px;transform:none!important;transition:height .45s var(--doux)}
+.prop-a.en-haut{--entete:140px}
+.prop-a.en-haut .logo img{height:104px}
+.prop-a .entete-actions>a:not(.btn){transition:opacity .3s}
+@media (max-width:1500px){.prop-a.en-haut .entete-actions>a:not(.btn){opacity:0;pointer-events:none;width:0;overflow:hidden;margin-left:-14px}}
+@media (max-width:760px){.prop-a.en-haut,.prop-b.en-haut{--entete:88px}.prop-a .logo img,.prop-b .logo img{height:52px;transition:height .45s var(--doux)}.prop-a.en-haut .logo img,.prop-b.en-haut .logo img{height:62px}.prop-b .entete-in{transition:height .45s var(--doux)}}
+/* B : le logo au cœur du héros, sur un panneau clair bordé d'une ligne d'eau */
+.prop-b .heros-marque{display:none}
+.heros-logo{position:absolute;top:0;right:0;bottom:0;width:44%;z-index:0;display:flex;align-items:center;justify-content:center;padding:0 3% 8% 11%}
+.heros-logo-fond{position:absolute;inset:0;width:100%;height:100%}
+.heros-logo-trait{stroke-dasharray:1200;stroke-dashoffset:1200;animation:trait-logo 1.6s .2s var(--doux) forwards}
+@keyframes trait-logo{to{stroke-dashoffset:0}}
+.heros-logo-img{position:relative;width:min(100%,520px);height:auto;clip-path:inset(0 100% 0 0);animation:logo-ouvre 1.3s .55s var(--doux) forwards}
+@keyframes logo-ouvre{to{clip-path:inset(0 0 0 0)}}
+.prop-b .heros-corps{padding-right:46%}
+.prop-b .heros-faits ul{max-width:calc(56vw - 90px)}
+@media (max-width:900px){
+  .heros-logo{display:none}
+  .prop-b .heros-marque{display:block}
+  .prop-b .heros-corps{padding-right:0}
+  .prop-b .heros-faits ul{max-width:none}
+}
+@media (prefers-reduced-motion:reduce){.heros-logo-img{clip-path:none;animation:none}.heros-logo-trait{animation:none;stroke-dashoffset:0}}
