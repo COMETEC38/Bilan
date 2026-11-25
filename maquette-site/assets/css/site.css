@@ -1564,6 +1564,20 @@ body.page-fiche{font-size:16px;line-height:1.55}
 }
 .dense .raccourcis{padding-bottom:clamp(40px,5vw,72px)}
 
+/* Version 2 : pictogramme à la place de la photo, appareils réels sous chaque schéma */
+.raccourci-picto{display:flex;align-items:center;justify-content:flex-start;padding:16px 14px 0}
+.raccourci-picto svg{width:46px;height:46px;transition:transform .5s var(--doux)}
+.raccourci:hover .raccourci-picto svg{transform:translateY(-2px)}
+.raccourci-picto+.raccourci-texte{padding-top:8px}
+.raccourci[aria-selected=true]{background:linear-gradient(#fff,#F3F8F8)}
+.panneaux .techs>li{flex-direction:column}
+.tech-appareils{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.tech-appareils a{display:inline-flex;align-items:center;gap:6px;min-height:30px;padding:2px 10px 2px 3px;border:1px solid var(--trait);border-radius:999px;background:#fff;font-size:12px;font-weight:620;letter-spacing:.01em;color:var(--encre);text-decoration:none;transition:border-color .25s,color .25s,box-shadow .3s}
+.tech-appareils a:hover,.tech-appareils a:focus-visible{border-color:var(--ardoise);color:var(--ardoise);box-shadow:0 8px 18px -12px rgba(11,37,38,.5)}
+.tech-appareils img{width:26px;height:26px;object-fit:contain;border-radius:50%;background:radial-gradient(circle at 50% 40%,#fff 0%,#EAF1F1 100%);padding:2px}
+.tech-appareils i{width:8px;height:8px;margin:0 3px 0 6px;border-radius:50%;background:var(--givre)}
+.large .tech-appareils{grid-column:2}
+
 /* Frise : cartes de terrain plus étroites, donc moins de défilement */
 @media (min-width:901px) and (min-height:561px){.dense .terrain{width:min(46vw,640px)}}
 
