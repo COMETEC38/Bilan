@@ -1595,3 +1595,38 @@ body.page-fiche{font-size:16px;line-height:1.55}
 /* Pastille de comparaison */
 .pastille-variante{position:fixed;left:16px;bottom:16px;z-index:60;display:flex;flex-direction:column;padding:9px 14px;border-radius:12px;background:var(--rouge);color:#fff;font-size:13px;font-weight:650;text-decoration:none;box-shadow:0 14px 30px -14px rgba(0,0,0,.45)}
 .pastille-variante span{font-weight:500;font-size:12px;opacity:.9;text-decoration:underline}
+
+/* =========================================================
+   Page d'un principe de mesure (exemple : solutions/radar-sans-contact.html, 25/11/2026)
+   ========================================================= */
+.page-solution .rubrique{padding:clamp(44px,5.5vw,76px) 0}
+.solution-tete{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:clamp(22px,3vw,44px);align-items:center;padding:clamp(10px,2vw,24px) 0 clamp(36px,4vw,56px);border-bottom:1px solid var(--trait)}
+.solution-tete h1{font-size:clamp(2.2rem,4vw,3.6rem);font-weight:300;font-stretch:82%;letter-spacing:-.03em;line-height:1;margin-top:10px}
+.solution-tete .chapo{margin-top:18px;color:var(--encre-2);max-width:48ch}
+.solution-tete .schema-carte{margin:0}
+.solution-ancres{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.solution-ancres a{display:inline-flex;align-items:center;min-height:34px;padding:0 13px;border:1px solid var(--trait);border-radius:999px;background:#fff;font-size:13.5px;font-weight:560;color:var(--encre);text-decoration:none;transition:border-color .25s,color .25s}
+.solution-ancres a:hover{border-color:var(--ardoise);color:var(--ardoise)}
+.solution-texte{margin-top:22px;max-width:70ch}
+.solution-texte p+p{margin-top:12px}
+.solution-texte p{color:var(--encre-2);font-size:16px;line-height:1.6}
+.solution-etapes{list-style:none;margin:26px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--trait);border:1px solid var(--trait);border-radius:10px;overflow:hidden;counter-reset:etape}
+.solution-etapes li{background:#fff;padding:16px 18px 18px;counter-increment:etape;position:relative}
+.solution-etapes li::before{content:counter(etape);display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--ardoise);color:#fff;font-size:12.5px;font-weight:650;margin-bottom:10px}
+.solution-etapes b{display:block;font-size:1.05rem;font-weight:620}
+.solution-etapes span{display:block;font-size:13.5px;color:var(--encre-2);margin-top:2px}
+.page-solution .forts{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:26px}
+.page-solution .forts b{font-size:1.4rem}
+.solution-limites{margin-top:16px;padding:16px 20px;border:1px dashed var(--givre);border-radius:10px;background:var(--brume)}
+.solution-limites b{display:block;font-size:14px;font-weight:650;color:var(--ardoise)}
+.solution-limites ul{margin:8px 0 0;padding-left:18px;color:var(--encre-2);font-size:14.5px;line-height:1.55}
+.solution-appareils{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:24px}
+.solution-appareil.avec-photo{grid-template-columns:120px 1fr;gap:18px;padding:18px 20px;align-items:start}
+.solution-appareil.avec-photo img{width:120px;height:120px}
+.solution-appareil b{font-size:1.5rem}
+.solution-appareil ul{margin:10px 0 0;padding-left:16px;font-size:13.5px;color:var(--encre-2);line-height:1.55}
+.solution-appareil em{display:inline-block;margin-top:10px;font-style:normal;font-size:13px;font-weight:650;color:var(--rouge)}
+.solution-autres{margin-top:24px;grid-template-columns:repeat(3,minmax(0,1fr))}
+.solution-conseil{padding:14px 18px 0;font-size:14px;color:var(--encre-2);line-height:1.5}
+@media (max-width:900px){.solution-tete{grid-template-columns:1fr}.solution-etapes,.page-solution .forts,.solution-appareils{grid-template-columns:1fr}}
+.solution-tete .sur-titre{font-size:12.5px;font-weight:650;letter-spacing:.07em;text-transform:uppercase;color:var(--ardoise)}
