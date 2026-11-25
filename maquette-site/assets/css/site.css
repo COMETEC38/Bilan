@@ -1493,3 +1493,9 @@ body.page-fiche{font-size:16px;line-height:1.55}
 @keyframes s-vidange{0%,48%{opacity:0}51%,64%{opacity:1}68%,100%{opacity:0}}
 @keyframes s-cmd1{0%,7%{opacity:0}9%,13%{opacity:1}15%,29%{opacity:0}31%,35%{opacity:1}37%,100%{opacity:0}}
 @keyframes s-cmd2{0%,43%{opacity:0}45%,49%{opacity:1}51%,65%{opacity:0}67%,71%{opacity:1}73%,100%{opacity:0}}
+/* Mesure ponctuelle : perche qui passe d'une verticale à l'autre, ondes du radar de vitesse */
+.anim .a-perche2{animation:s-perche2 7s cubic-bezier(.6,0,.3,1) infinite}
+.anim .a-visee2{animation:s-visee2 1.5s linear infinite}
+.sch .a-visee2{opacity:0}
+@keyframes s-perche2{0%,22%{transform:translateX(-20px)}33%,55%{transform:translateX(0)}66%,88%{transform:translateX(20px)}100%{transform:translateX(-20px)}}
+@keyframes s-visee2{0%{transform:translate(0,0) scale(.8);opacity:0}12%{opacity:.9}100%{transform:translate(48px,33px) scale(2.2);opacity:0}}

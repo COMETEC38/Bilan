@@ -12,15 +12,16 @@ window.PHOTO = function (id, w) {
 
 window.FAMILLES = [
   {
-    id: "debitmetres", nom: "Débitmètres", desc: "Surface libre, canal de comptage, conduite en charge et cours d’eau.",
+    id: "debitmetres", nom: "Débitmètres", desc: "Débit et vitesse : surface libre, canal de comptage, conduite en charge et mesures ponctuelles.",
     photo: "photo-1585793451936-e321aa5efb24",
     groupes: [
-      { nom: "Hauteur-vitesse", items: [
+      { nom: "Surface libre", items: [
         ["RAVEN-EYE", "Débitmètre hauteur-vitesse radar sans contact", "appareils/raven-eye.html"],
         ["BELUGA", "Débitmètre Doppler hauteur-vitesse", "appareils/beluga.html"],
         ["BELUGA A/V", "Débitmètre Doppler hauteur-vitesse", "appareils/beluga-av.html"],
         ["LOG’R", "Débitmètre hauteur-vitesse portable autonome", "appareils/logr.html"],
-        ["Solutions autonomes", "Hauteur-vitesse sur enregistreur autonome", "appareils/solutions-autonomes.html"] ] },
+        ["Solutions autonomes", "Hauteur-vitesse sur enregistreur autonome", "appareils/solutions-autonomes.html"],
+        ["PHOENIX", "Débitmètre radar pour rivière", "appareils/phoenix.html"] ] },
       { nom: "Canal de comptage", items: [
         ["DEBULLE", "Débitmètre bulle à bulle, poste fixe", "appareils/debulle.html"],
         ["BUL’R2", "Débitmètre bulle à bulle portable", "appareils/bulr2.html"],
@@ -33,16 +34,15 @@ window.FAMILLES = [
         ["KF100", "Débitmètre à ultrasons à temps de transit, poste fixe", "appareils/kf100.html"],
         ["KF200", "Débitmètre à ultrasons à temps de transit, portable", "appareils/kf200.html"],
         ["KF210", "Débitmètre à ultrasons à temps de transit, en mallette", "appareils/kf210.html"] ] },
-      { nom: "Rivière et jaugeage", items: [
+      { nom: "Mesure ponctuelle", items: [
         ["FLUVIA", "Courantomètre électromagnétique", "appareils/fluvia.html"],
         ["FloStick", "Courantomètre compact", "appareils/flostick.html"],
         ["RADAR-MATE 2", "Radar de vitesse portable", "appareils/radar-mate-2.html"],
-        ["PHOENIX", "Débitmètre radar pour rivière", "appareils/phoenix.html"],
         ["EASYFLOW", "Débitmètre par traçage au sel", "appareils/easyflow.html"] ] }
     ]
   },
   {
-    id: "preleveurs", nom: "Préleveurs", desc: "Fixes ou portables, réfrigérés, péristaltiques, version ATEX.",
+    id: "preleveurs", nom: "Préleveurs", desc: "Fixes ou portables, sur conduite en charge ou ATEX, asservis au temps ou au débit.",
     photo: "photo-1674578745937-c73f81bdda07",
     groupes: [
       { nom: "Fixes", items: [
@@ -181,8 +181,7 @@ window.PRINCIPES = {
   "famille": "debitmetres",
   "appareils": [
    "RAVEN-EYE",
-   "PHOENIX",
-   "RADAR-MATE 2"
+   "PHOENIX"
   ]
  },
  "doppler": {
@@ -237,6 +236,13 @@ window.PRINCIPES = {
    "FloStick"
   ]
  },
+ "radar-vitesse": {
+  "nom": "Radar de vitesse portable",
+  "famille": "debitmetres",
+  "appareils": [
+   "RADAR-MATE 2"
+  ]
+ },
  "tracage": {
   "nom": "Traçage au sel",
   "famille": "debitmetres",
@@ -250,7 +256,6 @@ window.PRINCIPES = {
   "appareils": [
    "SP5C",
    "SP5B",
-   "SP5 ATEX",
    "TP5 W"
   ]
  },
@@ -271,17 +276,11 @@ window.PRINCIPES = {
    "SP5 DK"
   ]
  },
- "asservi": {
-  "nom": "Asservi au débit",
+ "atex": {
+  "nom": "Préleveur ATEX",
   "famille": "preleveurs",
   "appareils": [
-   "SP5C",
-   "SP5B",
-   "SP5 DK",
-   "TP5 P",
-   "TP5 C",
-   "TP5 W",
-   "MAXX P6"
+   "SP5 ATEX"
   ]
  },
  "electrochimie": {
