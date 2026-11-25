@@ -1460,8 +1460,10 @@ body.page-fiche{font-size:16px;line-height:1.55}
 @keyframes s-diag-d{0%{transform:translate(0,0) scale(1);opacity:0}15%{opacity:.9}100%{transform:translate(20px,-27px) scale(1.6);opacity:0}}
 @keyframes s-derive-g{0%{transform:translateX(10px);opacity:0}20%,80%{opacity:.8}100%{transform:translateX(-26px);opacity:0}}
 @keyframes s-pression{0%{transform:translateY(0);opacity:0}15%{opacity:.85}100%{transform:translateY(-40px);opacity:0}}
-/* Électrodes du TORPEE-MAG : même taille, bien rouges ; un halo s'allume tour à tour autour de chacune */
+/* Électrodes du TORPEE-MAG : même taille, bien rouges ; toutes ensemble, une surbrillance s'allume puis s'éteint */
 .sch .elec{fill:var(--rouge);stroke:#fff;stroke-width:.9}
-.sch .elec-halo{fill:var(--rouge);opacity:0}
-.anim .a-halo{animation:s-halo 2.2s ease-in-out infinite}
-@keyframes s-halo{0%,100%{opacity:0}14%{opacity:.35}34%{opacity:0}}
+.sch .elec-halo{fill:#FF3B45;opacity:0}
+.anim .a-halo{animation:s-halo 1.6s ease-in-out infinite}
+.anim .a-elec-on{animation:s-elec-on 1.6s ease-in-out infinite}
+@keyframes s-halo{0%,100%{opacity:0}18%,42%{opacity:.5}60%{opacity:0}}
+@keyframes s-elec-on{0%,100%{fill:#B8000A}18%,42%{fill:#FF2A35}60%{fill:#B8000A}}
