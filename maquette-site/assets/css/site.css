@@ -1522,3 +1522,28 @@ body.page-fiche{font-size:16px;line-height:1.55}
 .prop-g .heros-actions{justify-content:center}
 .prop-g .heros-faits ul{margin:0 auto}
 .prop-g .heros::before{background:radial-gradient(120% 90% at 50% 40%,rgba(11,37,38,.62) 0%,rgba(11,37,38,.86) 100%),linear-gradient(rgba(26,77,77,.3),rgba(26,77,77,.3))}
+
+/* ===== Proposition G2 : G épurée (25/11/2026) =====
+   Moins d'éléments, une hiérarchie nette (le logo domine, le titre suit), la virgule rouge se trace,
+   une lumière douce derrière le logo, des exemples de recherche qui se relaient. */
+.prop-g2 .heros{min-height:max(calc(100svh - var(--entete)),600px)}
+.prop-g2 .heros-corps{padding-top:clamp(28px,5vh,64px);padding-bottom:clamp(120px,17vh,190px)}
+.prop-g2 .heros-signature{width:clamp(260px,min(40vw,60vh),600px);margin-bottom:clamp(22px,3.6vh,38px)}
+.prop-g2 .heros h1{font-size:clamp(2.1rem,min(3.9vw,6.1vh),3.9rem);font-weight:300;letter-spacing:-.025em;line-height:1.02}
+.prop-g2 .heros .chapo{margin-top:clamp(14px,2.2vh,22px);font-size:clamp(16px,1.25vw,18.5px);color:rgba(255,255,255,.78)}
+.prop-g2 .recherche{margin-top:clamp(22px,3.6vh,34px)}
+.heros-lien{margin-top:18px;font-size:15px}
+.heros-lien a{color:rgba(255,255,255,.82);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.32);padding-bottom:2px;transition:color .2s,border-color .2s}
+.heros-lien a:hover{color:#fff;border-color:var(--rouge-logo)}
+.prop-g2 .heros::before{background:radial-gradient(60% 46% at 50% 30%,rgba(36,95,95,.42) 0%,rgba(36,95,95,0) 100%),radial-gradient(120% 90% at 50% 40%,rgba(11,37,38,.6) 0%,rgba(11,37,38,.88) 100%),linear-gradient(rgba(26,77,77,.28),rgba(26,77,77,.28))}
+/* la virgule rouge se trace de gauche à droite, le O rouge arrive en fondu */
+.prop-g2 .heros-signature .lb-virgule{animation:virgule-trace .8s .95s cubic-bezier(.3,.6,.2,1) both}
+@keyframes virgule-trace{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+.prop-g2 .heros-signature .lb-virgule{transform-box:fill-box}
+.prop-g2 .heros-faits li{text-align:left}
+.prop-g2 #q::placeholder{transition:opacity .35s}
+.prop-g2 #q.change::placeholder{opacity:0}
+@media (prefers-reduced-motion:reduce){.prop-g2 .heros-signature .lb-virgule{animation:none}}
+.prop-g2 .heros .chapo{max-width:64ch}
+.prop-g2 .heros-faits li{text-align:center;padding-right:0}
+.prop-g2 .heros-faits li::before{left:50%;margin-left:-14px}

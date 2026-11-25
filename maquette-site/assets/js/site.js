@@ -452,6 +452,19 @@
     mesurer(); setTimeout(mesurer, 400);
   }
 
+  /* Proposition G2 : exemples de recherche qui se relaient dans le champ, tant qu'il est vide et sans focus */
+  var champQ = $(".prop-g2 #q");
+  if (champQ && !calme) {
+    var exemples = ["Débitmètre radar sans contact", "Débitmètre électromagnétique multipoint", "Préleveur réfrigéré", "Sonde pH, redox, oxygène dissous", "Détecteur d’hydrocarbures", "RAVEN-EYE, TORPEE-MAG, BUL’R2…"], iEx = 0;
+    var tourEx = setInterval(function () {
+      if (doc.activeElement === champQ || champQ.value) return;
+      champQ.classList.add("change");
+      setTimeout(function () { iEx = (iEx + 1) % exemples.length; champQ.placeholder = exemples[iEx]; champQ.classList.remove("change"); }, 350);
+    }, 3200);
+    champQ.placeholder = exemples[0];
+    finir(function () { clearInterval(tourEx); });
+  }
+
   /* ---------- Héros : l'eau en mouvement (WebGL) ---------- */
   var heros = $(".heros-media");
   if (heros && !calme) {
