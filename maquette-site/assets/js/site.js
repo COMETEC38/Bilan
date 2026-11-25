@@ -58,12 +58,22 @@
   /* Méga-menus générés depuis les données */
   var megaApp = $("#mega-appareils .mega-in");
   if (megaApp) {
-    megaApp.innerHTML = win.FAMILLES.map(function (f) {
-      return '<div><h3><a href="' + url(CATALOGUE, f.id) + '">' + echap(f.nom) + "</a></h3>" + f.groupes.map(function (g) {
-        return (f.groupes.length > 1 ? "<h4>" + echap(g.nom) + "</h4>" : "") + "<ul>" + g.items.map(function (it) {
+    /* Colonnes équilibrées : les débitmètres sur deux sous-colonnes, les petites familles empilées */
+    var parId = {}; win.FAMILLES.forEach(function (f) { parId[f.id] = f; });
+    var colonnes = (win.MEGA_COLONNES || win.FAMILLES.map(function (f) { return [f.id]; }));
+    var famille = function (f) {
+      var large = f.groupes.length > 3;
+      return '<div class="mega-fam' + (large ? " mega-large" : "") + '"><h3><a href="' + url(CATALOGUE, f.id) + '">' + echap(f.nom) + "</a></h3>" +
+        (large ? '<div class="mega-groupes">' : "") + f.groupes.map(function (g) {
+        return '<div class="mega-groupe">' + (f.groupes.length > 1 ? "<h4>" + echap(g.nom) + "</h4>" : "") + "<ul>" + g.items.map(function (it) {
           return '<li><a href="' + lienApp(it) + '">' + echap(it[0]) + "</a></li>";
-        }).join("") + "</ul>";
-      }).join("") + "</div>";
+        }).join("") + "</ul></div>";
+      }).join("") + (large ? "</div>" : "") + "</div>";
+    };
+    megaApp.innerHTML = colonnes.map(function (col) {
+      var fams = col.map(function (id) { return parId[id]; }).filter(Boolean);
+      var large = fams.some(function (f) { return f.groupes.length > 3; });
+      return '<div class="mega-col' + (large ? " mega-col-large" : "") + '">' + fams.map(famille).join("") + "</div>";
     }).join("");
   }
   var megaTer = $("#mega-applications .mega-in");
@@ -94,14 +104,26 @@
       if (b.getAttribute("aria-expanded") === "true") fermerMegas(); else ouvrirMega(b);
     });
     if (win.matchMedia("(hover:hover)").matches) {
+      /* Ouverture après un court survol (évite les ouvertures en traversant l'en-tête),
+         fermeture rapide dès que la souris quitte le bouton ou le panneau */
+      b.addEventListener("mouseenter", function () {
+        clearTimeout(minuteur);
+        minuteur = setTimeout(function () { ouvrirMega(b); }, $(".mega.ouvert") ? 0 : 90);
+      });
+      p.addEventListener("mouseenter", function () { clearTimeout(minuteur); });
       [b, p].forEach(function (el) {
-        el.addEventListener("mouseenter", function () { clearTimeout(minuteur); ouvrirMega(b); });
-        el.addEventListener("mouseleave", function () { minuteur = setTimeout(fermerMegas, 220); });
+        el.addEventListener("mouseleave", function (e) {
+          clearTimeout(minuteur);
+          /* du bouton vers son panneau : on laisse le temps de descendre */
+          var versPanneau = el === b && e.clientY > b.getBoundingClientRect().bottom - 2;
+          minuteur = setTimeout(fermerMegas, versPanneau ? 160 : 60);
+        });
       });
     }
   });
   doc.addEventListener("keydown", function (e) { if (e.key === "Escape") { fermerMegas(); fermerTiroir(); etat.fermerDevis(); } });
   doc.addEventListener("click", function (e) { if (!e.target.closest(".mega,[data-mega]")) fermerMegas(); });
+  doc.documentElement.addEventListener("mouseleave", function () { clearTimeout(minuteur); fermerMegas(); });
   var yMega = 0;
   win.addEventListener("scroll", function () { if (Math.abs(win.scrollY - yMega) > 60) { yMega = win.scrollY; if ($(".mega.ouvert")) fermerMegas(); } }, { passive: true });
 
