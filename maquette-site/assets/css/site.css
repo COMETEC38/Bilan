@@ -1578,6 +1578,17 @@ body.page-fiche{font-size:16px;line-height:1.55}
 .tech-appareils i{width:8px;height:8px;margin:0 3px 0 6px;border-radius:50%;background:var(--givre)}
 .large .tech-appareils{grid-column:2}
 
+/* Petite barre fixe des familles (variante) : visible une fois descendu dans les familles */
+.barre-familles{position:fixed;left:0;right:0;top:var(--entete);z-index:50;background:rgba(246,248,248,.96);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--trait);box-shadow:0 12px 26px -24px rgba(11,37,38,.5);transform:translateY(-110%);opacity:0;visibility:hidden;transition:transform .35s var(--doux),opacity .25s,visibility 0s .35s}
+.barre-familles.visible{transform:none;opacity:1;visibility:visible;transition:transform .35s var(--doux),opacity .25s,visibility 0s}
+.barre-familles ul{list-style:none;margin:0;padding:0;display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+.barre-familles ul::-webkit-scrollbar{display:none}
+.barre-familles a{flex:none;display:inline-flex;align-items:center;gap:8px;min-height:46px;padding:0 12px;font-size:14px;font-weight:580;color:var(--encre-2);text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent;transition:color .2s,border-color .2s}
+.barre-familles a:hover{color:var(--encre)}
+.barre-familles a[aria-current]{color:var(--ardoise);border-bottom-color:var(--rouge)}
+.barre-familles svg{width:22px;height:22px;flex:none}
+@media (prefers-reduced-motion:reduce){.barre-familles,.barre-familles.visible{transition:none}}
+
 /* Frise : cartes de terrain plus étroites, donc moins de défilement */
 @media (min-width:901px) and (min-height:561px){.dense .terrain{width:min(46vw,640px)}}
 

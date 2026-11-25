@@ -363,19 +363,41 @@
   if (racc && $(".panneaux", racc)) {
     var ongletsFam = $$('[role="tab"]', racc), panneauxFam = $$(".panneaux .famille", racc);
     racc.classList.add("en-onglets");
+    var barreFam = $(".barre-familles", racc), listeFam = $(".raccourcis-liste", racc), zoneFam = $(".panneaux", racc);
+    var liensBarre = barreFam ? $$("a", barreFam) : [];
     var ouvrirFam = function (id) {
       ongletsFam.forEach(function (o) { var on = o.getAttribute("data-fam") === id; o.setAttribute("aria-selected", on ? "true" : "false"); o.tabIndex = on ? 0 : -1; });
       panneauxFam.forEach(function (p) { p.classList.toggle("ouvert", p.id === "f-" + id); });
+      liensBarre.forEach(function (a) {
+        if (a.getAttribute("data-fam") !== id) { a.removeAttribute("aria-current"); return; }
+        a.setAttribute("aria-current", "true");
+        var ul = a.parentNode.parentNode; if (ul.scrollWidth > ul.clientWidth) ul.scrollTo({ left: Math.max(0, a.parentNode.offsetLeft - 16), behavior: calme ? "auto" : "smooth" });
+      });
     };
+    /* descend jusqu'au titre de la famille, juste sous l'en-tête et la petite barre */
+    var allerFam = function (id) {
+      var p = $("#f-" + id); if (!p) return;
+      var haut = p.getBoundingClientRect().top + win.scrollY - (entete ? entete.offsetHeight : 0) - (barreFam ? barreFam.offsetHeight : 0) - 10;
+      win.scrollTo({ top: Math.max(0, haut), behavior: calme ? "auto" : "smooth" });
+    };
+    liensBarre.forEach(function (a) {
+      a.addEventListener("click", function (e) { e.preventDefault(); ouvrirFam(a.getAttribute("data-fam")); allerFam(a.getAttribute("data-fam")); });
+    });
+    /* la barre apparaît quand la rangée des grandes cartes est passée, et disparaît après les familles */
+    if (barreFam) {
+      var majBarre = function () {
+        var h = entete ? entete.offsetHeight : 0;
+        var visible = listeFam.getBoundingClientRect().bottom < h + barreFam.offsetHeight + 30 && zoneFam.getBoundingClientRect().bottom > h + barreFam.offsetHeight + 60;
+        barreFam.classList.toggle("visible", visible);
+      };
+      var attenteBarre = false;
+      win.addEventListener("scroll", function () { if (!attenteBarre) { attenteBarre = true; requestAnimationFrame(function () { attenteBarre = false; majBarre(); }); } }, OP);
+      win.addEventListener("resize", majBarre, O);
+      majBarre();
+    }
     ongletsFam.forEach(function (o, i) {
       o.addEventListener("click", function (e) {
-        e.preventDefault(); ouvrirFam(o.getAttribute("data-fam"));
-        /* la page descend : le titre de la famille vient se placer juste sous l'en-tête */
-        var p = $("#f-" + o.getAttribute("data-fam"));
-        if (p) {
-          var haut = p.getBoundingClientRect().top + win.scrollY - (entete ? entete.offsetHeight : 0) - 14;
-          win.scrollTo({ top: Math.max(0, haut), behavior: calme ? "auto" : "smooth" });
-        }
+        e.preventDefault(); ouvrirFam(o.getAttribute("data-fam")); allerFam(o.getAttribute("data-fam"));
       });
       o.addEventListener("keydown", function (e) {
         var d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
