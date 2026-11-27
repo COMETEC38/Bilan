@@ -158,6 +158,7 @@
   /* ---------- « Ma demande » : lignes de devis gardées d'une fiche à l'autre ---------- */
   var CLE = "cometec-demande";
   function lireDemande() { try { return JSON.parse(win.localStorage.getItem(CLE)) || []; } catch (e) { return etat.demande || []; } }
+  function euros(n) { return n.toLocaleString("fr-FR", { maximumFractionDigits: 2 }) + "\u00a0€"; }
   function ecrireDemande(l) { etat.demande = l; try { win.localStorage.setItem(CLE, JSON.stringify(l)); } catch (e) {} majBadge(); majFin(); }
   var badge = null;
   if (entete) {
@@ -257,8 +258,14 @@
   function dessinerRecap() {
     var l = lireDemande(), zoneL = $(".recap-lignes", voileD);
     zoneL.innerHTML = l.length ? l.map(function (x, i) {
-      return '<div class="recap-ligne"><div><b>' + echap(x.produit) + "</b><span>" + echap(x.details.join(" · ")) + '</span></div><em>× ' + x.qte + '</em><button type="button" data-retirer="' + i + '" aria-label="Retirer ' + echap(x.produit) + '">×</button></div>';
+      var prixL = x.prix ? '<span class="recap-prix">' + euros(x.prix * x.qte) + " HT</span>" : "";
+      return '<div class="recap-ligne"><div><b>' + echap(x.produit) + "</b><span>" + echap(x.details.join(" · ")) + "</span>" + prixL + '</div><em>× ' + x.qte + '</em><button type="button" data-retirer="' + i + '" aria-label="Retirer ' + echap(x.produit) + '">×</button></div>';
     }).join("") : '<p class="recap-vide">Votre demande est vide. Composez-la depuis la fiche d’un appareil.</p>';
+    var chiffre = l.filter(function (x) { return x.prix; });
+    if (chiffre.length) {
+      var tot = chiffre.reduce(function (a, x) { return a + x.prix * x.qte; }, 0);
+      zoneL.insertAdjacentHTML("beforeend", '<p class="recap-total">Articles à prix fixe : <b>' + euros(tot) + " HT</b>" + (chiffre.length < l.length ? ". Les appareils sont chiffrés par votre interlocuteur." : ".") + "</p>");
+    }
   }
   function ouvrirDemande(dep) {
     dessinerRecap(); majFin(); dernierD = doc.activeElement; voileD.classList.add("ouvert");
@@ -687,6 +694,31 @@
       ioB.observe(panneauD); finir(function () { ioB.disconnect(); });
     }
   }
+  /* ---------- Accessoires à prix fixe : longueur au choix, ajout direct au panier « Ma demande » ---------- */
+  $$(".accessoire").forEach(function (fa) {
+    var reglette = $("input[type=range]", fa), lg = $(".unite input", fa), q = $(".qte input", fa);
+    var prix = +fa.getAttribute("data-prix"), total = $("[data-total]", fa), retourA = $(".accessoire-retour", fa);
+    var borne = function (v) { return Math.min(+lg.max, Math.max(+lg.min, Math.round(+v || +lg.min))); };
+    var majTotal = function () { total.textContent = euros(prix * Math.max(1, parseInt(q.value, 10) || 1)) + " HT"; };
+    reglette.addEventListener("input", function () { lg.value = reglette.value; });
+    lg.addEventListener("input", function () { if (lg.value !== "") reglette.value = borne(lg.value); });
+    lg.addEventListener("change", function () { lg.value = borne(lg.value); reglette.value = lg.value; });
+    $$("[data-qte-acc]", fa).forEach(function (b) {
+      b.addEventListener("click", function () { q.value = Math.max(1, (parseInt(q.value, 10) || 1) + (+b.getAttribute("data-qte-acc"))); majTotal(); });
+    });
+    q.addEventListener("input", majTotal);
+    fa.addEventListener("submit", function (e) {
+      e.preventDefault();
+      lg.value = borne(lg.value); reglette.value = lg.value;
+      var l = lireDemande();
+      l.push({ produit: fa.getAttribute("data-produit"), details: ["Longueur " + lg.value + "\u00a0m"], qte: Math.max(1, parseInt(q.value, 10) || 1), prix: prix });
+      ecrireDemande(l);
+      retourA.innerHTML = "Ajouté au panier. <button type=\"button\" data-ouvrir-demande>Voir le panier</button>";
+      setTimeout(function () { retourA.textContent = ""; }, 5000);
+    });
+    majTotal();
+  });
+
   $$("[data-devis]").forEach(function (b) {
     b.addEventListener("click", function (e) {
       e.preventDefault();
