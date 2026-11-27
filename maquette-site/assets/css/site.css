@@ -1630,28 +1630,3 @@ body.page-fiche{font-size:16px;line-height:1.55}
 .solution-conseil{padding:14px 18px 0;font-size:14px;color:var(--encre-2);line-height:1.5}
 @media (max-width:900px){.solution-tete{grid-template-columns:1fr}.solution-etapes,.page-solution .forts,.solution-appareils{grid-template-columns:1fr}}
 .solution-tete .sur-titre{font-size:12.5px;font-weight:650;letter-spacing:.07em;text-transform:uppercase;color:var(--ardoise)}
-
-/* Accessoires à prix fixe sur les fiches (câble du RAVEN-EYE, 27/11/2026) */
-.accessoires{display:grid;gap:14px;margin-top:24px}
-.accessoire{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1.3fr) auto auto;gap:16px 22px;align-items:end;padding:20px 22px;border:1px solid var(--trait);border-radius:12px;background:#fff}
-.accessoire-info{grid-column:1/-1;display:flex;flex-direction:column;gap:4px}
-.accessoire-info b{font-size:1.35rem;font-weight:400;font-stretch:88%;letter-spacing:-.01em}
-.accessoire-info span{font-size:14.5px;color:var(--encre-2)}
-.accessoire .ch label{display:block;font-size:12.5px;font-weight:600;color:var(--encre-2);margin-bottom:6px}
-.accessoire .ch small{display:block;margin-top:4px;font-size:12px;color:var(--encre-2)}
-.longueur{display:flex;align-items:center;gap:12px}
-.longueur input[type=range]{flex:1;min-width:0;accent-color:var(--rouge);height:24px}
-.longueur .unite{display:inline-flex;align-items:center;gap:5px;font-weight:600}
-.longueur .unite input{width:64px;height:42px;padding:0 8px;border:1px solid var(--trait);border-radius:7px;font:inherit;font-weight:600;text-align:center}
-.accessoire-prix{display:flex;flex-direction:column;align-items:flex-end;gap:2px;padding-bottom:2px}
-.accessoire-prix b{font-size:1.6rem;font-weight:500;font-stretch:90%;letter-spacing:-.01em;color:var(--ardoise);white-space:nowrap}
-.accessoire-prix span{font-size:12px;color:var(--encre-2);text-align:right;max-width:20ch}
-.accessoire .btn{grid-column:4;grid-row:2;align-self:end}
-.accessoire-prix{grid-column:3;grid-row:2}
-.accessoire-retour{grid-column:1/-1;min-height:1em;margin:0;font-size:13.5px;font-weight:600;color:var(--ardoise)}
-.accessoire-retour button{margin-left:6px;border:0;background:none;padding:0;font:inherit;color:var(--rouge);text-decoration:underline;cursor:pointer}
-.recap-prix{margin-top:3px;font-weight:650;color:var(--ardoise)!important}
-.recap-total{margin:4px 2px 0;font-size:14px;color:var(--encre-2)}
-.recap-total b{color:var(--ardoise)}
-@media (max-width:900px){.accessoire{grid-template-columns:1fr 1fr}.accessoire-longueur{grid-column:1/-1}.accessoire-prix{grid-column:1;grid-row:auto;align-items:flex-start}.accessoire-prix span{text-align:left}.accessoire .btn{grid-column:1/-1;grid-row:auto}}
-.accessoire .qte{width:max-content}
