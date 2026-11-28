@@ -42,7 +42,7 @@
 html{-webkit-text-size-adjust:100%;scroll-padding-top:calc(var(--entete) + 16px)}
 @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
 body{margin:0;background:var(--papier);color:var(--encre);font-family:var(--f);font-size:17px;line-height:1.6;font-stretch:100%;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;overflow-x:hidden}
-img{max-width:100%;display:block}
+img{max-width:100%;height:auto;display:block}
 a{color:inherit}
 h1,h2,h3,h4{margin:0;font-weight:400;line-height:1.05;letter-spacing:-.015em}
 p{margin:0}
@@ -1630,3 +1630,10 @@ body.page-fiche{font-size:16px;line-height:1.55}
 .solution-conseil{padding:14px 18px 0;font-size:14px;color:var(--encre-2);line-height:1.5}
 @media (max-width:900px){.solution-tete{grid-template-columns:1fr}.solution-etapes,.page-solution .forts,.solution-appareils{grid-template-columns:1fr}}
 .solution-tete .sur-titre{font-size:12.5px;font-weight:650;letter-spacing:.07em;text-transform:uppercase;color:var(--ardoise)}
+
+/* ---------- Fluidité : fondu entre les pages, apparition des photos ---------- */
+@media (prefers-reduced-motion:no-preference){
+  @view-transition{navigation:auto}
+  img.photo-fondu{animation:photo-fondu .5s ease-out}
+}
+@keyframes photo-fondu{from{opacity:0}}

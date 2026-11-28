@@ -11,6 +11,43 @@
   var norm = function (s) { return String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, " ").trim(); };
   var echap = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
 
+  /* ---------- Fluidité : pages préparées à l'avance, photos en fondu ---------- */
+  (function () {
+    /* Photo arrivée pendant qu'on fait défiler la page : elle apparaît en fondu au lieu de surgir */
+    if (!calme) doc.addEventListener("load", function (e) {
+      var im = e.target;
+      if (!im || im.tagName !== "IMG" || im.loading !== "lazy" || im.classList.contains("photo-fondu")) return;
+      if (win.getComputedStyle(im).animationName !== "none") return;
+      im.classList.add("photo-fondu");
+    }, true);
+
+    /* Lien survolé : la page est demandée tout de suite ; au clic, elle est déjà prête */
+    var base = new URL(racine || "./", win.location.href).pathname;
+    var exclus = "[target=_blank], [download], [href^='#'], [href$='.pdf']";
+    if (win.HTMLScriptElement && HTMLScriptElement.supports && HTMLScriptElement.supports("speculationrules")) {
+      var regle = { where: { and: [{ href_matches: base + "*" }, { not: { selector_matches: exclus } }] } };
+      var sr = doc.createElement("script");
+      sr.type = "speculationrules";
+      sr.textContent = JSON.stringify({
+        prefetch: [Object.assign({ eagerness: "moderate" }, regle)],
+        prerender: [Object.assign({ eagerness: "conservative" }, regle)]
+      });
+      doc.head.appendChild(sr);
+    } else {
+      var vus = {};
+      var prevoir = function (e) {
+        var a = e.target.closest && e.target.closest("a[href]");
+        if (!a || a.matches(exclus) || a.origin !== win.location.origin || a.pathname.indexOf(base) !== 0) return;
+        var u = a.href.split("#")[0];
+        if (vus[u] || u === win.location.href.split("#")[0]) return;
+        vus[u] = 1;
+        var l = doc.createElement("link"); l.rel = "prefetch"; l.href = u; doc.head.appendChild(l);
+      };
+      doc.addEventListener("mouseover", prevoir, { passive: true });
+      doc.addEventListener("touchstart", prevoir, { passive: true });
+    }
+  })();
+
   /* ---------- Index des appareils ---------- */
   var APPAREILS = [];
   /* Liens entre pages : fichiers séparés (site final) ou routes internes (aperçu en un seul fichier) */
@@ -22,6 +59,12 @@
   function slugDe(nom) { return norm(nom).replace(/ /g, "-"); }
   function lienApp(it) { return it[2] ? url(it[2]) : url(CATALOGUE, "a-" + slugDe(it[0])); }
   function img(nom) { return (win.IMAGES_INTEGREES && win.IMAGES_INTEGREES[nom]) || racine + "assets/img/appareils/" + nom + ".webp"; }
+  /* Version demi-taille préparée à la publication (window.VARIANTES) : le navigateur prend celle qui suffit */
+  function jeu(nom) {
+    var v = win.VARIANTES && win.VARIANTES["appareils/" + nom];
+    if (!v || (win.IMAGES_INTEGREES && win.IMAGES_INTEGREES[nom])) return "";
+    return ' srcset="' + racine + "assets/img/appareils/" + nom + "-" + v[0] + "w.webp " + v[0] + "w, " + img(nom) + " " + v[1] + 'w" sizes="auto, 100vw" decoding="async"';
+  }
   (win.FAMILLES || []).forEach(function (f) {
     f.groupes.forEach(function (g) {
       g.items.forEach(function (it) {
@@ -416,7 +459,7 @@
     var piste = $(".piste", parcours), epingle = $(".parcours-epingle", parcours);
     piste.innerHTML = win.TERRAINS.map(function (t, i) {
       return '<article class="terrain" id="t-' + t.id + '">' +
-        '<div class="terrain-photo"><img src="' + win.PHOTO(t.photo, 1400) + '" alt="" loading="' + (i < 2 ? "eager" : "lazy") + '"></div>' +
+        '<div class="terrain-photo"><img src="' + win.PHOTO(t.photo, 1400) + '" srcset="' + win.PHOTO(t.photo, 700) + " 700w, " + win.PHOTO(t.photo, 1400) + ' 1400w" sizes="' + (i < 2 ? "100vw" : "auto, 100vw") + '" alt="" loading="' + (i < 2 ? "eager" : "lazy") + '"></div>' +
         '<div class="terrain-texte">' + (t.badge ? '<p class="terrain-badge">' + echap(t.badge) + "</p>" : "") + "<h3>" + echap(t.nom) + "</h3><p>" + echap(t.texte) + "</p><ul>" +
         t.appareils.map(function (n) { var a = parNom[n]; return '<li><a href="' + (a ? a.url : "#") + '">' + echap(n) + "</a></li>"; }).join("") +
         '</ul><a class="lien" href="' + url(CATALOGUE) + '">Tous les appareils</a></div></article>';
@@ -766,8 +809,8 @@
             g.items.map(function (it) {
               var v = win.VISUELS && win.VISUELS[it[0]], slug = slugDe(it[0]);
               var visuel = v
-                ? '<div class="app-visuel"><img class="produit" src="' + img(v[0]) + '" alt="' + echap(it[0]) + '" loading="lazy">' +
-                  (v[1] ? '<img class="situ" src="' + img(v[0] + "-situ") + '" alt="" loading="lazy"><span class="situ-etiquette">Sur le terrain</span>' : "") + "</div>"
+                ? '<div class="app-visuel"><img class="produit" src="' + img(v[0]) + '"' + jeu(v[0]) + ' alt="' + echap(it[0]) + '" loading="lazy">' +
+                  (v[1] ? '<img class="situ" src="' + img(v[0] + "-situ") + '"' + jeu(v[0] + "-situ") + ' alt="" loading="lazy"><span class="situ-etiquette">Sur le terrain</span>' : "") + "</div>"
                 : '<div class="app-visuel attente"><div>' + picto + "Photo à venir</div></div>";
               return '<a class="app-carte' + (v && !v[1] ? " sans-situ" : "") + '" id="a-' + slug + '" href="' + (it[2] ? url(it[2]) : "#a-" + slug) + '" data-app="' + echap(it[0]) + '" data-nom="' + echap(norm(it[0] + " " + it[1] + " " + g.nom + " " + f.nom)) + '" data-terrains="' + (parTerrain[it[0]] || []).join(" ") + '">' +
                 visuel + '<div class="app-texte"><b>' + echap(it[0]) + "</b><span>" + echap(it[1]) + "</span>" + (it[2] ? "<em>Voir la fiche</em>" : "") + '<i aria-hidden="true">→</i></div></a>';
