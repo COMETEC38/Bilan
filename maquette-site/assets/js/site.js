@@ -810,7 +810,7 @@
               var v = win.VISUELS && win.VISUELS[it[0]], slug = slugDe(it[0]);
               var visuel = v
                 ? '<div class="app-visuel"><img class="produit" src="' + img(v[0]) + '"' + jeu(v[0]) + ' alt="' + echap(it[0]) + '" loading="lazy">' +
-                  (v[1] ? '<img class="situ" src="' + img(v[0] + "-situ") + '"' + jeu(v[0] + "-situ") + ' alt="" loading="lazy"><span class="situ-etiquette">Sur le terrain</span>' : "") + "</div>"
+                  (v[1] ? '<img class="situ" src="' + img(v[0] + "-situ") + '"' + jeu(v[0] + "-situ") + ' alt="" loading="lazy"><span class="situ-etiquette">' + echap(v[2] || "Sur le terrain") + '</span>' : "") + "</div>"
                 : '<div class="app-visuel attente"><div>' + picto + "Photo à venir</div></div>";
               return '<a class="app-carte' + (v && !v[1] ? " sans-situ" : "") + '" id="a-' + slug + '" href="' + (it[2] ? url(it[2]) : "#a-" + slug) + '" data-app="' + echap(it[0]) + '" data-nom="' + echap(norm(it[0] + " " + it[1] + " " + g.nom + " " + f.nom)) + '" data-terrains="' + (parTerrain[it[0]] || []).join(" ") + '">' +
                 visuel + '<div class="app-texte"><b>' + echap(it[0]) + "</b><span>" + echap(it[1]) + "</span>" + (it[2] ? "<em>Voir la fiche</em>" : "") + '<i aria-hidden="true">→</i></div></a>';

@@ -808,12 +808,14 @@ button{font:inherit;color:inherit}
 .galerie-scene img{position:absolute;inset:0;width:100%;height:100%;opacity:0;transition:opacity .5s var(--doux),transform .9s var(--doux);transform:scale(1.03)}
 .galerie-scene img.detoure{object-fit:contain;padding:6%;filter:drop-shadow(0 26px 26px rgba(11,37,38,.24)) drop-shadow(0 4px 6px rgba(11,37,38,.16))}
 .galerie-scene img.photo{object-fit:cover}
+.galerie-scene img.entiere{object-fit:contain;background:#fff}
 .galerie-scene img.vu{opacity:1;transform:none}
 .galerie-scene figcaption{position:absolute;left:14px;bottom:12px;padding:5px 10px;border-radius:999px;background:rgba(255,255,255,.86);font-size:12.5px;color:var(--encre);font-weight:520;backdrop-filter:blur(4px)}
 .galerie-vignettes{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
 .galerie-vignettes button{position:relative;aspect-ratio:4/3;border-radius:8px;overflow:hidden;border:1px solid var(--trait);padding:0;cursor:pointer;background:#EEF3F3}
 .galerie-vignettes button img{width:100%;height:100%;object-fit:cover}
 .galerie-vignettes button.detoure img{object-fit:contain;padding:8%}
+.galerie-vignettes button.entiere img{object-fit:contain;background:#fff}
 .galerie-vignettes button[aria-pressed=true]{outline:2px solid var(--ardoise);outline-offset:2px}
 .galerie-vignettes button:hover img{transform:scale(1.05)}
 .galerie-vignettes button img{transition:transform .5s var(--doux)}
